@@ -21,7 +21,17 @@ class Lang {
             "about.text", "OnAirKey {1}`n`nShows when Wispr Flow is recording, using your keyboard LED and the tray icon.`n`nFree and open source (MIT).",
 
             "settings.title", "OnAirKey settings",
+            "tab.howto", "How it works",
             "tab.shortcuts", "Shortcuts",
+
+            "howto.title", "One key. No guessing.",
+            "howto.problem", "Dictating with Wispr Flow and similar apps can make you several times faster. But shortcuts like Ctrl+Win+Space are finger gymnastics, and with no clear sign that recording is on, the classics happen: minutes of talking that were never captured, or a conversation that keeps getting transcribed.",
+            "howto.solution", "OnAirKey turns a small macro pad into a dictation remote: one key per action and a light that glows red exactly when you're on air. One press, and you always know what's going on.",
+            "howto.steps_title", "Set up in 3 steps",
+            "howto.step1", "Keyboard: in its software (for example SayoDevice), give each key a shortcut such as Ctrl+Shift+F13…F16 and set the LEDs to Indicator > Scroll Lock.",
+            "howto.step2", "OnAirKey: on the Shortcuts tab, record those keys by pressing them.",
+            "howto.step3", "Wispr Flow: in Settings > Shortcuts, set the same shortcuts for Push to talk, Hands-free and Cancel.",
+            "howto.no_led", "No keyboard with an LED? The red dot in the tray shows you're recording too.",
             "tab.indicator", "Indicator",
             "tab.general", "General",
             "tab.advanced", "Advanced",
@@ -79,7 +89,7 @@ class Lang {
             "adv.hint", "Change these only if something doesn't work.",
             "btn.restore", "Restore defaults",
 
-            "support.cta", "OnAirKey is free. If it saves you time, buy me a coffee:",
+            "support.cta", "Hi, I'm Patryk Szulczewski. I built OnAirKey to stop losing my dictated thoughts. If it made your day easier too, buy me a coffee:",
             "btn.open_config", "Open config.ini",
             "btn.cancel", "Cancel",
             "btn.save", "Save",
@@ -105,7 +115,17 @@ class Lang {
             "about.text", "OnAirKey {1}`n`nPokazuje, kiedy Wispr Flow nagrywa: diodą klawiatury i ikoną w zasobniku.`n`nDarmowy i otwartoźródłowy (MIT).",
 
             "settings.title", "OnAirKey — ustawienia",
+            "tab.howto", "Jak to działa",
             "tab.shortcuts", "Skróty",
+
+            "howto.title", "Jeden klawisz. Zero zgadywania.",
+            "howto.problem", "Dyktowanie z Wispr Flow i podobnymi programami potrafi kilkukrotnie przyspieszyć pracę. Ale skróty w stylu Ctrl+Win+Space to gimnastyka dla palców, a brak sygnału, czy nagrywanie trwa, kończy się klasyką: kilka minut monologu, który nigdy się nie nagrał, albo rozmowa, która nagrywa się w najlepsze.",
+            "howto.solution", "OnAirKey zamienia małą klawiaturę makro w pilota do dyktowania: osobny klawisz na każdą funkcję i lampka, która świeci na czerwono dokładnie wtedy, gdy jesteś „na antenie”. Jedno naciśnięcie i od razu wiesz, co się dzieje.",
+            "howto.steps_title", "Konfiguracja w 3 krokach",
+            "howto.step1", "Klawiatura: w jej programie (np. SayoDevice) przypisz każdemu klawiszowi skrót, np. Ctrl+Shift+F13…F16, a diody ustaw na Indicator > Scroll Lock.",
+            "howto.step2", "OnAirKey: w zakładce Skróty nagraj te klawisze, naciskając je na klawiaturze.",
+            "howto.step3", "Wispr Flow: w Settings > Shortcuts ustaw te same skróty dla Push to talk, Hands-free i Cancel.",
+            "howto.no_led", "Nie masz klawiatury z diodą? Czerwona kropka w zasobniku też pokaże, że nagrywasz.",
             "tab.indicator", "Wskaźnik",
             "tab.general", "Ogólne",
             "tab.advanced", "Zaawansowane",
@@ -163,7 +183,7 @@ class Lang {
             "adv.hint", "Zmieniaj tylko, jeśli coś nie działa.",
             "btn.restore", "Przywróć domyślne",
 
-            "support.cta", "OnAirKey jest darmowy. Jeśli oszczędza Ci czas, postaw kawę:",
+            "support.cta", "Cześć, tu Patryk Szulczewski. Zrobiłem OnAirKey, żeby przestać gubić podyktowane myśli. Jeśli Tobie też coś ułatwił, postaw mi kawę:",
             "btn.open_config", "Otwórz config.ini",
             "btn.cancel", "Anuluj",
             "btn.save", "Zapisz",

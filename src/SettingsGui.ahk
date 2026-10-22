@@ -9,6 +9,9 @@ class SettingsWindow {
     static ColorWarning := "c8A5300"
     static ColorMuted := "c6B6B6B"
 
+    ; Tab numbers
+    static TAB_HOWTO := 1, TAB_SHORTCUTS := 2, TAB_INDICATOR := 3, TAB_GENERAL := 4, TAB_ADVANCED := 5
+
     static Open(owner) {
         if SettingsWindow.Instance {
             SettingsWindow.Instance.Win.Show()
@@ -20,13 +23,18 @@ class SettingsWindow {
     __New(owner) {
         this.Owner := owner
         this.Draft := Map()
-        for action in Config.Actions
+        hasShortcuts := false
+        for action in Config.Actions {
             this.Draft[action] := owner.Cfg.Shortcuts[action]
+            hasShortcuts := hasShortcuts || this.Draft[action] != ""
+        }
         this.Recording := ""
         this.Recorder := KeyRecorder()
         this.Rows := Map()
         this.LockRadios := Map()
         this._Build()
+        ; New users land on "How it works", everyone else straight on their shortcuts
+        this.Tabs.Value := hasShortcuts ? SettingsWindow.TAB_SHORTCUTS : SettingsWindow.TAB_HOWTO
         this._Validate()
         this._UpdateWisprStatus()
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
@@ -36,39 +44,65 @@ class SettingsWindow {
 
     _Build() {
         cfg := this.Owner.Cfg
+        muted := SettingsWindow.ColorMuted
         win := Gui("-MaximizeBox -MinimizeBox", T("settings.title"))
         win.SetFont("s9", "Segoe UI")
         win.OnEvent("Close", (*) => this.Close())
         this.Win := win
-        this.WisprStatus := win.AddText("x16 y12 w568 Right", "")
 
-        tabs := win.AddTab3("x12 y34 w576 h352",
-            [T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced")])
+        ; --- Header: logo and Wispr status ---
+        logo := this.Owner.LogoFile
+        if logo != "" && FileExist(logo)
+            win.AddPicture("x16 y10 h32 w-1", logo)
+        this.WisprStatus := win.AddText("x300 y20 w284 Right", "")
+
+        tabs := win.AddTab3("x12 y52 w576 h404",
+            [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced")])
         this.Tabs := tabs
 
+        ; --- How it works ---
+        tabs.UseTab(SettingsWindow.TAB_HOWTO)
+        win.SetFont("s12 bold")
+        win.AddText("x28 y88 w544", T("howto.title"))
+        win.SetFont("s9 norm")
+        win.AddText("x28 y116 w544 h76", T("howto.problem"))
+        win.AddText("x28 y196 w544 h48", T("howto.solution"))
+        win.SetFont("s10 bold")
+        win.AddText("x28 y254 w544", T("howto.steps_title"))
+        win.SetFont("s9 norm")
+        y := 280
+        for i, step in ["howto.step1", "howto.step2", "howto.step3"] {
+            win.SetFont("bold")
+            win.AddText(Format("x28 y{} w20", y), i ".")
+            win.SetFont("norm")
+            win.AddText(Format("x48 y{} w524 h32", y), T(step))
+            y += 38
+        }
+        win.AddText(Format("x28 y{} w544 {}", y + 4, muted), T("howto.no_led"))
+
         ; --- Shortcuts ---
-        tabs.UseTab(1)
-        win.AddText("x28 y70 w544", T("shortcuts.hint"))
-        y := 108
+        tabs.UseTab(SettingsWindow.TAB_SHORTCUTS)
+        win.AddText("x28 y88 w544", T("shortcuts.hint"))
+        y := 128
         for action in Config.Actions {
             row := {}
             win.AddText(Format("x28 y{} w118", y + 4), T("action." action))
             row.Field := win.AddEdit(Format("x148 y{} w186 ReadOnly", y))
-            win.AddText(Format("x342 y{} w88 {}", y + 4, SettingsWindow.ColorMuted), T("type." SettingsWindow.Types[action]))
+            win.AddText(Format("x342 y{} w88 {}", y + 4, muted), T("type." SettingsWindow.Types[action]))
             row.Record := win.AddButton(Format("x432 y{} w90 h24", y - 1), T("btn.record"))
             row.Record.OnEvent("Click", ObjBindMethod(this, "_OnRecordClick", action))
             row.Clear := win.AddButton(Format("x528 y{} w40 h24", y - 1), "✕")
             row.Clear.OnEvent("Click", ObjBindMethod(this, "_OnClearClick", action))
             row.Message := win.AddText(Format("x148 y{} w420 h28", y + 25), "")
             this.Rows[action] := row
-            y += 56
+            y += 58
         }
-        win.AddText(Format("x28 y{} w544 h44 {}", y, SettingsWindow.ColorMuted), T("shortcuts.escape_hint"))
+        win.AddText(Format("x28 y{} w544 h48 {}", y + 4, muted), T("shortcuts.escape_hint"))
 
         ; --- Indicator ---
-        tabs.UseTab(2)
-        win.AddText("x28 y70 w544", T("indicator.lock_label"))
-        y := 94
+        tabs.UseTab(SettingsWindow.TAB_INDICATOR)
+        win.AddText("x28 y88 w544", T("indicator.lock_label"))
+        y := 112
         for i, lock in Config.Locks {
             radio := win.AddRadio(Format("x40 y{} w300 {}", y, i = 1 ? "Group" : ""), T("lock." lock))
             radio.Value := cfg.Lock = lock
@@ -80,26 +114,26 @@ class SettingsWindow {
         this.TrayState := win.AddCheckbox(Format("x28 y{} w540", y + 40), T("indicator.tray_state"))
         this.TrayState.Value := cfg.TrayIconShowsState
         win.AddButton(Format("x28 y{} w150 h26", y + 74), T("btn.test_led")).OnEvent("Click", (*) => this._TestLed())
-        win.AddText(Format("x28 y{} w544 h44 {}", y + 114, SettingsWindow.ColorMuted), T("indicator.keyboard_hint"))
+        win.AddText(Format("x28 y{} w544 h44 {}", y + 114, muted), T("indicator.keyboard_hint"))
 
         ; --- General ---
-        tabs.UseTab(3)
-        win.AddText("x28 y70 w300", T("general.language"))
+        tabs.UseTab(SettingsWindow.TAB_GENERAL)
+        win.AddText("x28 y88 w300", T("general.language"))
         autoName := T("lang.name." Config.ResolveLanguage("auto"))
-        this.LanguageList := win.AddDropDownList("x28 y90 w260", [T("lang.auto", autoName), "Polski", "English"])
+        this.LanguageList := win.AddDropDownList("x28 y108 w260", [T("lang.auto", autoName), "Polski", "English"])
         this.LanguageList.Value := cfg.Language = "pl" ? 2 : cfg.Language = "en" ? 3 : 1
-        this.StartWithWindows := win.AddCheckbox("x28 y132 w540", T("general.autostart"))
+        this.StartWithWindows := win.AddCheckbox("x28 y150 w540", T("general.autostart"))
         this.StartWithWindows.Value := cfg.StartWithWindows
         if !A_IsCompiled
-            win.AddText("x46 y152 w520 " SettingsWindow.ColorMuted, T("general.autostart_dev"))
-        this.DebugLog := win.AddCheckbox("x28 y180 w540", T("general.debug"))
+            win.AddText("x46 y170 w520 " muted, T("general.autostart_dev"))
+        this.DebugLog := win.AddCheckbox("x28 y198 w540", T("general.debug"))
         this.DebugLog.Value := cfg.Debug
-        win.AddButton("x28 y212 w150 h26", T("btn.open_folder")).OnEvent("Click", (*) => Run(this.Owner.DataDir))
+        win.AddButton("x28 y230 w150 h26", T("btn.open_folder")).OnEvent("Click", (*) => Run(this.Owner.DataDir))
 
         ; --- Advanced ---
-        tabs.UseTab(4)
+        tabs.UseTab(SettingsWindow.TAB_ADVANCED)
         this.Advanced := Map()
-        y := 70
+        y := 88
         for item in [["SyncIntervalMs", "adv.sync", "Number"], ["ResyncDelayMs", "adv.resync", "Number"]
                 , ["WisprHelperProcess", "adv.process", ""], ["HookReinstallDelaysMs", "adv.hook", ""]] {
             win.AddText(Format("x28 y{} w544", y), T(item[2]))
@@ -108,22 +142,28 @@ class SettingsWindow {
         }
         this._FillAdvanced(cfg)
         win.AddButton(Format("x28 y{} w150 h26", y + 2), T("btn.restore")).OnEvent("Click", (*) => this._FillAdvanced(Config()))
-        win.AddText(Format("x28 y{} w544 {}", y + 40, SettingsWindow.ColorMuted), T("adv.hint"))
+        win.AddText(Format("x28 y{} w544 {}", y + 40, muted), T("adv.hint"))
         tabs.UseTab()
 
-        ; --- Support bar (visible on every tab) ---
-        win.AddText("x16 y400 w250 h32", T("support.cta"))
-        x := 272
-        for link in Support.Links(Lang.Current) {
-            width := link.Name = "GitHub Sponsors" ? 116 : 96
-            win.AddButton(Format("x{} y398 w{} h26", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
-            x += width + 6
+        ; --- Support bar (visible on every tab); buttons right-aligned, story fills the rest ---
+        links := Support.Links(Lang.Current)
+        x := 588
+        buttons := []
+        Loop links.Length {
+            link := links[links.Length - A_Index + 1]  ; from the right, so they read in order
+            width := link.Name = "GitHub Sponsors" ? 120 : 100
+            x -= width
+            buttons.Push([x, width, link])
+            x -= 6
         }
+        win.AddText(Format("x16 y466 w{} h44", x - 16 - 6), T("support.cta"))
+        for b in buttons
+            win.AddButton(Format("x{} y472 w{} h28", b[1], b[2]), b[3].Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(b[3]))
 
         ; --- Footer ---
-        win.AddButton("x16 y442 w140 h28", T("btn.open_config")).OnEvent("Click", (*) => Run('notepad.exe "' this.Owner.Cfg.Path '"'))
-        win.AddButton("x396 y442 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
-        win.AddButton("x494 y442 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
+        win.AddButton("x16 y520 w140 h28", T("btn.open_config")).OnEvent("Click", (*) => Run('notepad.exe "' this.Owner.Cfg.Path '"'))
+        win.AddButton("x396 y520 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
+        win.AddButton("x494 y520 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
     }
 
     _FillAdvanced(source) {
@@ -156,6 +196,7 @@ class SettingsWindow {
     StartRecording(action) {
         if this.Recording != ""
             this._EndRecording()
+        this.Tabs.Value := SettingsWindow.TAB_SHORTCUTS
         this.Recording := action
         this.Owner.Hotkeys.SetPaused(true)
         row := this.Rows[action]
@@ -256,7 +297,7 @@ class SettingsWindow {
             if issue.Level = "error"
                 errors.Push(T("action." issue.Action) ": " SettingsWindow.IssueText(issue))
         if errors.Length {
-            this.Tabs.Value := 1
+            this.Tabs.Value := SettingsWindow.TAB_SHORTCUTS
             MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(errors), T("settings.title"), "Icon!")
             return false
         }
@@ -273,7 +314,7 @@ class SettingsWindow {
         if !Config.ParseIntList(adv["HookReinstallDelaysMs"].Value, 0, 120000, 5, &delays)
             advErrors.Push(T("save.invalid_list", T("adv.hook")))
         if advErrors.Length {
-            this.Tabs.Value := 4
+            this.Tabs.Value := SettingsWindow.TAB_ADVANCED
             MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(advErrors), T("settings.title"), "Icon!")
             return false
         }

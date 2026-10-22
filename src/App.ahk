@@ -21,12 +21,14 @@ class App {
         this.Hotkeys := HotkeyEngine(this.State)
         this.Wispr := ""
         this.Tray := TrayUI(this)
+        this.LogoFile := ""
     }
 
     Start() {
         this.Cfg := Config.Load(this.ConfigPath)
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
+        this.LogoFile := App._LogoFile(dir)
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
 
@@ -70,6 +72,15 @@ class App {
         }
 
         this.Tray.Build()
+    }
+
+    ; The script uses the asset directly; the EXE carries it inside and unpacks it once.
+    static _LogoFile(dataDir) {
+        if !A_IsCompiled
+            return TrayUI._FullPath(A_LineFile "\..\..\assets\logo-ui.png")
+        target := dataDir "\logo-ui.png"
+        try FileInstall("..\assets\logo-ui.png", target, 1)
+        return target
     }
 
     OnRecordingChange(recording) {

@@ -1,5 +1,5 @@
-; Donation links. Order depends on the language: Polish platforms (BLIK) first in Polish,
-; GitHub Sponsors first in English.
+; Donation links, chosen by language: Polish platforms (BLIK) in Polish,
+; GitHub Sponsors in English (international cards).
 ; TODO before release: replace the placeholder homepages with the author's profile URLs.
 class Support {
     static IsPlaceholder := true
@@ -10,8 +10,8 @@ class Support {
 
     static Links(language) {
         if language = "pl"
-            return [Support.Suppi, Support.BuyCoffee, Support.Sponsors]
-        return [Support.Sponsors, Support.Suppi, Support.BuyCoffee]
+            return [Support.Suppi, Support.BuyCoffee]
+        return [Support.Sponsors]
     }
 
     static Open(link) => Run(link.Url)

@@ -7,6 +7,8 @@ Requires Inkscape on PATH. Produces:
   assets/tray-rec.ico        tray icon, recording state
   assets/logo.svg            wordmark for dark backgrounds, text converted to paths
   assets/logo-on-dark.svg    the same wordmark on its own dark plate (works on any background)
+  assets/logo-light.svg      wordmark for light backgrounds
+  assets/logo-ui.png         logo for the settings window header
 """
 
 import struct
@@ -56,13 +58,18 @@ def main() -> None:
                   {size: export_png(f"icon-small-{state}", size) for size in TRAY_SIZES})
     export_png("icon-app", 512)
 
-    for logo in ("logo", "logo-on-dark"):
+    for logo in ("logo", "logo-on-dark", "logo-light"):
         subprocess.run(["inkscape", str(SRC / f"{logo}.svg"), "--export-text-to-path",
                         "--export-plain-svg", f"--export-filename={ASSETS / f'{logo}.svg'}"],
                        check=True, capture_output=True)
         subprocess.run(["inkscape", str(SRC / f"{logo}.svg"), "--export-type=png",
                         f"--export-filename={PNG / f'{logo}.png'}", "-h", "240"],
                        check=True, capture_output=True)
+
+    # Logo shown in the settings window header (light window background)
+    subprocess.run(["inkscape", str(SRC / "logo-light.svg"), "--export-type=png",
+                    f"--export-filename={ASSETS / 'logo-ui.png'}", "-h", "64"],
+                   check=True, capture_output=True)
 
 
 if __name__ == "__main__":

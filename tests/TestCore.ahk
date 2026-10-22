@@ -6,6 +6,7 @@
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\State.ahk
 #Include %A_LineFile%\..\..\src\Lang.ahk
+#Include %A_LineFile%\..\..\src\Support.ahk
 #Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
@@ -83,6 +84,16 @@ Check("T format", InStr(T("about.text", "9.9.9"), "OnAirKey 9.9.9") = 1, true)
 Lang.Set("xx")
 Check("unknown language falls back", Lang.Current, "en")
 Check("missing key returns key", T("no.such.key"), "no.such.key")
+
+; --- Support: platforms depend on the language ---
+Names(links) {
+    text := ""
+    for link in links
+        text .= (text = "" ? "" : ", ") link.Name
+    return text
+}
+Check("support pl", Names(Support.Links("pl")), "Suppi.pl, Buycoffee.to")
+Check("support en", Names(Support.Links("en")), "GitHub Sponsors")
 
 ; --- RecState ---
 changes := []
