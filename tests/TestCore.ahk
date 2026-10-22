@@ -7,6 +7,7 @@
 #Include %A_LineFile%\..\..\src\State.ahk
 #Include %A_LineFile%\..\..\src\Lang.ahk
 #Include %A_LineFile%\..\..\src\Support.ahk
+#Include %A_LineFile%\..\..\src\Installer.ahk
 #Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
@@ -105,6 +106,29 @@ Check("bug body pl", InStr(body, "Co się stało?") = 1, true)
 Check("bug body details last", SubStr(body, -StrLen("Cancel=Ctrl+Shift+F16")), "Cancel=Ctrl+Shift+F16")
 Lang.Set("en")
 Check("bug body en", InStr(Support.BugBody(""), "What happened?") = 1, true)
+
+; --- Installer: what the EXE does when it starts ---
+Check("installed copy just runs", Installer.Decide(true, "0.1.0", "0.1.0", true, false), "")
+Check("first start offers install", Installer.Decide(false, "", "0.1.0", false, false), "install")
+Check("portable is not asked", Installer.Decide(false, "", "0.1.0", false, true), "")
+Check("newer offers update", Installer.Decide(false, "0.1.0", "0.2.0", false, false), "update")
+Check("newer offers update when portable", Installer.Decide(false, "0.1.0", "0.2.0", false, true), "update")
+Check("10 is newer than 9", Installer.Decide(false, "0.9.0", "0.10.0", false, false), "update")
+Check("same version, other build", Installer.Decide(false, "0.1.0", "0.1.0", false, false), "update")
+Check("same file runs installed", Installer.Decide(false, "0.1.0", "0.1.0", true, false), "run-installed")
+Check("older runs installed", Installer.Decide(false, "0.2.0", "0.1.0", false, false), "run-installed")
+Check("file version shortened", Installer.ShortVersion("0.1.0.0"), "0.1.0")
+
+; --- Config: Portable, read before the file exists without creating it ---
+portablePath := TempConfig()
+Check("peek without file", Config.PeekBool(portablePath, "General", "Portable", false), false)
+Check("peek creates nothing", FileExist(portablePath), "")
+portableCfg := Config.Load(portablePath)
+Check("portable off by default", portableCfg.Portable, false)
+portableCfg.Portable := true
+portableCfg.Save()
+Check("peek portable", Config.PeekBool(portablePath, "General", "Portable", false), true)
+Check("portable saved", Config.Load(portablePath).Portable, true)
 
 ; --- RecState ---
 changes := []

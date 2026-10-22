@@ -41,7 +41,8 @@ i od razu wiesz, co się dzieje.
 - **Czerwona ikona w zasobniku podczas nagrywania**, więc OnAirKey pomaga także bez diody.
 - **Wszystkie akcje nagrywania Wispr Flow:** Push to talk, Hands-free, Cancel i Command Mode.
 - **Skróty nagrywasz, naciskając je**, także F13–F24 i domyślne skróty Wispr, np. `Ctrl+Win`.
-- **Po polsku i po angielsku**, uruchamia się z Windows, jeden mały plik EXE bez instalatora.
+- **Po polsku i po angielsku**, uruchamia się z Windows, jeden mały plik EXE, który na życzenie
+  sam się instaluje (bez uprawnień administratora i osobnego instalatora).
 - **Prywatny z założenia:** OnAirKey tylko nasłuchuje Twoich skrótów. Niczego nie blokuje, nie czyta
   tekstu, nie zbiera danych i nie łączy się z internetem.
 
@@ -54,7 +55,11 @@ i od razu wiesz, co się dzieje.
 ## Pierwsze kroki
 
 **0. Pobierz** `OnAirKey.exe` z [Releases](https://github.com/onairkey/onairkey/releases/latest)
-i uruchom. Przy pierwszym starcie okno ustawień otworzy się na zakładce *Jak to działa*.
+i uruchom. Przy pierwszym starcie OnAirKey zapyta, czy się zainstalować: **Tak** kopiuje go do
+`%LOCALAPPDATA%\Programs\OnAirKey` i dodaje skrót w menu Start (bez uprawnień administratora),
+więc pobrany plik możesz usunąć; **Nie** uruchamia go tam, gdzie leży, i więcej nie pyta. Potem
+okno ustawień otworzy się na zakładce *Jak to działa*. Aktualizacja: pobierz nową wersję
+i uruchom ją, a OnAirKey zaproponuje zastąpienie zainstalowanej kopii (ustawienia zostają).
 
 > Windows może pokazać „System Windows ochronił ten komputer”, bo plik nie ma jeszcze podpisu
 > cyfrowego. Kliknij **Więcej informacji → Uruchom mimo to**. Zobacz
@@ -151,6 +156,10 @@ przed nim.
 
 ## Warto wiedzieć
 
+- **Trzymaj ikonę w zasobniku na widoku.** Windows chowa nowe ikony pod strzałką **^** obok
+  zegara. Przeciągnij stamtąd ikonę OnAirKey na pasek zadań, żeby czerwona kropka była zawsze
+  widoczna. W Windows 11 możesz ją też włączyć w *Ustawienia → Personalizacja → Pasek zadań*,
+  w sekcji z pozostałymi ikonami zasobnika.
 - **OnAirKey śledzi Twoje skróty, a nie samego Wispr.** Jeśli nagrywanie zmieni się inaczej
   (podwójne naciśnięcie Push to talk, zatrzymanie myszką w Flow Bar, automatyczny koniec po
   20 minutach), dioda może zostać zapalona. Naciśnij Cancel i wszystko wraca do normy.
@@ -171,8 +180,12 @@ a niektóre antywirusy mylnie je oznaczają, zwłaszcza że program nasłuchuje 
 ## Ustawienia i odinstalowanie
 
 Ustawienia są w `%APPDATA%\OnAirKey\config.ini` (ścieżkę pokazuje zakładka *O programie*). Żeby
-usunąć OnAirKey: odznacz *Uruchamiaj z Windows*, zamknij program z menu w zasobniku, a potem usuń
-`OnAirKey.exe` i folder `%APPDATA%\OnAirKey`.
+usunąć OnAirKey: odznacz *Uruchamiaj z Windows*, zamknij program z menu w zasobniku, a potem usuń:
+
+- folder programu `%LOCALAPPDATA%\Programs\OnAirKey` (albo sam `OnAirKey.exe` tam, skąd go
+  uruchamiasz, jeśli nie był instalowany),
+- skrót *OnAirKey* w menu Start (prawy klik → *Otwórz lokalizację pliku*),
+- folder ustawień `%APPDATA%\OnAirKey`.
 
 ## Budowanie ze źródeł
 

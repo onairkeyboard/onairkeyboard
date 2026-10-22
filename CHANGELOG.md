@@ -24,6 +24,11 @@ First version.
 - Support links (Buycoffee.to, GitHub Sponsors) and onairkey.com.
 - While Wispr Flow isn't running, shortcuts are ignored and the LED stays off (it turns off if
   Wispr Flow exits mid-recording); the tray tooltip and the settings header, in red, say so.
+- Self-install on request: the first start asks to copy OnAirKey to
+  `%LOCALAPPDATA%\Programs\OnAirKey` with a Start menu shortcut (no administrator rights);
+  a newer download offers to replace the installed copy; "No" runs it from where it is and is
+  remembered (`Portable=1`).
+- How it works scrolls, and tells how to keep the tray icon visible on the taskbar.
 - Report a bug (settings header, tray menu, About): a window with the address bug@onairkey.com,
   a subject and a ready e-mail text with technical details, and buttons to copy them into any
   mailbox (no mail app needed). It says clearly that the text is a template to complete and

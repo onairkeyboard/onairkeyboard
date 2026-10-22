@@ -20,6 +20,7 @@ class Config {
         this.Language := "auto"
         this.StartWithWindows := true
         this.Debug := false
+        this.Portable := false
         this.SyncIntervalMs := 150
         this.ResyncDelayMs := 2000
         this.WisprHelperProcess := "Wispr Flow Helper.exe"
@@ -46,6 +47,18 @@ class Config {
             FileDelete(tmp)
         FileAppend(this._Render(), tmp, "UTF-16")
         FileMove(tmp, this.Path, true)
+    }
+
+    ; Reads one value without creating the file (used before the first run creates it)
+    static Peek(path, section, key, default) {
+        if !FileExist(path)
+            return default
+        value := IniRead(path, section, key, "")
+        return Trim(value) = "" ? default : Trim(value)
+    }
+
+    static PeekBool(path, section, key, default) {
+        return Config.ParseBool(Config.Peek(path, section, key, default ? "1" : "0"), &value) ? value : default
     }
 
     ; "pl" when chosen explicitly or when "auto" and Windows is Polish; otherwise "en".
@@ -98,6 +111,7 @@ class Config {
         this.Language := this._Enum("General", "Language", Config.Languages, this.Language)
         this.StartWithWindows := this._Bool("General", "StartWithWindows", this.StartWithWindows)
         this.Debug := this._Bool("General", "Debug", this.Debug)
+        this.Portable := this._Bool("General", "Portable", this.Portable)
         this.SyncIntervalMs := this._Int("Advanced", "SyncIntervalMs", 50, 2000, this.SyncIntervalMs)
         this.ResyncDelayMs := this._Int("Advanced", "ResyncDelayMs", 0, 30000, this.ResyncDelayMs)
         process := this._Get("Advanced", "WisprHelperProcess", this.WisprHelperProcess)
@@ -181,6 +195,8 @@ Language={7}
 StartWithWindows={8}
 ; 1: write a diagnostic log (onairkey.log) next to this file
 Debug={9}
+; 1: run OnAirKey from where its EXE is and don't offer to install it
+Portable={14}
 
 [Advanced]
 SyncIntervalMs={10}
@@ -191,6 +207,6 @@ HookReinstallDelaysMs={13}
         , this.Shortcuts["PushToTalk"], this.Shortcuts["HandsFree"], this.Shortcuts["Cancel"]
         , this.Shortcuts["CommandMode"], this.Lock, b(this.TrayIconShowsState), this.Language
         , b(this.StartWithWindows), b(this.Debug), this.SyncIntervalMs, this.ResyncDelayMs
-        , this.WisprHelperProcess, Config._JoinInts(this.HookReinstallDelaysMs)) "`n"
+        , this.WisprHelperProcess, Config._JoinInts(this.HookReinstallDelaysMs), b(this.Portable)) "`n"
     }
 }

@@ -27,6 +27,7 @@ Persistent
 #Include %A_LineFile%\..\Tray.ahk
 #Include %A_LineFile%\..\KeyRecorder.ahk
 #Include %A_LineFile%\..\Autostart.ahk
+#Include %A_LineFile%\..\Installer.ahk
 #Include %A_LineFile%\..\ScrollPane.ahk
 #Include %A_LineFile%\..\SettingsGui.ahk
 #Include %A_LineFile%\..\BugReport.ahk
@@ -38,11 +39,18 @@ OnError((e, *) => Log.Write("ERROR " e.Message " (" e.Extra ") at " e.File ":" e
 ; A held key auto-repeats, which would trip the default hotkey rate limit
 A_MaxHotkeysPerInterval := 500
 
-; --config <path> overrides the settings file (used for testing)
-configPath := Config.DefaultPath()
-for i, arg in A_Args
-    if arg = "--config" && i < A_Args.Length
-        configPath := A_Args[i + 1]
+; Test options: --config <path> overrides the settings file; --install-dir <folder> and
+; --install-answer yes|no exercise the self-install of the EXE without touching the real one
+configPath := Config.DefaultPath(), installDir := "", installAnswer := ""
+for i, arg in A_Args {
+    if i = A_Args.Length
+        break
+    switch arg {
+        case "--config": configPath := A_Args[i + 1]
+        case "--install-dir": installDir := A_Args[i + 1]
+        case "--install-answer": installAnswer := A_Args[i + 1]
+    }
+}
 
-OnAirKeyApp := App(configPath)
+OnAirKeyApp := App(configPath, installDir, installAnswer)
 OnAirKeyApp.Start()

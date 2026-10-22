@@ -21,8 +21,11 @@ class App {
     static CMD_SAVE_SETTINGS := 5
     static CMD_REPORT_BUG := 6
 
-    __New(configPath) {
+    ; installDir / installAnswer: test overrides for the self-install (see Installer)
+    __New(configPath, installDir := "", installAnswer := "") {
         this.ConfigPath := configPath
+        this.InstallDir := installDir
+        this.InstallAnswer := installAnswer
         this.Paused := false
         this.Cfg := ""
         this.State := RecState(ObjBindMethod(this, "OnRecordingChange"))
@@ -37,7 +40,21 @@ class App {
     }
 
     Start() {
+        ; The EXE on the real settings file may install itself (tests name an install folder).
+        ; Asked before Config.Load creates the settings file, so the installed copy sees a first run.
+        install := ""
+        if A_IsCompiled && (this.ConfigPath = Config.DefaultPath() || this.InstallDir != "") {
+            dir := this.InstallDir != "" ? this.InstallDir : Installer.DefaultDir()
+            args := this.InstallDir = "" ? "" : Format(' --config "{1}" --install-dir "{2}"', this.ConfigPath, this.InstallDir)
+            install := Installer.Check(App.Version, this.ConfigPath, dir, this.InstallAnswer, args)
+            if install = "exit"
+                ExitApp()
+        }
         this.Cfg := Config.Load(this.ConfigPath)
+        if install = "portable" && !this.Cfg.Portable {
+            this.Cfg.Portable := true
+            this.Cfg.Save()
+        }
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
         this.LogoFile := App._UiImage(dir, "logo-ui.png")

@@ -40,7 +40,8 @@ red exactly when you're on air. One press, and you always know what's going on.
 - **All Wispr Flow recording actions:** Push to talk, Hands-free, Cancel and Command Mode.
 - **Record shortcuts by pressing them**, including F13–F24 and Wispr's default shortcuts such as
   `Ctrl+Win`.
-- **Polish and English**, starts with Windows, a single small EXE with no installer.
+- **Polish and English**, starts with Windows, a single small EXE that installs itself on request
+  (no administrator rights, no separate installer).
 - **Private by design:** OnAirKey only listens for your shortcuts. It never blocks keys, reads no
   text, collects no data and makes no internet connections.
 
@@ -53,7 +54,11 @@ red exactly when you're on air. One press, and you always know what's going on.
 ## Get started
 
 **0. Download** `OnAirKey.exe` from [Releases](https://github.com/onairkey/onairkey/releases/latest)
-and run it. On the first start the settings window opens on *How it works*.
+and run it. On the first start OnAirKey asks whether to install itself: **Yes** copies it to
+`%LOCALAPPDATA%\Programs\OnAirKey` and adds a Start menu shortcut (no administrator rights needed),
+so you can delete the downloaded file; **No** runs it from where it is and doesn't ask again.
+Then the settings window opens on *How it works*. To update, download the new version and run it:
+OnAirKey offers to replace the installed copy and keeps your settings.
 
 > Windows may show "Windows protected your PC" because the EXE isn't code-signed yet. Click
 > **More info → Run anyway**. See [SmartScreen and antivirus](#smartscreen-and-antivirus).
@@ -149,6 +154,10 @@ dedicated key of your macro pad. OnAirKey still supports Escape, but warns you a
 
 ## Good to know
 
+- **Keep the tray icon in sight.** Windows hides new tray icons under the **^** arrow next to the
+  clock. Drag the OnAirKey icon from there onto the taskbar, so the red dot is always visible.
+  On Windows 11 you can also turn it on in *Settings → Personalization → Taskbar → Other system
+  tray icons*.
 - **OnAirKey follows your shortcuts, not Wispr itself.** If recording changes some other way
   (double-tapping Push to talk, stopping it with the mouse in the Flow Bar, the automatic stop
   after 20 minutes), the LED can stay on. Press Cancel and it's back in sync.
@@ -169,8 +178,12 @@ this repository, and you can [build the EXE yourself](#build-from-source).
 ## Settings and uninstalling
 
 Settings live in `%APPDATA%\OnAirKey\config.ini` (the path is shown on the *About* tab). To remove
-OnAirKey: untick *Start with Windows*, exit from the tray menu, then delete `OnAirKey.exe` and the
-`%APPDATA%\OnAirKey` folder.
+OnAirKey: untick *Start with Windows*, exit from the tray menu, then delete:
+
+- the program folder `%LOCALAPPDATA%\Programs\OnAirKey` (or `OnAirKey.exe` wherever you run it
+  from, if you didn't install it),
+- the *OnAirKey* shortcut in the Start menu (right-click → *Open file location*),
+- the settings folder `%APPDATA%\OnAirKey`.
 
 ## Build from source
 

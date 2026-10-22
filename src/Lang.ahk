@@ -3,8 +3,8 @@
 class Lang {
     static Current := "en"
 
-    static Strings := Map(
-        "en", Map(
+    ; One declaration per language: AutoHotkey limits the length of a single declaration
+    static En := Map(
             "tray.settings", "Settings",
             "tray.support", "Support OnAirKey",
             "tray.test_led", "Test LED",
@@ -38,6 +38,9 @@ class Lang {
             "tip.no_wispr", "OnAirKey: Wispr Flow is not running",
             "tip.no_shortcuts", "OnAirKey: set your shortcuts in Settings",
             "log.disabled", "The diagnostic log is turned off.`nTurn it on in Settings > General.",
+            "install.ask", "Install OnAirKey on this computer?`n`nIt copies itself to:`n{1}`nand adds a Start menu shortcut. No administrator rights needed. Afterwards you can delete the file you've just opened.`n`nYes: install (recommended)`nNo: run it from here without installing (you won't be asked again)",
+            "install.update_ask", "Replace the installed OnAirKey {1} with this version ({2})?`n`nThe copy in:`n{3}`nis closed if it's running and replaced. Your settings stay.`n`nYes: update`nNo: run this file from here without installing",
+            "install.failed", "Couldn't install OnAirKey to:`n{1}`n`nIt runs from here without installing.",
             "about.title", "OnAirKey {1}",
             "about.why_title", "Why it exists",
             "about.why", "Dictation made my work faster, but juggling shortcuts and never being sure whether recording was on kept breaking my flow. OnAirKey is the tool I wanted for myself. Now it's yours too.",
@@ -62,6 +65,7 @@ class Lang {
             "howto.step2", "OnAirKey: on the Shortcuts tab, record those keys by pressing them.",
             "howto.step3", "Wispr Flow: in Settings > Shortcuts, set the same shortcuts for Push to talk, Hands-free and Cancel.",
             "howto.no_led", "No keyboard with an LED? The red dot in the tray shows you're recording too.",
+            "howto.tray_tip", "Tip: Windows hides new tray icons under the ^ arrow next to the clock. Drag the OnAirKey icon from there onto the taskbar, so the red dot is always in sight. On Windows 11 you can also turn it on in Settings > Personalization > Taskbar > Other system tray icons.",
             "howto.more", "More about OnAirKey:",
             "tab.indicator", "Indicator",
             "tab.general", "General",
@@ -130,8 +134,9 @@ class Lang {
             "save.invalid_number", "{1}: enter a number from {2} to {3}.",
             "save.invalid_list", "{1}: up to 5 numbers from 0 to 120000, separated by commas.",
             "save.invalid_process", "{1}: enter the process name."
-        ),
-        "pl", Map(
+        )
+
+    static Pl := Map(
             "tray.settings", "Ustawienia",
             "tray.support", "Wesprzyj OnAirKey",
             "tray.test_led", "Test diody",
@@ -165,6 +170,9 @@ class Lang {
             "tip.no_wispr", "OnAirKey: Wispr Flow nie działa",
             "tip.no_shortcuts", "OnAirKey: ustaw skróty w ustawieniach",
             "log.disabled", "Dziennik diagnostyczny jest wyłączony.`nWłącz go w Ustawienia > Ogólne.",
+            "install.ask", "Zainstalować OnAirKey na tym komputerze?`n`nProgram skopiuje się do folderu:`n{1}`ni doda skrót do menu Start. Nie potrzebuje do tego uprawnień administratora. Plik, który właśnie otwierasz, możesz potem usunąć.`n`nTak: zainstaluj (zalecane)`nNie: uruchom stąd, bez instalacji (więcej nie zapytam)",
+            "install.update_ask", "Zastąpić zainstalowany OnAirKey {1} tą wersją ({2})?`n`nKopia w folderze:`n{3}`nzostanie zamknięta, jeśli działa, i zastąpiona. Ustawienia zostają.`n`nTak: zaktualizuj`nNie: uruchom ten plik stąd, bez instalacji",
+            "install.failed", "Nie udało się zainstalować OnAirKey w folderze:`n{1}`n`nProgram uruchomi się stąd, bez instalacji.",
             "about.title", "OnAirKey {1}",
             "about.why_title", "Skąd się wziął",
             "about.why", "Dyktowanie przyspieszyło moją pracę, ale żonglowanie skrótami i ciągła niepewność, czy nagrywanie trwa, wybijały mnie z rytmu. OnAirKey to narzędzie, które chciałem mieć dla siebie. Teraz jest też Twoje.",
@@ -189,6 +197,7 @@ class Lang {
             "howto.step2", "OnAirKey: w zakładce Skróty nagraj te klawisze, naciskając je na klawiaturze.",
             "howto.step3", "Wispr Flow: w Settings > Shortcuts ustaw te same skróty dla Push to talk, Hands-free i Cancel.",
             "howto.no_led", "Nie masz klawiatury z diodą? Czerwona kropka w zasobniku też pokaże, że nagrywasz.",
+            "howto.tray_tip", "Wskazówka: Windows chowa nowe ikony zasobnika pod strzałką ^ obok zegara. Przeciągnij stamtąd ikonę OnAirKey na pasek zadań, żeby czerwona kropka była zawsze na widoku. W Windows 11 możesz ją też włączyć w Ustawienia > Personalizacja > Pasek zadań, w sekcji z pozostałymi ikonami zasobnika.",
             "howto.more", "Więcej o OnAirKey:",
             "tab.indicator", "Wskaźnik",
             "tab.general", "Ogólne",
@@ -258,7 +267,8 @@ class Lang {
             "save.invalid_list", "{1}: do 5 liczb od 0 do 120000, oddzielonych przecinkami.",
             "save.invalid_process", "{1}: wpisz nazwę procesu."
         )
-    )
+
+    static Strings := Map("en", Lang.En, "pl", Lang.Pl)
 
     static Set(language) => Lang.Current := Lang.Strings.Has(language) ? language : "en"
 

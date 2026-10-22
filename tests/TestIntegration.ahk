@@ -8,9 +8,10 @@
 #Include %A_LineFile%\..\TestLib.ahk
 
 target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk"'
+exePath := ""
 for i, arg in A_Args
     if arg = "--exe" && i < A_Args.Length
-        target := '"' A_Args[i + 1] '"'
+        exePath := A_Args[i + 1], target := '"' exePath '"'
 Out("target: " target)
 
 ; Shortcuts only work while the Wispr helper runs, so a process that surely runs stands in
@@ -256,5 +257,60 @@ Sleep(300)
 Check("later opens shortcuts", ControlGetIndex("SysTabControl321", firstWin), 2)
 WinClose("ahk_class AutoHotkey ahk_pid " pid2)
 ProcessWaitClose(pid2, 3)
+
+; Process id of the OnAirKey.exe running from the test install folder, 0 if none
+InstalledPid() {
+    for hwnd in WinGetList("ahk_class AutoHotkey ahk_exe OnAirKey.exe")
+        if WinGetProcessPath(hwnd) = instDir "\OnAirKey.exe"
+            return WinGetPID(hwnd)
+    return 0
+}
+WaitInstalledPid(oldPid := 0) {
+    loop 60 {
+        if (p := InstalledPid()) && p != oldPid
+            return p
+        Sleep(100)
+    }
+    return 0
+}
+
+; Self-install (EXE only). Temporary folders stand in for Downloads and the install folder,
+; so the real installation, Start menu and Startup folder stay untouched.
+; Note: fresh configs use Scroll Lock, so the keyboard LED may blink here.
+if exePath != "" {
+    DetectHiddenWindows(true)
+    dlDir := A_Temp "\onairkey-download", instDir := A_Temp "\onairkey-install"
+    for folder in [dlDir, instDir, A_Temp "\onairkey-install-no", A_Temp "\onairkey-inst-cfg", A_Temp "\onairkey-portable-cfg"]
+        try DirDelete(folder, true)
+    DirCreate(dlDir)
+    FileCopy(exePath, dlDir "\OnAirKey.exe")
+    downloaded := '"' dlDir '\OnAirKey.exe" --install-dir "' instDir '"'
+
+    instCfg := A_Temp "\onairkey-inst-cfg\config.ini"
+    Run(downloaded ' --config "' instCfg '" --install-answer yes', , , &dlPid)
+    Check("download exits after install", ProcessWaitClose(dlPid, 10), 0)
+    Check("exe installed", FileExist(instDir "\OnAirKey.exe") != "", true)
+    Check("start menu shortcut", FileExist(instDir "\Start Menu\OnAirKey.lnk") != "", true)
+    instPid := WaitInstalledPid()
+    Check("installed copy runs", instPid != 0, true)
+    Check("installed copy sees first run", WinWait("ahk_class AutoHotkeyGUI ahk_pid " instPid, , 5) != 0, true)
+    ; The same build opened again from Downloads starts the installed copy without asking
+    Run(downloaded ' --config "' instCfg '"', , , &dlPid2)
+    Check("same build hands over", ProcessWaitClose(dlPid2, 10), 0)
+    instPid2 := WaitInstalledPid(instPid)
+    Check("installed copy restarted", instPid2 != 0, true)
+    WinClose("ahk_class AutoHotkey ahk_pid " instPid2)
+    ProcessWaitClose(instPid2, 3)
+
+    ; "No": runs from Downloads, installs nothing and remembers Portable=1
+    portableCfg := A_Temp "\onairkey-portable-cfg\config.ini"
+    Run('"' dlDir '\OnAirKey.exe" --install-dir "' A_Temp '\onairkey-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
+    Sleep(2000)
+    Check("no keeps running here", ProcessExist(portablePid) != 0, true)
+    Check("no installs nothing", FileExist(A_Temp "\onairkey-install-no\OnAirKey.exe"), "")
+    Check("no is remembered", InStr(FileRead(portableCfg, "UTF-16"), "Portable=1") > 0, true)
+    WinClose("ahk_class AutoHotkey ahk_pid " portablePid)
+    ProcessWaitClose(portablePid, 3)
+}
 
 Finish()

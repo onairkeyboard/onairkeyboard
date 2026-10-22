@@ -119,7 +119,8 @@ class SettingsWindow {
             if i = 1  ; SayoDevice 2x2 owners can skip step 1 with the ready backup
                 y := Below(p.AddLink(Format("x40 y{} w496", y), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl)), 18)
         }
-        y := Below(p.AddText(Format("x20 y{} w516 {}", y + 10, muted), T("howto.no_led")), 14)
+        y := Below(p.AddText(Format("x20 y{} w516 {}", y + 10, muted), T("howto.no_led")), 10)
+        y := Below(p.AddText(Format("x20 y{} w516", y), T("howto.tray_tip")), 14)
         y := Below(p.AddLink(Format("x20 y{} w516", y), T("howto.more") " " SettingsWindow.WebsiteLink()), 20)
         this.HowtoPane := pane
         this.HowtoHeight := y
