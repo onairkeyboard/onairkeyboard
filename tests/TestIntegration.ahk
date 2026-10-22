@@ -13,24 +13,32 @@ for i, arg in A_Args
         target := '"' A_Args[i + 1] '"'
 Out("target: " target)
 
+; Shortcuts only work while the Wispr helper runs, so a process that surely runs stands in
+; for it: AutoHotkey running this test.
+TestConfig(folder, helperProcess) {
+    try DirDelete(folder, true)
+    DirCreate(folder)
+    FileAppend(Format("
+    (
+    [Shortcuts]
+    PushToTalk=Ctrl+Shift+F20
+    HandsFree=Ctrl+Shift+F21
+    Cancel=Ctrl+Shift+F22
+    [Indicator]
+    Lock=CapsLock
+    [General]
+    Debug=1
+    [Advanced]
+    SyncIntervalMs=50
+    ResyncDelayMs=0
+    WisprHelperProcess={1}
+    HookReinstallDelaysMs=
+    )", helperProcess), folder "\config.ini", "UTF-16")
+}
+
+SplitPath(A_AhkPath, &ahkExe)
 dir := A_Temp "\onairkey-integration"
-try DirDelete(dir, true)
-DirCreate(dir)
-FileAppend("
-(
-[Shortcuts]
-PushToTalk=Ctrl+Shift+F20
-HandsFree=Ctrl+Shift+F21
-Cancel=Ctrl+Shift+F22
-[Indicator]
-Lock=CapsLock
-[General]
-Debug=1
-[Advanced]
-SyncIntervalMs=50
-ResyncDelayMs=0
-HookReinstallDelaysMs=
-)", dir "\config.ini", "UTF-16")
+TestConfig(dir, ahkExe)
 
 SetCapsLockState(false)
 Run(target ' --config "' dir '\config.ini"', , , &pid)
@@ -114,11 +122,14 @@ Check("no runtime errors", InStr(logText, "ERROR"), 0)
 
 ; Settings window: record shortcuts with simulated keys, save, use them without a restart
 ; Waits until the app's log contains text (instead of guessing delays), up to timeoutMs
-WaitLog(text, timeoutMs := 4000) {
+WaitLog(text, timeoutMs := 4000, logDir := "") {
+    file := (logDir = "" ? dir : logDir) "\onairkey.log"
     start := A_TickCount
     while A_TickCount - start < timeoutMs {
-        if InStr(FileRead(dir "\onairkey.log"), text)
-            return true
+        try {  ; the app may be writing the log right now
+            if InStr(FileRead(file), text)
+                return true
+        }
         Sleep(50)
     }
     return false
@@ -179,6 +190,31 @@ Check("exits cleanly", ProcessWaitClose(pid, 3), 0)
 SetCapsLockState(false)
 if failures
     Out(FileRead(dir "\onairkey.log"))
+
+; Wispr Flow not running: shortcuts are ignored and the LED stays off. When the helper exits
+; while recording, the LED turns off. A hidden ping process stands in for the helper.
+failuresBefore := failures
+wDir := A_Temp "\onairkey-nowispr"
+TestConfig(wDir, "PING.EXE")
+Run(target ' --config "' wDir '\config.ini"', , , &pid3)
+Check("missing helper logged", WaitLog("Wispr helper not running", 6000, wDir), true)
+Tap("F21")
+Check("no wispr ignores keys", Caps(), 0)
+Run('ping.exe -n 60 127.0.0.1', , "Hide", &pingPid)
+Check("helper start detected", WaitLog("Wispr helper running", 6000, wDir), true)
+Tap("F21")
+Check("keys work once wispr runs", Caps(), 1)
+ProcessClose(pingPid)
+Check("helper exit logged", WaitLog("Wispr helper exited", 6000, wDir), true)
+Sleep(250)
+Check("helper exit turns led off", Caps(), 0)
+Tap("F21")
+Check("keys ignored after exit", Caps(), 0)
+WinClose("ahk_class AutoHotkey ahk_pid " pid3)
+ProcessWaitClose(pid3, 3)
+SetCapsLockState(false)
+if failures > failuresBefore
+    Out(FileRead(wDir "\onairkey.log"))
 
 ; First run (no config yet): settings open by themselves on "How it works";
 ; opening them again later shows "Shortcuts".

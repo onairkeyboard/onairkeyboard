@@ -28,6 +28,7 @@ class App {
         this.Led := ""
         this.Hotkeys := HotkeyEngine(this.State)
         this.Wispr := ""
+        this.WisprRunning := true  ; until the first check says otherwise
         this.Tray := TrayUI(this)
         this.LogoFile := ""
         this.SettingsShown := false
@@ -67,13 +68,13 @@ class App {
         this.Hotkeys.Register(Shortcut.ValidShortcuts(cfg.Shortcuts, cfg.Lock, &issues))
         for issue in issues
             Log.Write(Format("shortcut {1} for {2}: {3} {4}", issue.Level, issue.Action, issue.Code, issue.Detail))
-        this.Hotkeys.SetPaused(this.Paused)
+        this.UpdateHotkeys()
 
         this.Led.Start(cfg.SyncIntervalMs, cfg.ResyncDelayMs)
 
         if this.Wispr
             this.Wispr.Stop()
-        this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs)
+        this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs, ObjBindMethod(this, "OnWisprChange"))
         this.Wispr.Start()
 
         ; Only the EXE on the real settings file manages autostart, so tests and
@@ -108,10 +109,23 @@ class App {
         this.Tray.Update()
     }
 
+    ; Shortcuts are ignored while paused, while a shortcut is being recorded in settings and
+    ; while Wispr Flow isn't running (it wouldn't record, so the LED would be wrong).
+    UpdateHotkeys() {
+        recording := SettingsWindow.Instance && SettingsWindow.Instance.Recording != ""
+        this.Hotkeys.SetPaused(this.Paused || recording || !this.WisprRunning)
+    }
+
+    OnWisprChange(running) {
+        this.WisprRunning := running
+        this.UpdateHotkeys()
+        this.Tray.Update()
+    }
+
     TogglePause() {
         this.Paused := !this.Paused
         Log.Write(this.Paused ? "paused" : "resumed")
-        this.Hotkeys.SetPaused(this.Paused)
+        this.UpdateHotkeys()
         this.Led.Paused := this.Paused
         this.Led.Sync()
         this.Tray.Update()

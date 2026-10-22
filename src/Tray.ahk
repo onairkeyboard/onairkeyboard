@@ -64,6 +64,8 @@ class TrayUI {
 
         if owner.Paused
             A_IconTip := T("tip.paused")
+        else if !owner.WisprRunning
+            A_IconTip := T("tip.no_wispr")
         else if !owner.Hotkeys.HasShortcuts
             A_IconTip := T("tip.no_shortcuts")
         else

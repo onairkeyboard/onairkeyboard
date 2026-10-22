@@ -34,6 +34,9 @@ class SettingsWindow {
         this.Rows := Map()
         this.LockRadios := Map()
         this._Build()
+        ; Registered before Show(): showing the window pumps messages, and a command arriving
+        ; meanwhile (open settings, record) must reuse this window instead of opening a second one
+        SettingsWindow.Instance := this
         if !tab
             tab := owner.Cfg.IsFirstRun && !owner.SettingsShown ? SettingsWindow.TAB_HOWTO : SettingsWindow.TAB_SHORTCUTS
         owner.SettingsShown := true
@@ -247,7 +250,7 @@ class SettingsWindow {
         this.Recorder.Stop()
         this.Rows[this.Recording].Record.Text := T("btn.record")
         this.Recording := ""
-        this.Owner.Hotkeys.SetPaused(this.Owner.Paused)
+        this.Owner.UpdateHotkeys()
     }
 
     _OnClearClick(action, *) {
@@ -309,7 +312,7 @@ class SettingsWindow {
 
     _UpdateWisprStatus() {
         running := this.Owner.Wispr && this.Owner.Wispr.IsRunning
-        this.WisprStatus.SetFont(running ? "c1E7B34" : SettingsWindow.ColorMuted)
+        this.WisprStatus.SetFont(running ? "c1E7B34" : SettingsWindow.ColorError)
         this.WisprStatus.Value := T(running ? "wispr.running" : "wispr.not_running")
     }
 

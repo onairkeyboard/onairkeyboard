@@ -22,5 +22,7 @@ First version.
   injected keys after dictation stops), refreshed after startup, keyboard replug and wake, and
   the keyboard hook is reinstalled after Wispr Flow starts.
 - Support links (Buycoffee.to, GitHub Sponsors) and onairkey.com.
+- While Wispr Flow isn't running, shortcuts are ignored and the LED stays off (it turns off if
+  Wispr Flow exits mid-recording); the tray tooltip and the settings header, in red, say so.
 - Ready-made SayoDevice 2x2 setup (`presets/WisprFlow_2x2.sayobak`), linked from How it works
   and the README with restore steps.
