@@ -3,6 +3,8 @@
 class App {
     static Name := "OnAirKey"
     static Version := "0.1.0"
+    ; GitHub organisation until the public repository exists
+    static RepoUrl := "https://github.com/onairkey"
 
     ; Private window message for test / automation commands (wParam = command)
     static WM_COMMAND := 0x8001
@@ -22,6 +24,7 @@ class App {
         this.Wispr := ""
         this.Tray := TrayUI(this)
         this.LogoFile := ""
+        this.SettingsShown := false
     }
 
     Start() {
@@ -36,6 +39,10 @@ class App {
         OnMessage(0x0218, (*) => this.Led.ScheduleResync(1000))  ; WM_POWERBROADCAST
         OnMessage(App.WM_COMMAND, ObjBindMethod(this, "OnCommand"))
         OnExit(ObjBindMethod(this, "Shutdown"))
+
+        ; First run: no welcome screen, the settings window opens on "How it works"
+        if this.Cfg.IsFirstRun
+            SetTimer(() => this.OpenSettings(), -500)
     }
 
     ; (Re)applies the current settings to every module.
@@ -111,7 +118,7 @@ class App {
             MsgBox(T("log.disabled"), App.Name, "Iconi")
     }
 
-    ShowAbout() => MsgBox(T("about.text", App.Version), App.Name, "Iconi")
+    ShowAbout() => SettingsWindow.Open(this, SettingsWindow.TAB_ABOUT)
 
     ; Commands run on a timer so the sender's PostMessage returns immediately.
     OnCommand(wParam, lParam, *) {

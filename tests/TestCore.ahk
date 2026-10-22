@@ -80,7 +80,7 @@ for key in Lang.Strings["pl"]
     Check("en has " key, Lang.Strings["en"].Has(key), true)
 Lang.Set("pl")
 Check("T pl", T("tray.exit"), "Wyjście")
-Check("T format", InStr(T("about.text", "9.9.9"), "OnAirKey 9.9.9") = 1, true)
+Check("T format", T("about.title", "9.9.9"), "OnAirKey 9.9.9")
 Lang.Set("xx")
 Check("unknown language falls back", Lang.Current, "en")
 Check("missing key returns key", T("no.such.key"), "no.such.key")

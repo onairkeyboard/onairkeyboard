@@ -159,4 +159,25 @@ Check("exits cleanly", ProcessWaitClose(pid, 3), 0)
 SetCapsLockState(false)
 if failures
     Out(FileRead(dir "\onairkey.log"))
+
+; First run (no config yet): settings open by themselves on "How it works";
+; opening them again later shows "Shortcuts".
+; Note: a fresh config uses Scroll Lock, so the keyboard LED may blink once here.
+freshDir := A_Temp "\onairkey-firstrun"
+try DirDelete(freshDir, true)
+Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk" --config "' freshDir '\config.ini"', , , &pid2)
+firstWin := "ahk_class AutoHotkeyGUI ahk_pid " pid2
+Check("first run opens settings", WinWait(firstWin, , 5) != 0, true)
+Sleep(300)
+Check("first run shows how it works", ControlGetIndex("SysTabControl321", firstWin), 1)
+Check("first run creates config", FileExist(freshDir "\config.ini") != "", true)
+WinClose(firstWin)
+Sleep(300)
+PostMessage(0x8001, 3, 0, , "ahk_class AutoHotkey ahk_pid " pid2)
+Check("settings reopen", WinWait(firstWin, , 5) != 0, true)
+Sleep(300)
+Check("later opens shortcuts", ControlGetIndex("SysTabControl321", firstWin), 2)
+WinClose("ahk_class AutoHotkey ahk_pid " pid2)
+ProcessWaitClose(pid2, 3)
+
 Finish()

@@ -39,7 +39,7 @@ FileAppend(x ' ' y ' ' w ' ' h, '*')
 "@ | Set-Content $helper -Encoding UTF8
 
 Add-Type -AssemblyName System.Drawing
-for ($i = 1; $i -le 5; $i++) {
+for ($i = 1; $i -le 6; $i++) {
     $rect = (& $ahk $helper ($(if ($i -eq 1) { 'open' } else { 'next' })) | Out-String).Trim() -split ' '
     $x, $y, $w, $h = [int[]]$rect
     $bmp = New-Object Drawing.Bitmap $w, $h

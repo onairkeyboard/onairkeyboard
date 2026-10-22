@@ -10,31 +10,34 @@ class SettingsWindow {
     static ColorMuted := "c6B6B6B"
 
     ; Tab numbers
-    static TAB_HOWTO := 1, TAB_SHORTCUTS := 2, TAB_INDICATOR := 3, TAB_GENERAL := 4, TAB_ADVANCED := 5
+    static TAB_HOWTO := 1, TAB_SHORTCUTS := 2, TAB_INDICATOR := 3, TAB_GENERAL := 4
+    static TAB_ADVANCED := 5, TAB_ABOUT := 6
 
-    static Open(owner) {
+    ; tab: 0 picks the default (How it works the very first time, Shortcuts afterwards)
+    static Open(owner, tab := 0) {
         if SettingsWindow.Instance {
+            if tab
+                SettingsWindow.Instance.Tabs.Value := tab
             SettingsWindow.Instance.Win.Show()
             return SettingsWindow.Instance
         }
-        return SettingsWindow.Instance := SettingsWindow(owner)
+        return SettingsWindow.Instance := SettingsWindow(owner, tab)
     }
 
-    __New(owner) {
+    __New(owner, tab := 0) {
         this.Owner := owner
         this.Draft := Map()
-        hasShortcuts := false
-        for action in Config.Actions {
+        for action in Config.Actions
             this.Draft[action] := owner.Cfg.Shortcuts[action]
-            hasShortcuts := hasShortcuts || this.Draft[action] != ""
-        }
         this.Recording := ""
         this.Recorder := KeyRecorder()
         this.Rows := Map()
         this.LockRadios := Map()
         this._Build()
-        ; New users land on "How it works", everyone else straight on their shortcuts
-        this.Tabs.Value := hasShortcuts ? SettingsWindow.TAB_SHORTCUTS : SettingsWindow.TAB_HOWTO
+        if !tab
+            tab := owner.Cfg.IsFirstRun && !owner.SettingsShown ? SettingsWindow.TAB_HOWTO : SettingsWindow.TAB_SHORTCUTS
+        owner.SettingsShown := true
+        this.Tabs.Value := tab
         this._Validate()
         this._UpdateWisprStatus()
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
@@ -57,7 +60,7 @@ class SettingsWindow {
         this.WisprStatus := win.AddText("x300 y20 w284 Right", "")
 
         tabs := win.AddTab3("x12 y52 w576 h404",
-            [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced")])
+            [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced"), T("tab.about")])
         this.Tabs := tabs
 
         ; --- How it works ---
@@ -144,6 +147,23 @@ class SettingsWindow {
         win.AddButton(Format("x28 y{} w150 h26", y + 2), T("btn.restore")).OnEvent("Click", (*) => this._FillAdvanced(Config()))
         win.AddButton(Format("x186 y{} w150 h26", y + 2), T("btn.open_config")).OnEvent("Click", (*) => Run('notepad.exe "' this.Owner.Cfg.Path '"'))
         win.AddText(Format("x28 y{} w544 {}", y + 40, muted), T("adv.hint"))
+
+        ; --- About ---
+        tabs.UseTab(SettingsWindow.TAB_ABOUT)
+        win.SetFont("s12 bold")
+        win.AddText("x28 y88 w544", T("about.title", App.Version))
+        win.SetFont("s10 bold")
+        win.AddText("x28 y122 w544", T("about.why_title"))
+        win.SetFont("s9 norm")
+        win.AddText("x28 y144 w544 h48", T("about.why"))
+        win.SetFont("s10 bold")
+        win.AddText("x28 y204 w544", T("about.oss_title"))
+        win.SetFont("s9 norm")
+        win.AddText("x28 y226 w544 h32", T("about.oss"))
+        win.AddLink("x28 y262 w544", Format('<a href="{1}">{1}</a>', App.RepoUrl))
+        win.AddText("x28 y300 w544", T("about.author"))
+        win.AddText(Format("x28 y322 w544 h32 {}", muted), T("about.disclaimer"))
+        win.AddText(Format("x28 y360 w544 h32 {}", muted), T("about.config", this.Owner.Cfg.Path))
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---
