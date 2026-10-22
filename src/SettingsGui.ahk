@@ -46,7 +46,7 @@ class SettingsWindow {
         this._UpdateWisprStatus()
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
         SetTimer(this._statusTimer, 2000)
-        this.Win.Show("w600 h572")
+        this.Win.Show("w600 h662")
         this.Tabs.Focus()  ; otherwise the header link gets the focus rectangle
     }
 
@@ -74,34 +74,34 @@ class SettingsWindow {
         if bugIcon != "" && FileExist(bugIcon)
             win.AddPicture(Format("x{} y20 w16 h16", 582 - linkW - 16), bugIcon).OnEvent("Click", (*) => this.Owner.ReportBug())
 
-        tabs := win.AddTab3("x12 y52 w576 h404",
+        tabs := win.AddTab3("x12 y52 w576 h470",
             [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced"), T("tab.about")])
         this.Tabs := tabs
 
         ; --- How it works ---
         tabs.UseTab(SettingsWindow.TAB_HOWTO)
         win.SetFont("s12 bold")
-        win.AddText("x28 y88 w544", T("howto.title"))
+        win.AddText("x28 y92 w544", T("howto.title"))
         win.SetFont("s9 norm")
-        win.AddText("x28 y116 w544 h76", T("howto.problem"))
-        win.AddText("x28 y196 w544 h48", T("howto.solution"))
+        win.AddText("x28 y128 w544 h76", T("howto.problem"))
+        win.AddText("x28 y214 w544 h48", T("howto.solution"))
         win.SetFont("s10 bold")
-        win.AddText("x28 y248 w544", T("howto.steps_title"))
+        win.AddText("x28 y280 w544", T("howto.steps_title"))
         win.SetFont("s9 norm")
-        y := 272
+        y := 310
         for i, step in ["howto.step1", "howto.step2", "howto.step3"] {
             win.SetFont("bold")
             win.AddText(Format("x28 y{} w20", y), i ".")
             win.SetFont("norm")
             win.AddText(Format("x48 y{} w524 h32", y), T(step))
             if i = 1 {  ; SayoDevice 2x2 owners can skip step 1 with the ready backup
-                win.AddLink(Format("x48 y{} w524 h32", y + 34), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl))
-                y += 70
+                win.AddLink(Format("x48 y{} w524 h32", y + 36), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl))
+                y += 82
             } else
-                y += 28
+                y += 34
         }
-        win.AddText(Format("x28 y{} w544 {}", y + 4, muted), T("howto.no_led"))
-        win.AddLink(Format("x28 y{} w544", y + 30), T("howto.more") " " SettingsWindow.WebsiteLink())
+        win.AddText(Format("x28 y{} w544 {}", y + 10, muted), T("howto.no_led"))
+        win.AddLink(Format("x28 y{} w544", y + 40), T("howto.more") " " SettingsWindow.WebsiteLink())
 
         ; --- Shortcuts ---
         tabs.UseTab(SettingsWindow.TAB_SHORTCUTS)
@@ -189,17 +189,17 @@ class SettingsWindow {
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---
-        win.AddText("x16 y478 w568 h32", T("support.cta"))
+        win.AddText("x16 y558 w568 h32", T("support.cta"))
         x := 16
         for link in Support.Links(Lang.Current) {
             width := link.Name = "GitHub Sponsors" ? 120 : 100
-            win.AddButton(Format("x{} y526 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
+            win.AddButton(Format("x{} y614 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
             x += width + 6
         }
 
         ; --- Footer ---
-        win.AddButton("x396 y526 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
-        win.AddButton("x494 y526 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
+        win.AddButton("x396 y614 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
+        win.AddButton("x494 y614 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
     }
 
     _FillAdvanced(source) {
