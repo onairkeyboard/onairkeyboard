@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/png/logo.png">
-    <img src="assets/png/logo-light.png" alt="OnAirKey" height="80">
-  </picture>
+  <img src="assets/logo-on-dark.svg" alt="OnAirKey" height="90">
 </p>
 
 <h3 align="center">One key. No guessing.</h3>
@@ -83,6 +80,30 @@ state.
 Hands-free and Cancel.
 
 Done: press Push to talk or Hands-free and the LED turns red.
+
+## Why only four keys?
+
+Let's be honest: Wispr Flow can do a lot more. But most people don't use the bells and whistles.
+They talk to their AI with the basics: **Push to talk, Hands-free and Cancel**. Command Mode is there
+too, and OnAirKey supports it, but it's used far less often. The fourth key on the pad goes to
+**Paste last transcript** (see below).
+
+OnAirKey is a specific solution to a specific problem for a specific group of users, not a
+do-it-all multitool. A more universal version may come one day, but not now: that's not what
+matters.
+
+## Why Wispr Flow?
+
+I've tried several alternatives, and Wispr Flow works best of them all. I use it every day myself,
+and OnAirKey is built around exactly how I work with it.
+
+## Why Paste last transcript on the fourth key?
+
+It happens to everyone: you dictate, but the cursor wasn't in a text field (or the window lost
+focus), and the text lands nowhere. Wispr Flow keeps it. Click into the field, press the fourth key,
+and your last dictation appears. No retyping, no saying it all again, no shortcut to remember.
+
+OnAirKey doesn't need this key recorded: pasting doesn't change the recording state.
 
 ## Why not Escape?
 

@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/png/logo.png">
-    <img src="assets/png/logo-light.png" alt="OnAirKey" height="80">
-  </picture>
+  <img src="assets/logo-on-dark.svg" alt="OnAirKey" height="90">
 </p>
 
 <h3 align="center">Jeden klawisz. Zero zgadywania.</h3>
@@ -85,6 +82,30 @@ klawiaturze makro. Paste last transcript nie trzeba nagrywać, bo nie zmienia st
 Hands-free i Cancel.
 
 Gotowe: naciśnij Push to talk albo Hands-free, a dioda zaświeci na czerwono.
+
+## Dlaczego tylko cztery przyciski?
+
+Umówmy się: Wispr Flow potrafi dużo więcej. Ale większość ludzi nie korzysta z tych bajerów, tylko
+rozmawia ze swoim AI za pomocą podstaw: **Push to talk, Hands-free i Cancel**. Jest jeszcze Command
+Mode i OnAirKey też go obsługuje, ale na pewno używa się go dużo rzadziej. Czwarty klawisz na
+klawiaturze trafia do **Paste last transcript** (o tym niżej).
+
+OnAirKey to konkretne rozwiązanie konkretnego problemu dla konkretnej grupy użytkowników, a nie
+uniwersalny kombajn do wszystkiego. Może kiedyś pokusimy się o bardziej uniwersalną wersję, ale na
+pewno nie teraz, bo to nie jest teraz istotne.
+
+## Dlaczego Wispr Flow?
+
+Korzystałem z kilku alternatywnych narzędzi i uważam, że Wispr Flow działa najlepiej ze wszystkich.
+Sam używam go na co dzień, a OnAirKey powstał dokładnie pod to, jak z nim pracuję.
+
+## Dlaczego Paste last transcript na czwartym klawiszu?
+
+Każdemu się zdarza: dyktujesz, ale kursor nie stał w polu tekstowym (albo okno straciło fokus)
+i tekst nigdzie nie trafił. Wispr Flow go pamięta. Kliknij w pole, naciśnij czwarty klawisz i ostatnie
+dyktowanie się pojawi. Bez przepisywania, bez mówienia wszystkiego od nowa i bez zapamiętywania skrótu.
+
+OnAirKey nie musi znać tego klawisza: wklejanie nie zmienia stanu nagrywania.
 
 ## Dlaczego nie Escape?
 
