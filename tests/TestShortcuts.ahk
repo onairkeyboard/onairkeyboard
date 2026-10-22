@@ -6,6 +6,8 @@
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\Shortcut.ahk
 #Include %A_LineFile%\..\..\src\ModSession.ahk
+#Include %A_LineFile%\..\..\src\KeyRecorder.ahk
+#Include %A_LineFile%\..\..\src\Autostart.ahk
 #Include %A_LineFile%\..\TestLib.ahk
 
 ParseText(text) {
@@ -110,5 +112,39 @@ ses.OnModsChanged(C, 20)
 Check("toggle not again same session", Pairs(ses.OnModsChanged(C | SH, 30)), "")
 ses.OnModsChanged(0, 40)
 Check("toggle next session", Pairs(ses.OnModsChanged(C | SH, 50)), "Cancel:down")
+
+; --- ComboRecorder ---
+Record(events) {
+    rec := ComboRecorder()
+    for ev in StrSplit(events, " ") {
+        name := SubStr(ev, 2)
+        result := SubStr(ev, 1, 1) = "+" ? rec.KeyDown(name) : rec.KeyUp(name)
+        if result != ""
+            return result
+    }
+    return "<none>"
+}
+Check("rec main key", Record("+LControl +LShift +F13"), "Ctrl+Shift+F13")
+Check("rec right mods", Record("+RControl +RAlt +a"), "Ctrl+Alt+A")
+Check("rec escape alone", Record("+Escape"), "Escape")
+Check("rec capslock", Record("+CapsLock"), "CapsLock")
+Check("rec modifier only", Record("+LControl +LWin -LWin -LControl"), "Ctrl+Win")
+Check("rec peak mods", Record("+LControl +LWin +LAlt -LAlt -LWin -LControl"), "Ctrl+Alt+Win")
+Check("rec partial release", Record("+LControl +LWin -LWin"), "<none>")
+Check("rec stray up ignored", Record("-LShift +LControl +F1"), "Ctrl+F1")
+Check("rec parses back", ParseText(Record("+LShift +LControl +F24")), "Ctrl+Shift+F24")
+
+; --- Autostart (temporary folder, never the real Startup folder) ---
+startDir := A_Temp "\onairkey-autostart-" A_TickCount
+DirCreate(startDir)
+Autostart.Sync(true, startDir, A_AhkPath)
+Check("autostart creates link", FileExist(Autostart.LinkPath(startDir)) != "", true)
+FileGetShortcut(Autostart.LinkPath(startDir), &target)
+Check("autostart target", target, A_AhkPath)
+Autostart.Sync(false, startDir, A_AhkPath)
+Check("autostart removes link", FileExist(Autostart.LinkPath(startDir)) = "", true)
+Autostart.Sync(false, startDir, A_AhkPath)
+Check("autostart remove twice ok", true, true)
+DirDelete(startDir, true)
 
 Finish()

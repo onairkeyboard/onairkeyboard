@@ -8,6 +8,9 @@ class App {
     static WM_COMMAND := 0x8001
     static CMD_TOGGLE_PAUSE := 1
     static CMD_TEST_LED := 2
+    static CMD_OPEN_SETTINGS := 3
+    static CMD_RECORD := 4        ; lParam = action index in Config.Actions
+    static CMD_SAVE_SETTINGS := 5
 
     __New(configPath) {
         this.ConfigPath := configPath
@@ -58,6 +61,14 @@ class App {
         this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs)
         this.Wispr.Start()
 
+        if A_IsCompiled {
+            try Autostart.Sync(cfg.StartWithWindows)
+            catch as e
+                Log.Write("autostart failed: " e.Message)
+        } else {
+            Log.Write("autostart not managed (script, not EXE)")
+        }
+
         this.Tray.Build()
     }
 
@@ -79,8 +90,7 @@ class App {
 
     TestLed() => this.Led.Blink()
 
-    ; Stage 4 replaces this with the settings window.
-    OpenSettings() => Run('notepad.exe "' this.Cfg.Path '"')
+    OpenSettings() => SettingsWindow.Open(this)
 
     OpenLog() {
         file := this.DataDir "\onairkey.log"
@@ -92,11 +102,19 @@ class App {
 
     ShowAbout() => MsgBox(T("about.text", App.Version), App.Name, "Iconi")
 
-    OnCommand(wParam, *) {
-        if wParam = App.CMD_TOGGLE_PAUSE
-            this.TogglePause()
-        else if wParam = App.CMD_TEST_LED
-            SetTimer(() => this.TestLed(), -1)
+    ; Commands run on a timer so the sender's PostMessage returns immediately.
+    OnCommand(wParam, lParam, *) {
+        switch wParam {
+            case App.CMD_TOGGLE_PAUSE: SetTimer(() => this.TogglePause(), -1)
+            case App.CMD_TEST_LED: SetTimer(() => this.TestLed(), -1)
+            case App.CMD_OPEN_SETTINGS: SetTimer(() => this.OpenSettings(), -1)
+            case App.CMD_RECORD:
+                if lParam >= 1 && lParam <= Config.Actions.Length
+                    SetTimer(() => SettingsWindow.Open(this).StartRecording(Config.Actions[lParam]), -1)
+            case App.CMD_SAVE_SETTINGS:
+                if SettingsWindow.Instance
+                    SetTimer(() => SettingsWindow.Instance.Save(), -1)
+        }
         return 1
     }
 

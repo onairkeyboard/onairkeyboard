@@ -76,7 +76,7 @@ Check("cleanup off", Caps(), 0)
 
 ; Commands normally triggered from the tray menu (App.WM_COMMAND = 0x8001)
 DetectHiddenWindows(true)
-Command(cmd) => PostMessage(0x8001, cmd, 0, , "ahk_class AutoHotkey ahk_pid " pid)
+Command(cmd, lp := 0) => PostMessage(0x8001, cmd, lp, , "ahk_class AutoHotkey ahk_pid " pid)
 
 Tap("F21")
 Command(1)  ; pause
@@ -103,6 +103,56 @@ logText := FileRead(dir "\onairkey.log")
 Check("tray icon goes red", InStr(logText, "tray icon tray-rec") > 0, true)
 Check("tray icon back to idle", InStr(logText, "tray icon tray-idle") > 0, true)
 Check("paused logged", InStr(logText, "paused") > 0, true)
+
+; Settings window: record shortcuts with simulated keys, save, use them without a restart
+settingsWin := "ahk_class AutoHotkeyGUI ahk_pid " pid
+Command(3)
+Sleep(800)
+Check("settings window opens", WinExist(settingsWin) != 0, true)
+
+Command(4, 1)  ; record push to talk
+Sleep(300)
+Send("{Ctrl down}{Shift down}{F23}{Shift up}{Ctrl up}")
+Sleep(300)
+Command(4, 3)  ; record cancel: Escape must be recorded, not close anything
+Sleep(300)
+Send("{Escape}")
+Sleep(300)
+Command(4, 2)  ; record hands-free as a modifier-only shortcut
+Sleep(300)
+Send("{Ctrl down}{Alt down}")
+Sleep(60)
+Send("{Alt up}{Ctrl up}")
+Sleep(300)
+Command(4, 4)  ; record command mode, press nothing: times out after 5 s
+Sleep(5600)
+Check("window still open after Escape", WinExist(settingsWin) != 0, true)
+Command(5)     ; save
+Sleep(1000)
+Check("save closes window", WinExist(settingsWin) = 0, true)
+
+cfgText := FileRead(dir "\config.ini", "UTF-16")
+Check("saved push to talk", InStr(cfgText, "PushToTalk=Ctrl+Shift+F23`n") > 0, true)
+Check("saved escape cancel", InStr(cfgText, "Cancel=Escape`n") > 0, true)
+Check("saved modifier-only", InStr(cfgText, "HandsFree=Ctrl+Alt`n") > 0, true)
+Check("timeout leaves empty", InStr(cfgText, "CommandMode=`n") > 0, true)
+
+Send("{Ctrl down}{Shift down}{F23 down}")
+Sleep(250)
+Check("new ptt works", Caps(), 1)
+Send("{F23 up}{Shift up}{Ctrl up}")
+Sleep(250)
+Check("new ptt released", Caps(), 0)
+Send("{Ctrl down}{Alt down}")
+Sleep(60)
+Send("{Alt up}{Ctrl up}")
+Sleep(250)
+Check("modifier-only hands-free on", Caps(), 1)
+Send("{Ctrl down}{Alt down}")
+Sleep(60)
+Send("{Alt up}{Ctrl up}")
+Sleep(250)
+Check("modifier-only hands-free off", Caps(), 0)
 
 WinClose("ahk_class AutoHotkey ahk_pid " pid)
 Check("exits cleanly", ProcessWaitClose(pid, 3), 0)

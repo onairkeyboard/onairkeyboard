@@ -13,6 +13,9 @@ Persistent
 #Include %A_LineFile%\..\Hotkeys.ahk
 #Include %A_LineFile%\..\Support.ahk
 #Include %A_LineFile%\..\Tray.ahk
+#Include %A_LineFile%\..\KeyRecorder.ahk
+#Include %A_LineFile%\..\Autostart.ahk
+#Include %A_LineFile%\..\SettingsGui.ahk
 #Include %A_LineFile%\..\App.ahk
 
 ; Unexpected errors go to the diagnostic log (the standard error dialog still appears)
