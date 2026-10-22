@@ -27,6 +27,7 @@ Persistent
 #Include %A_LineFile%\..\Tray.ahk
 #Include %A_LineFile%\..\KeyRecorder.ahk
 #Include %A_LineFile%\..\Autostart.ahk
+#Include %A_LineFile%\..\ScrollPane.ahk
 #Include %A_LineFile%\..\SettingsGui.ahk
 #Include %A_LineFile%\..\BugReport.ahk
 #Include %A_LineFile%\..\App.ahk

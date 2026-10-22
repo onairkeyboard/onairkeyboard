@@ -27,6 +27,7 @@ TestConfig(folder, helperProcess) {
     [Indicator]
     Lock=CapsLock
     [General]
+    Language=en
     Debug=1
     [Advanced]
     SyncIntervalMs=50
@@ -147,6 +148,16 @@ Check("bug report closes", WinWaitClose(settingsWin, , 3) != 0, true)
 
 Command(3)
 Check("settings window opens", WinWait(settingsWin, , 5) != 0, true)
+
+; How it works is a scrolling pane: page down moves its text up
+ControlChooseIndex(1, "SysTabControl321", settingsWin)
+Sleep(300)
+howtoTitle := ControlGetHwnd("One key. No guessing.", settingsWin)
+ControlGetPos(, &titleY, , , howtoTitle)
+PostMessage(0x115, 3, 0, DllCall("GetParent", "Ptr", howtoTitle, "Ptr"))  ; WM_VSCROLL, SB_PAGEDOWN
+Sleep(300)
+ControlGetPos(, &scrolledY, , , howtoTitle)
+Check("how it works scrolls", scrolledY < titleY, true)
 
 Command(4, 1)  ; record push to talk
 Check("recording ptt starts", WaitLog("recording shortcut for PushToTalk"), true)

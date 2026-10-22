@@ -17,7 +17,7 @@ class SettingsWindow {
     static Open(owner, tab := 0) {
         if SettingsWindow.Instance {
             if tab
-                SettingsWindow.Instance.Tabs.Value := tab
+                SettingsWindow.Instance.ShowTab(tab)
             SettingsWindow.Instance.Win.Show()
             return SettingsWindow.Instance
         }
@@ -46,8 +46,24 @@ class SettingsWindow {
         this._UpdateWisprStatus()
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
         SetTimer(this._statusTimer, 2000)
-        this.Win.Show("w600 h662")
+        this.Win.Show("w600 h588")
+        this.HowtoPane.Fill(this.HowtoHeight)
+        this._SyncPanes()
         this.Tabs.Focus()  ; otherwise the header link gets the focus rectangle
+    }
+
+    ShowTab(tab) {
+        this.Tabs.Value := tab
+        this._SyncPanes()
+    }
+
+    ; The How it works pane is a separate window, so it follows the selected tab by hand
+    _SyncPanes() => this.HowtoPane.Visible := this.Tabs.Value = SettingsWindow.TAB_HOWTO
+
+    ; y below a control, plus a gap
+    static _Below(ctrl, gap) {
+        ctrl.GetPos(, &y, , &h)
+        return y + h + gap
     }
 
     _Build() {
@@ -74,34 +90,39 @@ class SettingsWindow {
         if bugIcon != "" && FileExist(bugIcon)
             win.AddPicture(Format("x{} y20 w16 h16", 582 - linkW - 16), bugIcon).OnEvent("Click", (*) => this.Owner.ReportBug())
 
-        tabs := win.AddTab3("x12 y52 w576 h470",
+        tabs := win.AddTab3("x12 y52 w576 h404",
             [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced"), T("tab.about")])
+        tabs.OnEvent("Change", (*) => this._SyncPanes())
         this.Tabs := tabs
 
-        ; --- How it works ---
-        tabs.UseTab(SettingsWindow.TAB_HOWTO)
-        win.SetFont("s12 bold")
-        win.AddText("x28 y92 w544", T("howto.title"))
-        win.SetFont("s9 norm")
-        win.AddText("x28 y128 w544 h76", T("howto.problem"))
-        win.AddText("x28 y214 w544 h48", T("howto.solution"))
-        win.SetFont("s10 bold")
-        win.AddText("x28 y280 w544", T("howto.steps_title"))
-        win.SetFont("s9 norm")
-        y := 310
+        ; --- How it works: a scrolling pane over the tab page, so the text can breathe and grow
+        ; (later maybe a video). Each control goes below the previous one by its real height.
+        ; Tab3 keeps the page controls in a dialog window; the pane goes inside it, so the page
+        ; can't paint over it
+        page := DllCall("FindWindowEx", "Ptr", win.Hwnd, "Ptr", 0, "Str", "#32770", "Ptr", 0, "Ptr")
+        pane := ScrollPane(page, "White")
+        p := pane.Gui
+        Below := ObjBindMethod(SettingsWindow, "_Below")
+        p.SetFont("s14 bold", "Segoe UI")
+        y := Below(p.AddText("x20 y20 w516", T("howto.title")), 12)
+        p.SetFont("s9 norm")
+        y := Below(p.AddText(Format("x20 y{} w516", y), T("howto.problem")), 12)
+        y := Below(p.AddText(Format("x20 y{} w516", y), T("howto.solution")), 28)
+        p.SetFont("s11 bold")
+        y := Below(p.AddText(Format("x20 y{} w516", y), T("howto.steps_title")), 14)
+        p.SetFont("s9 norm")
         for i, step in ["howto.step1", "howto.step2", "howto.step3"] {
-            win.SetFont("bold")
-            win.AddText(Format("x28 y{} w20", y), i ".")
-            win.SetFont("norm")
-            win.AddText(Format("x48 y{} w524 h32", y), T(step))
-            if i = 1 {  ; SayoDevice 2x2 owners can skip step 1 with the ready backup
-                win.AddLink(Format("x48 y{} w524 h32", y + 36), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl))
-                y += 82
-            } else
-                y += 34
+            p.SetFont("bold")
+            p.AddText(Format("x20 y{} w20", y), i ".")
+            p.SetFont("norm")
+            y := Below(p.AddText(Format("x40 y{} w496", y), T(step)), i = 1 ? 8 : 18)
+            if i = 1  ; SayoDevice 2x2 owners can skip step 1 with the ready backup
+                y := Below(p.AddLink(Format("x40 y{} w496", y), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl)), 18)
         }
-        win.AddText(Format("x28 y{} w544 {}", y + 10, muted), T("howto.no_led"))
-        win.AddLink(Format("x28 y{} w544", y + 40), T("howto.more") " " SettingsWindow.WebsiteLink())
+        y := Below(p.AddText(Format("x20 y{} w516 {}", y + 10, muted), T("howto.no_led")), 14)
+        y := Below(p.AddLink(Format("x20 y{} w516", y), T("howto.more") " " SettingsWindow.WebsiteLink()), 20)
+        this.HowtoPane := pane
+        this.HowtoHeight := y
 
         ; --- Shortcuts ---
         tabs.UseTab(SettingsWindow.TAB_SHORTCUTS)
@@ -189,17 +210,17 @@ class SettingsWindow {
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---
-        win.AddText("x16 y558 w568 h32", T("support.cta"))
+        win.AddText("x16 y486 w568 h32", T("support.cta"))
         x := 16
         for link in Support.Links(Lang.Current) {
             width := link.Name = "GitHub Sponsors" ? 120 : 100
-            win.AddButton(Format("x{} y614 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
+            win.AddButton(Format("x{} y542 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
             x += width + 6
         }
 
         ; --- Footer ---
-        win.AddButton("x396 y614 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
-        win.AddButton("x494 y614 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
+        win.AddButton("x396 y542 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
+        win.AddButton("x494 y542 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
     }
 
     _FillAdvanced(source) {
@@ -232,7 +253,7 @@ class SettingsWindow {
     StartRecording(action) {
         if this.Recording != ""
             this._EndRecording()
-        this.Tabs.Value := SettingsWindow.TAB_SHORTCUTS
+        this.ShowTab(SettingsWindow.TAB_SHORTCUTS)
         this.Recording := action
         this.Owner.Hotkeys.SetPaused(true)
         row := this.Rows[action]
@@ -334,7 +355,7 @@ class SettingsWindow {
             if issue.Level = "error"
                 errors.Push(T("action." issue.Action) ": " SettingsWindow.IssueText(issue))
         if errors.Length {
-            this.Tabs.Value := SettingsWindow.TAB_SHORTCUTS
+            this.ShowTab(SettingsWindow.TAB_SHORTCUTS)
             MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(errors), T("settings.title"), "Icon!")
             return false
         }
@@ -351,7 +372,7 @@ class SettingsWindow {
         if !Config.ParseIntList(adv["HookReinstallDelaysMs"].Value, 0, 120000, 5, &delays)
             advErrors.Push(T("save.invalid_list", T("adv.hook")))
         if advErrors.Length {
-            this.Tabs.Value := SettingsWindow.TAB_ADVANCED
+            this.ShowTab(SettingsWindow.TAB_ADVANCED)
             MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(advErrors), T("settings.title"), "Icon!")
             return false
         }
@@ -381,6 +402,7 @@ class SettingsWindow {
     Close() {
         this._EndRecording()
         SetTimer(this._statusTimer, 0)
+        this.HowtoPane.Destroy()
         this.Win.Destroy()
         SettingsWindow.Instance := ""
     }
