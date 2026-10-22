@@ -189,10 +189,12 @@ Icons are generated from `assets/src` with `python -I assets/build_icons.py` (ne
 ## Report a bug
 
 Something doesn't work? Click **🐞 Report a bug** at the top of the settings window (or in the
-tray menu). It opens an e-mail to [bug@onairkey.com](mailto:bug@onairkey.com) with three short
-questions and the technical details OnAirKey adds for you (version, Windows, shortcuts; nothing
-personal). Attaching the diagnostic log helps a lot: turn it on in *Settings → General*, make the
-problem happen again and attach `onairkey.log`.
+tray menu). A window shows the address [bug@onairkey.com](mailto:bug@onairkey.com), a subject and
+a ready e-mail text: three short questions plus the technical details OnAirKey fills in for you
+(version, Windows, shortcuts; nothing personal). **Copy address** and **Copy text** put them on
+the clipboard, so you can send the report from any mailbox, Gmail included. Attaching the
+diagnostic log helps a lot: turn it on in *Settings → General*, make the problem happen again and
+attach `onairkey.log`.
 
 ## Support
 

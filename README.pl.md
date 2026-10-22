@@ -191,10 +191,11 @@ Ikony powstają z `assets/src` poleceniem `python -I assets/build_icons.py` (wym
 ## Zgłoś błąd
 
 Coś nie działa? Kliknij **🐞 Zgłoś błąd** u góry okna ustawień (albo w menu w zasobniku).
-Otworzy się e-mail na [bug@onairkey.com](mailto:bug@onairkey.com) z trzema krótkimi pytaniami
-i danymi technicznymi, które OnAirKey dopisze za Ciebie (wersja, Windows, skróty; nic
-osobistego). Bardzo pomaga dziennik diagnostyczny: włącz go w *Ustawienia → Ogólne*, powtórz
-problem i załącz plik `onairkey.log`.
+Okienko pokaże adres [bug@onairkey.com](mailto:bug@onairkey.com), temat i gotową treść e-maila:
+trzy krótkie pytania oraz dane techniczne, które OnAirKey uzupełni za Ciebie (wersja, Windows,
+skróty; nic osobistego). Przyciski **Kopiuj adres** i **Kopiuj treść** wrzucają je do schowka,
+więc zgłoszenie wyślesz z dowolnej poczty, także z Gmaila. Bardzo pomaga dziennik
+diagnostyczny: włącz go w *Ustawienia → Ogólne*, powtórz problem i załącz plik `onairkey.log`.
 
 ## Wesprzyj
 

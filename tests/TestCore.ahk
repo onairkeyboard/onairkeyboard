@@ -97,15 +97,14 @@ Check("support en", Names(Support.Links("en")), "GitHub Sponsors, Buycoffee.to")
 Check("support urls", Support.BuyCoffee.Url " " Support.Sponsors.Url,
     "https://buycoffee.to/onairkey https://github.com/sponsors/onairkey")
 
-; --- Bug report e-mail ---
-Check("uri keeps unreserved", Support.UriEncode("Az09-._~"), "Az09-._~")
-Check("uri encodes utf-8", Support.UriEncode("a b/ż&?"), "a%20b%2F%C5%BC%26%3F")
+; --- Bug report e-mail text: current language, details at the end ---
+Check("bug address", Support.BugEmail, "bug@onairkey.com")
+Lang.Set("pl")
+body := Support.BugBody("Windows 10`nShortcuts: Cancel=Ctrl+Shift+F16")
+Check("bug body pl", InStr(body, "Co się stało?") = 1, true)
+Check("bug body details last", SubStr(body, -StrLen("Cancel=Ctrl+Shift+F16")), "Cancel=Ctrl+Shift+F16")
 Lang.Set("en")
-mailto := Support.BugMailto("0.1.0", "Windows 10`nShortcuts: Cancel=Ctrl+Shift+F16")
-Check("bug mailto address", InStr(mailto, "mailto:bug@onairkey.com?subject=OnAirKey%200.1.0%3A%20bug%20report&body=") = 1, true)
-Check("bug mailto crlf", InStr(mailto, "%0D%0A") > 0 && !RegExMatch(mailto, "(?<!%0D)%0A"), true)
-Check("bug mailto diag", InStr(mailto, "Cancel%3DCtrl%2BShift%2BF16") > 0, true)
-Check("bug mailto no raw chars", RegExMatch(mailto, "[ \r\n+]"), 0)
+Check("bug body en", InStr(Support.BugBody(""), "What happened?") = 1, true)
 
 ; --- RecState ---
 changes := []

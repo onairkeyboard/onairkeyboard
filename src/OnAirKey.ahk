@@ -28,6 +28,7 @@ Persistent
 #Include %A_LineFile%\..\KeyRecorder.ahk
 #Include %A_LineFile%\..\Autostart.ahk
 #Include %A_LineFile%\..\SettingsGui.ahk
+#Include %A_LineFile%\..\BugReport.ahk
 #Include %A_LineFile%\..\App.ahk
 
 ; Unexpected errors go to the diagnostic log (the standard error dialog still appears)

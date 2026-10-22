@@ -136,6 +136,15 @@ WaitLog(text, timeoutMs := 4000, logDir := "") {
 }
 
 settingsWin := "ahk_class AutoHotkeyGUI ahk_pid " pid
+
+; Report a bug: a window with the address and a prefilled text, no mail app involved
+Command(6)
+Check("bug report window opens", WinWait(settingsWin, , 5) != 0, true)
+Check("bug report address", ControlGetText("Edit1", settingsWin), "bug@onairkey.com")
+Check("bug report details", InStr(ControlGetText("Edit3", settingsWin), "Cancel=Ctrl+Shift+F22") > 0, true)
+WinClose(settingsWin)
+Check("bug report closes", WinWaitClose(settingsWin, , 3) != 0, true)
+
 Command(3)
 Check("settings window opens", WinWait(settingsWin, , 5) != 0, true)
 

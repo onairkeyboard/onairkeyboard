@@ -19,6 +19,7 @@ class App {
     static CMD_OPEN_SETTINGS := 3
     static CMD_RECORD := 4        ; lParam = action index in Config.Actions
     static CMD_SAVE_SETTINGS := 5
+    static CMD_REPORT_BUG := 6
 
     __New(configPath) {
         this.ConfigPath := configPath
@@ -145,8 +146,7 @@ class App {
 
     ShowAbout() => SettingsWindow.Open(this, SettingsWindow.TAB_ABOUT)
 
-    ; Opens a prefilled bug report e-mail. The address also goes to the clipboard, because
-    ; mailto: does nothing useful for people who only use webmail.
+    ; Opens the window with the address and a prefilled e-mail text to copy
     ReportBug() {
         cfg := this.Cfg
         shortcuts := ""
@@ -156,14 +156,8 @@ class App {
             , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion
             , this.WisprRunning ? "detected" : "not running", cfg.Lock, shortcuts, Lang.Current
             , cfg.Debug ? this.DataDir "\onairkey.log" : "off")
-        A_Clipboard := Support.BugEmail
         Log.Write("bug report opened")
-        try Run(Support.BugMailto(App.Version, diag))
-        catch {
-            MsgBox(T("bug.no_mail", Support.BugEmail), App.Name, "Iconi")
-            return
-        }
-        TrayTip(T("bug.copied", Support.BugEmail), App.Name)
+        BugReportWindow.Open(diag)
     }
 
     ; Commands run on a timer so the sender's PostMessage returns immediately.
@@ -178,6 +172,7 @@ class App {
             case App.CMD_SAVE_SETTINGS:
                 if SettingsWindow.Instance
                     SetTimer(() => SettingsWindow.Instance.Save(), -1)
+            case App.CMD_REPORT_BUG: SetTimer(() => this.ReportBug(), -1)
         }
         return 1
     }

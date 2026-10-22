@@ -24,7 +24,8 @@ First version.
 - Support links (Buycoffee.to, GitHub Sponsors) and onairkey.com.
 - While Wispr Flow isn't running, shortcuts are ignored and the LED stays off (it turns off if
   Wispr Flow exits mid-recording); the tray tooltip and the settings header, in red, say so.
-- Report a bug (settings header, tray menu, About): opens an e-mail to bug@onairkey.com with
-  a short template and technical details, and copies the address for webmail users.
+- Report a bug (settings header, tray menu, About): a window with the address bug@onairkey.com,
+  a subject and a ready e-mail text with technical details, and buttons to copy them into any
+  mailbox (no mail app needed).
 - Ready-made SayoDevice 2x2 setup (`presets/WisprFlow_2x2.sayobak`), linked from How it works
   and the README with restore steps.
