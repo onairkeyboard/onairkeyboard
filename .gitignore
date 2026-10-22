@@ -1,6 +1,9 @@
 # Build output (published as GitHub release assets, not committed)
 dist/
 
+# Icon and logo PNG exports from assets/build_icons.py (for the website, not used by the app)
+assets/png/
+
 # Logs
 *.log
 

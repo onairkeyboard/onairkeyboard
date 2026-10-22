@@ -1,15 +1,16 @@
 # OnAirKey: instructions for Claude
 
-Always answer the user in Polish. Code, comments and commit messages stay in English.
+Code, comments and commit messages are in English.
 
 ## What this is
 
 Windows tray program (AutoHotkey v2) that lights a keyboard LED (via Scroll / Num / Caps Lock)
 and turns the tray icon red while Wispr Flow is recording. Built for the author's SayoDevice 2x2
-macro pad, to be shared with friends and later promoted (TikTok, onairkey.com).
+macro pad, shared as free, open-source software (onairkey.com).
 
-Read before working: [PLAN.md](PLAN.md) (roadmap, brand, business decisions),
-[docs/SPEC-v0.1.md](docs/SPEC-v0.1.md) (approved spec), [docs/NEXT.md](docs/NEXT.md) (current to-do).
+On the author's PC, first read the private notes in `C:\dev\2026\OnAirKey-notes` (its
+`CLAUDE.md`, then `PLAN.md`, `SPEC-v0.1.md`, `NEXT.md`). They hold the author's preferences,
+roadmap and current to-do. Never copy their contents into this public repository.
 
 ## Commands
 
@@ -40,12 +41,3 @@ Run the tests after every change; commit after each finished step.
   start its own line or Ahk2Exe won't embed the file.
 - Wispr Flow blocks injected keys right after dictation stops (hence the LED sync timer), and
   its helper process can install its keyboard hook after ours (hence the hook reinstall).
-
-## Environment (author's PC)
-
-- AutoHotkey v2.0.30 only, Ahk2Exe 1.1.37.02a2 in `C:\Program Files\AutoHotkey\Compiler`.
-- Installed EXE: `%LOCALAPPDATA%\Programs\OnAirKey\OnAirKey.exe`; settings `%APPDATA%\OnAirKey`.
-- Legacy script `C:\AutoHotkey\wispr-sayo-led.ahk` is retired (its startup shortcut is in
-  `C:\AutoHotkey\_wylaczone`); old v1 scripts archived in `C:\AutoHotkey\_archiwum-v1`.
-- Sayo keys: ID0 `Ctrl+Shift+F16` Cancel, ID1 `F15` Paste last, ID2 `F13` Push to talk,
-  ID3 `F14` Hands-free; LEDs: Indicator → Scroll Lock, red.
