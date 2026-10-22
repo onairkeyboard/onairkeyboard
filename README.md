@@ -1,0 +1,146 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/png/logo.png">
+    <img src="assets/png/logo-light.png" alt="OnAirKey" height="80">
+  </picture>
+</p>
+
+<h3 align="center">One key. No guessing.</h3>
+
+<p align="center">
+  Your keyboard LED lights up red while Wispr Flow is recording.
+</p>
+
+<p align="center">
+  <a href="https://github.com/onairkey/onairkey/releases/latest"><img src="https://img.shields.io/badge/Download-OnAirKey.exe-1F1E1D?logo=windows&logoColor=white" alt="Download"></a>
+  <a href="https://onairkey.com"><img src="https://img.shields.io/badge/onairkey.com-website-E24B4A" alt="Website"></a>
+  <a href="https://github.com/sponsors/onairkey"><img src="https://img.shields.io/badge/GitHub_Sponsors-support-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
+  <a href="https://buycoffee.to/onairkey"><img src="https://img.shields.io/badge/Buycoffee.to-support-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License">
+</p>
+
+<p align="center"><a href="README.pl.md">Polski</a> · English</p>
+
+---
+
+## Why
+
+Dictating with [Wispr Flow](https://wisprflow.ai) and similar apps can make you several times faster.
+But shortcuts like `Ctrl+Win+Space` are finger gymnastics, and with no clear sign that recording is
+on, the classics happen: minutes of talking that were never captured, or a conversation that keeps
+getting transcribed.
+
+OnAirKey turns a small macro pad into a dictation remote: one key per action and a light that glows
+red exactly when you're on air. One press, and you always know what's going on.
+
+<p align="center"><img src="docs/img/settings-howto-en.png" alt="OnAirKey settings: How it works" width="600"></p>
+
+## Features
+
+- **Keyboard LED as an "on air" light.** Works with any keyboard whose LEDs can show a Lock key
+  state (for example SayoDevice macro pads): Scroll Lock by default, Num Lock or Caps Lock to choose.
+- **Red tray icon while recording**, so OnAirKey helps even without a keyboard LED.
+- **All Wispr Flow recording actions:** Push to talk, Hands-free, Cancel and Command Mode.
+- **Record shortcuts by pressing them**, including F13–F24 and Wispr's default shortcuts such as
+  `Ctrl+Win`.
+- **Polish and English**, starts with Windows, a single small EXE with no installer.
+- **Private by design:** OnAirKey only listens for your shortcuts. It never blocks keys, reads no
+  text, collects no data and makes no internet connections.
+
+## Requirements
+
+- Windows 10 or 11
+- [Wispr Flow](https://wisprflow.ai) for desktop
+- Optional: a keyboard whose LEDs can follow a Lock key (otherwise use the tray icon)
+
+## Get started
+
+**0. Download** `OnAirKey.exe` from [Releases](https://github.com/onairkey/onairkey/releases/latest)
+and run it. On the first start the settings window opens on *How it works*.
+
+> Windows may show "Windows protected your PC" because the EXE isn't code-signed yet. Click
+> **More info → Run anyway**. See [SmartScreen and antivirus](#smartscreen-and-antivirus).
+
+**1. Keyboard.** In your keyboard's software, give each key a shortcut and set the LEDs to the
+Lock indicator. Example for a 4-key SayoDevice macro pad:
+
+| Key | Shortcut | Wispr Flow action | LED |
+|---|---|---|---|
+| 1 | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
+| 2 | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
+| 3 | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
+| 4 | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
+
+F13–F24 exist in the USB standard but not on regular keyboards, so they don't clash with other apps.
+
+**2. OnAirKey.** On the *Shortcuts* tab, click **Record** next to each action and press the key on
+your macro pad. Paste last transcript doesn't need to be recorded: it doesn't change the recording
+state.
+
+<p align="center"><img src="docs/img/settings-shortcuts-en.png" alt="OnAirKey settings: Shortcuts" width="600"></p>
+
+**3. Wispr Flow.** In *Settings → General → Shortcuts*, set the same shortcuts for Push to talk,
+Hands-free and Cancel.
+
+Done: press Push to talk or Hands-free and the LED turns red.
+
+## Why not Escape?
+
+Wispr Flow's default Cancel is `Escape`, but Escape also interrupts other programs. If Claude Code
+or ChatGPT is working, one press cancels your dictation and stops the AI too. Put Cancel on a
+dedicated key of your macro pad. OnAirKey still supports Escape, but warns you about it.
+
+## Good to know
+
+- **OnAirKey follows your shortcuts, not Wispr itself.** If recording changes some other way
+  (double-tapping Push to talk, stopping it with the mouse in the Flow Bar, the automatic stop
+  after 20 minutes), the LED can stay on. Press Cancel and it's back in sync.
+- **The Lock key really toggles.** With Scroll Lock as the indicator, arrow keys scroll the sheet in
+  Excel while you dictate. With Caps Lock, letters come out in capitals.
+- A shortcut can have one key besides Ctrl / Alt / Shift / Win (Wispr also allows two, such as
+  `Ctrl+A+B`; OnAirKey doesn't yet).
+- If a "Scroll Lock on" notification pops up, it comes from your mouse or keyboard software
+  (for example Logitech SetPoint), not from Windows. You can turn it off there.
+
+## SmartScreen and antivirus
+
+OnAirKey is written in [AutoHotkey](https://www.autohotkey.com) and compiled into an EXE. Such files
+aren't code-signed yet, so Windows SmartScreen warns about them and some antivirus programs flag
+them by mistake, especially because the program listens to the keyboard. The full source code is in
+this repository, and you can [build the EXE yourself](#build-from-source).
+
+## Settings and uninstalling
+
+Settings live in `%APPDATA%\OnAirKey\config.ini` (the path is shown on the *About* tab). To remove
+OnAirKey: untick *Start with Windows*, exit from the tray menu, then delete `OnAirKey.exe` and the
+`%APPDATA%\OnAirKey` folder.
+
+## Build from source
+
+Requirements: [AutoHotkey v2.0](https://www.autohotkey.com) and Ahk2Exe 1.1.37 or newer
+(AutoHotkey Dash → Compile installs it).
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tests\run.ps1      # tests
+powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKey.exe
+powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe # tests incl. the EXE
+powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # try it from source
+```
+
+Icons are generated from `assets/src` with `python -I assets/build_icons.py` (needs Inkscape).
+
+## Support
+
+Hi, I'm Patryk Szulczewski. I built OnAirKey to make my life simpler. If it made yours simpler too,
+here's your chance to say thanks:
+
+<a href="https://github.com/sponsors/onairkey"><img src="https://img.shields.io/badge/GitHub_Sponsors-support-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
+<a href="https://buycoffee.to/onairkey"><img src="https://img.shields.io/badge/Buycoffee.to-support-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
+
+More about OnAirKey: [onairkey.com](https://onairkey.com)
+
+## License
+
+[MIT](LICENSE) © 2026 Patryk Szulczewski
+
+OnAirKey is an independent project, not affiliated with Wispr AI (Wispr Flow) or SayoDevice.

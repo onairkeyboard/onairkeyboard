@@ -1,7 +1,8 @@
 # Opens the settings window of a temporary OnAirKey instance and saves a PNG of every tab.
 #   powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl -OutDir <folder>
 # The instance uses Caps Lock and test shortcuts, so it doesn't interfere with a running setup.
-param([string]$Language = 'pl', [string]$OutDir = (Join-Path $env:TEMP 'onairkey-shots'))
+# -Showcase uses a clean, typical setup (for README images) instead of one that shows validation messages.
+param([string]$Language = 'pl', [string]$OutDir = (Join-Path $env:TEMP 'onairkey-shots'), [switch]$Showcase)
 
 $ErrorActionPreference = 'Stop'
 $ahk = 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe'
@@ -12,8 +13,12 @@ $dir = Join-Path $env:TEMP "onairkey-shot-$Language"
 Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory $dir | Out-Null
 $cfg = Join-Path $dir 'config.ini'
-$ini = "[Shortcuts]`r`nPushToTalk=Ctrl+Shift+F20`r`nHandsFree=Ctrl+Shift+F21`r`nCancel=Escape`r`n" +
-       "CommandMode=Ctrl+Shift+F20`r`n[Indicator]`r`nLock=CapsLock`r`n[General]`r`nLanguage=$Language`r`n"
+if ($Showcase) {
+    $shortcuts = "PushToTalk=Ctrl+Shift+F13`r`nHandsFree=Ctrl+Shift+F14`r`nCancel=Ctrl+Shift+F16`r`nCommandMode=`r`n"
+} else {
+    $shortcuts = "PushToTalk=Ctrl+Shift+F20`r`nHandsFree=Ctrl+Shift+F21`r`nCancel=Escape`r`nCommandMode=Ctrl+Shift+F20`r`n"
+}
+$ini = "[Shortcuts]`r`n$shortcuts[Indicator]`r`nLock=CapsLock`r`n[General]`r`nLanguage=$Language`r`n"
 [IO.File]::WriteAllText($cfg, $ini, [Text.Encoding]::Unicode)
 
 $app = Start-Process $ahk -ArgumentList "`"$root\src\OnAirKey.ahk`"", '--config', "`"$cfg`"" -PassThru
@@ -34,7 +39,11 @@ if A_Args[1] = 'open' {
     Send('^{Tab}')
 }
 Sleep(500)
-WinGetPos(&x, &y, &w, &h, win)
+; Visible frame only (WinGetPos would include the invisible resize borders of Windows 10)
+rect := Buffer(16)
+DllCall('dwmapi\DwmGetWindowAttribute', 'Ptr', WinExist(win), 'UInt', 9, 'Ptr', rect, 'UInt', 16)
+x := NumGet(rect, 0, 'Int'), y := NumGet(rect, 4, 'Int')
+w := NumGet(rect, 8, 'Int') - x, h := NumGet(rect, 12, 'Int') - y
 FileAppend(x ' ' y ' ' w ' ' h, '*')
 "@ | Set-Content $helper -Encoding UTF8
 
