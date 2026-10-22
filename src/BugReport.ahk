@@ -21,9 +21,9 @@ class BugReportWindow {
 
         win.AddText("x16 y14 w488", T("bug.intro"))
         win.AddText("x16 y43 w60", T("bug.address"))
-        win.AddEdit("x80 y40 w424 ReadOnly", Support.BugEmail)
+        win.AddEdit("x80 y40 w424 ReadOnly BackgroundWhite", Support.BugEmail)
         win.AddText("x16 y73 w60", T("bug.subject_label"))
-        win.AddEdit("x80 y70 w424 ReadOnly", T("bug.subject", App.Version))
+        win.AddEdit("x80 y70 w424 ReadOnly BackgroundWhite", T("bug.subject", App.Version))
 
         ; The text below is a template: it must be completed, and the log attached
         win.SetFont("bold")
@@ -36,7 +36,7 @@ class BugReportWindow {
             win.AddText(Format("x16 y142 w488 h32 {}", SettingsWindow.ColorMuted), T("bug.log_off"))
 
         win.AddText("x16 y180 w488", T("bug.text_label"))
-        win.AddEdit("x16 y200 w488 h220 ReadOnly Multi VScroll", this.Body)
+        win.AddEdit("x16 y200 w488 h220 ReadOnly BackgroundWhite Multi VScroll", this.Body)
 
         win.AddButton("x16 y432 w130 h28", T("bug.copy_address"))
             .OnEvent("Click", (*) => this._Copy(Support.BugEmail, "bug.address_copied"))
