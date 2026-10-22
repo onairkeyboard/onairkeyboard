@@ -92,8 +92,10 @@ Names(links) {
         text .= (text = "" ? "" : ", ") link.Name
     return text
 }
-Check("support pl", Names(Support.Links("pl")), "Buycoffee.to")
-Check("support en", Names(Support.Links("en")), "GitHub Sponsors")
+Check("support pl", Names(Support.Links("pl")), "Buycoffee.to, GitHub Sponsors")
+Check("support en", Names(Support.Links("en")), "GitHub Sponsors, Buycoffee.to")
+Check("support urls", Support.BuyCoffee.Url " " Support.Sponsors.Url,
+    "https://buycoffee.to/onairkey https://github.com/sponsors/onairkey")
 
 ; --- RecState ---
 changes := []
