@@ -35,6 +35,7 @@ class TrayUI {
         tray.Add(this.PauseLabel, (*) => owner.TogglePause())
         tray.Add(T("tray.open_log"), (*) => owner.OpenLog())
         tray.Add()
+        tray.Add(T("tray.website"), (*) => Run(App.WebsiteUrl))
         tray.Add(T("tray.about"), (*) => owner.ShowAbout())
         tray.Add(T("tray.exit"), (*) => ExitApp())
         tray.Default := T("tray.settings")

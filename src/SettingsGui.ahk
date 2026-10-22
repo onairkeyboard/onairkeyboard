@@ -43,6 +43,7 @@ class SettingsWindow {
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
         SetTimer(this._statusTimer, 2000)
         this.Win.Show("w600")
+        this.Tabs.Focus()  ; otherwise the header link gets the focus rectangle
     }
 
     _Build() {
@@ -57,6 +58,7 @@ class SettingsWindow {
         logo := this.Owner.LogoFile
         if logo != "" && FileExist(logo)
             win.AddPicture("x16 y10 h32 w-1", logo)
+        win.AddLink("x140 y20 w150", SettingsWindow.WebsiteLink())
         this.WisprStatus := win.AddText("x300 y20 w284 Right", "")
 
         tabs := win.AddTab3("x12 y52 w576 h404",
@@ -82,6 +84,7 @@ class SettingsWindow {
             y += 38
         }
         win.AddText(Format("x28 y{} w544 {}", y + 4, muted), T("howto.no_led"))
+        win.AddLink(Format("x28 y{} w544", y + 30), T("howto.more") " " SettingsWindow.WebsiteLink())
 
         ; --- Shortcuts ---
         tabs.UseTab(SettingsWindow.TAB_SHORTCUTS)
@@ -161,9 +164,10 @@ class SettingsWindow {
         win.SetFont("s9 norm")
         win.AddText("x28 y226 w544 h32", T("about.oss"))
         win.AddLink("x28 y262 w544", Format('<a href="{1}">{1}</a>', App.RepoUrl))
-        win.AddText("x28 y300 w544", T("about.author"))
-        win.AddText(Format("x28 y322 w544 h32 {}", muted), T("about.disclaimer"))
-        win.AddText(Format("x28 y360 w544 h32 {}", muted), T("about.config", this.Owner.Cfg.Path))
+        win.AddLink("x28 y288 w544", T("about.website") " " SettingsWindow.WebsiteLink())
+        win.AddText("x28 y318 w544", T("about.author"))
+        win.AddText(Format("x28 y340 w544 h32 {}", muted), T("about.disclaimer"))
+        win.AddText(Format("x28 y376 w544 h32 {}", muted), T("about.config", this.Owner.Cfg.Path))
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---
@@ -361,6 +365,8 @@ class SettingsWindow {
         this.Win.Destroy()
         SettingsWindow.Instance := ""
     }
+
+    static WebsiteLink() => Format('<a href="{1}">{2}</a>', App.WebsiteUrl, App.WebsiteName)
 
     static _Lines(list) {
         text := ""

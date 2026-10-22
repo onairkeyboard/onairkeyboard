@@ -3,6 +3,9 @@
 class App {
     static Name := "OnAirKey"
     static Version := "0.1.0"
+    ; Product website (videos, tutorials, FAQ and feedback will live there)
+    static WebsiteUrl := "https://onairkey.com"
+    static WebsiteName := "onairkey.com"
     ; GitHub organisation until the public repository exists
     static RepoUrl := "https://github.com/onairkey"
 
