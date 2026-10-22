@@ -74,9 +74,39 @@ Check("auto-repeat toggles once", Caps(), 1)
 Tap("F22")
 Check("cleanup off", Caps(), 0)
 
+; Commands normally triggered from the tray menu (App.WM_COMMAND = 0x8001)
 DetectHiddenWindows(true)
+Command(cmd) => PostMessage(0x8001, cmd, 0, , "ahk_class AutoHotkey ahk_pid " pid)
+
+Tap("F21")
+Command(1)  ; pause
+Sleep(250)
+Check("pause turns off", Caps(), 0)
+Tap("F21")
+Check("paused ignores keys", Caps(), 0)
+Command(1)  ; resume
+Sleep(250)
+Check("resume stays off", Caps(), 0)
+Tap("F21")
+Check("works after resume", Caps(), 1)
+Tap("F22")
+
+Command(2)  ; test LED: 3 blinks, 300 ms on / 300 ms off
+Sleep(150)
+Check("blink on", Caps(), 1)
+Sleep(300)
+Check("blink off", Caps(), 0)
+Sleep(1600)
+Check("blink ends off", Caps(), 0)
+
+logText := FileRead(dir "\onairkey.log")
+Check("tray icon goes red", InStr(logText, "tray icon tray-rec") > 0, true)
+Check("tray icon back to idle", InStr(logText, "tray icon tray-idle") > 0, true)
+Check("paused logged", InStr(logText, "paused") > 0, true)
+
 WinClose("ahk_class AutoHotkey ahk_pid " pid)
 Check("exits cleanly", ProcessWaitClose(pid, 3), 0)
 SetCapsLockState(false)
-Out(FileRead(dir "\onairkey.log"))
+if failures
+    Out(FileRead(dir "\onairkey.log"))
 Finish()

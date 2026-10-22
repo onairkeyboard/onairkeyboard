@@ -5,6 +5,7 @@
 #Include %A_LineFile%\..\..\src\Log.ahk
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\State.ahk
+#Include %A_LineFile%\..\..\src\Lang.ahk
 #Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
@@ -70,6 +71,18 @@ Check("bad int default", cfg3.SyncIntervalMs, 150)
 Check("bad bool default", cfg3.Debug, false)
 Check("empty process default", cfg3.WisprHelperProcess, "Wispr Flow Helper.exe")
 Check("warnings count", cfg3.Warnings.Length, 3)
+
+; --- Lang: every key exists in both languages ---
+for key in Lang.Strings["en"]
+    Check("pl has " key, Lang.Strings["pl"].Has(key), true)
+for key in Lang.Strings["pl"]
+    Check("en has " key, Lang.Strings["en"].Has(key), true)
+Lang.Set("pl")
+Check("T pl", T("tray.exit"), "Wyjście")
+Check("T format", InStr(T("about.text", "9.9.9"), "OnAirKey 9.9.9") = 1, true)
+Lang.Set("xx")
+Check("unknown language falls back", Lang.Current, "en")
+Check("missing key returns key", T("no.such.key"), "no.such.key")
 
 ; --- RecState ---
 changes := []

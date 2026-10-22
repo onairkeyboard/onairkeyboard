@@ -12,11 +12,27 @@ class Indicator {
         this.LockName := lockName
         this.WantFn := wantFn
         this.Paused := false
+        this.Testing := false
         this._sync := ObjBindMethod(this, "Sync")
         this._resync := ObjBindMethod(this, "Resync")
     }
 
     Wanted => !this.Paused && this.WantFn.Call()
+
+    ; Blinks the LED so the user can check the keyboard setup. Sync is held off meanwhile.
+    Blink(times := 3, intervalMs := 300) {
+        if this.Testing
+            return
+        this.Testing := true
+        Loop times {
+            this.Set(true)
+            Sleep(intervalMs)
+            this.Set(false)
+            Sleep(intervalMs)
+        }
+        this.Testing := false
+        this.Sync()
+    }
     IsOn => GetKeyState(this.LockName, "T")
 
     Set(on) => Indicator.Setters[this.LockName].Call(on ? true : false)
@@ -34,6 +50,8 @@ class Indicator {
     }
 
     Sync() {
+        if this.Testing
+            return
         want := this.Wanted
         if this.IsOn != want {
             this.Set(want)
@@ -45,6 +63,8 @@ class Indicator {
     ScheduleResync(delayMs) => SetTimer(this._resync, -Max(delayMs, 1))
 
     Resync() {
+        if this.Testing
+            return
         want := this.Wanted
         this.Set(!want)
         Sleep(50)
