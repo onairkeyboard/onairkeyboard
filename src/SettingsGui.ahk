@@ -221,6 +221,7 @@ class SettingsWindow {
         row.Field.Value := T("record.prompt")
         row.Record.Text := T("btn.stop_record")
         this.Recorder.Start(ObjBindMethod(this, "_OnRecorded"), ObjBindMethod(this, "_OnRecordTimeout"))
+        Log.Write("recording shortcut for " action)
     }
 
     _OnRecorded(text) {

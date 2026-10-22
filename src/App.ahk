@@ -73,12 +73,14 @@ class App {
         this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs)
         this.Wispr.Start()
 
-        if A_IsCompiled {
+        ; Only the EXE on the real settings file manages autostart, so tests and
+        ; development runs (--config, or the script) never touch the Startup folder.
+        if A_IsCompiled && this.ConfigPath = Config.DefaultPath() {
             try Autostart.Sync(cfg.StartWithWindows)
             catch as e
                 Log.Write("autostart failed: " e.Message)
         } else {
-            Log.Write("autostart not managed (script, not EXE)")
+            Log.Write("autostart not managed (script or custom config)")
         }
 
         this.Tray.Build()
@@ -89,7 +91,10 @@ class App {
         if !A_IsCompiled
             return TrayUI._FullPath(A_LineFile "\..\..\assets\logo-ui.png")
         target := dataDir "\logo-ui.png"
-        try FileInstall("..\assets\logo-ui.png", target, 1)
+        ; FileInstall must start its own line, or Ahk2Exe won't embed the file
+        try {
+            FileInstall("..\assets\logo-ui.png", target, 1)
+        }
         return target
     }
 

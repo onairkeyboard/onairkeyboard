@@ -2,9 +2,16 @@
 ; End-to-end test: starts OnAirKey with a temporary config and drives it with simulated keys.
 ; Uses Caps Lock as the indicator and Ctrl+Shift+F20..F22, which neither Wispr Flow nor the
 ; legacy script listen to. Keys are sent with SendLevel 1 so OnAirKey's hotkeys see them.
-; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk
+; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk [--exe dist\OnAirKey.exe]
+; With --exe the compiled program is tested instead of the script.
 
 #Include %A_LineFile%\..\TestLib.ahk
+
+target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk"'
+for i, arg in A_Args
+    if arg = "--exe" && i < A_Args.Length
+        target := '"' A_Args[i + 1] '"'
+Out("target: " target)
 
 dir := A_Temp "\onairkey-integration"
 try DirDelete(dir, true)
@@ -26,7 +33,7 @@ HookReinstallDelaysMs=
 )", dir "\config.ini", "UTF-16")
 
 SetCapsLockState(false)
-Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk" --config "' dir '\config.ini"', , , &pid)
+Run(target ' --config "' dir '\config.ini"', , , &pid)
 Sleep(1500)
 
 SendLevel(1)
@@ -103,32 +110,45 @@ logText := FileRead(dir "\onairkey.log")
 Check("tray icon goes red", InStr(logText, "tray icon tray-rec") > 0, true)
 Check("tray icon back to idle", InStr(logText, "tray icon tray-idle") > 0, true)
 Check("paused logged", InStr(logText, "paused") > 0, true)
+Check("no runtime errors", InStr(logText, "ERROR"), 0)
 
 ; Settings window: record shortcuts with simulated keys, save, use them without a restart
+; Waits until the app's log contains text (instead of guessing delays), up to timeoutMs
+WaitLog(text, timeoutMs := 4000) {
+    start := A_TickCount
+    while A_TickCount - start < timeoutMs {
+        if InStr(FileRead(dir "\onairkey.log"), text)
+            return true
+        Sleep(50)
+    }
+    return false
+}
+
 settingsWin := "ahk_class AutoHotkeyGUI ahk_pid " pid
 Command(3)
-Sleep(800)
-Check("settings window opens", WinExist(settingsWin) != 0, true)
+Check("settings window opens", WinWait(settingsWin, , 5) != 0, true)
 
 Command(4, 1)  ; record push to talk
-Sleep(300)
+Check("recording ptt starts", WaitLog("recording shortcut for PushToTalk"), true)
 Send("{Ctrl down}{Shift down}{F23}{Shift up}{Ctrl up}")
-Sleep(300)
+Check("ptt recorded", WaitLog("recorded PushToTalk: Ctrl+Shift+F23"), true)
 Command(4, 3)  ; record cancel: Escape must be recorded, not close anything
-Sleep(300)
+Check("recording cancel starts", WaitLog("recording shortcut for Cancel"), true)
 Send("{Escape}")
-Sleep(300)
+Check("escape recorded", WaitLog("recorded Cancel: Escape"), true)
 Command(4, 2)  ; record hands-free as a modifier-only shortcut
-Sleep(300)
+Check("recording hands-free starts", WaitLog("recording shortcut for HandsFree"), true)
 Send("{Ctrl down}{Alt down}")
 Sleep(60)
 Send("{Alt up}{Ctrl up}")
-Sleep(300)
+Check("modifier-only recorded", WaitLog("recorded HandsFree: Ctrl+Alt"), true)
 Command(4, 4)  ; record command mode, press nothing: times out after 5 s
+Check("recording command mode starts", WaitLog("recording shortcut for CommandMode"), true)
 Sleep(5600)
 Check("window still open after Escape", WinExist(settingsWin) != 0, true)
 Command(5)     ; save
-Sleep(1000)
+Check("settings saved", WaitLog("settings saved"), true)
+Sleep(300)
 Check("save closes window", WinExist(settingsWin) = 0, true)
 
 cfgText := FileRead(dir "\config.ini", "UTF-16")
@@ -165,7 +185,7 @@ if failures
 ; Note: a fresh config uses Scroll Lock, so the keyboard LED may blink once here.
 freshDir := A_Temp "\onairkey-firstrun"
 try DirDelete(freshDir, true)
-Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk" --config "' freshDir '\config.ini"', , , &pid2)
+Run(target ' --config "' freshDir '\config.ini"', , , &pid2)
 firstWin := "ahk_class AutoHotkeyGUI ahk_pid " pid2
 Check("first run opens settings", WinWait(firstWin, , 5) != 0, true)
 Sleep(300)
