@@ -1,0 +1,11 @@
+# Build output (published as GitHub release assets, not committed)
+dist/
+
+# Logs
+*.log
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
