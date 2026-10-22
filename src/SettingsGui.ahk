@@ -58,16 +58,21 @@ class SettingsWindow {
         win.OnEvent("Close", (*) => this.Close())
         this.Win := win
 
-        ; --- Header: logo and Wispr status ---
+        ; --- Header: logo (opens the website), Wispr status in the middle, Report a bug on the right ---
         logo := this.Owner.LogoFile
         if logo != "" && FileExist(logo)
-            win.AddPicture("x16 y10 h32 w-1", logo)
-        win.AddLink("x140 y20 w90", SettingsWindow.WebsiteLink())
+            win.AddPicture("x16 y10 h32 w-1", logo).OnEvent("Click", (*) => Run(App.WebsiteUrl))
+        win.SetFont("bold")
+        this.WisprStatus := win.AddText("x150 y20 w300 Center", "")
+        win.SetFont("norm")
+        ; Right-aligned to the tab edge: the link is sized to its text, then moved
+        bugLink := win.AddLink("x0 y20", '<a id="bug">' T("header.bug") '</a>')
+        bugLink.OnEvent("Click", (*) => this.Owner.ReportBug())
+        bugLink.GetPos(, , &linkW)
+        bugLink.Move(586 - linkW)
         bugIcon := this.Owner.BugIconFile
         if bugIcon != "" && FileExist(bugIcon)
-            win.AddPicture("x236 y20 w16 h16", bugIcon).OnEvent("Click", (*) => this.Owner.ReportBug())
-        win.AddLink("x256 y20 w110", '<a id="bug">' T("header.bug") '</a>').OnEvent("Click", (*) => this.Owner.ReportBug())
-        this.WisprStatus := win.AddText("x370 y20 w214 Right", "")
+            win.AddPicture(Format("x{} y20 w16 h16", 582 - linkW - 16), bugIcon).OnEvent("Click", (*) => this.Owner.ReportBug())
 
         tabs := win.AddTab3("x12 y52 w576 h404",
             [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced"), T("tab.about")])
