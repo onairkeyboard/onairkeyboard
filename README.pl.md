@@ -211,4 +211,7 @@ Więcej o OnAirKey: [onairkey.com](https://onairkey.com)
 
 [MIT](LICENSE) © 2026 Patryk Szulczewski
 
+Ikona owada pochodzi z [Ionicons](https://ionic.io/ionicons)
+([MIT](assets/src/LICENSE-ionicons.txt), © Ionic).
+
 OnAirKey to niezależny projekt, niepowiązany z Wispr AI (Wispr Flow) ani z SayoDevice.

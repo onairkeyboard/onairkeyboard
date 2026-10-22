@@ -63,10 +63,9 @@ class SettingsWindow {
         if logo != "" && FileExist(logo)
             win.AddPicture("x16 y10 h32 w-1", logo)
         win.AddLink("x140 y20 w90", SettingsWindow.WebsiteLink())
-        ; The bug icon needs its own control: a link control doesn't fall back to the emoji font
-        win.SetFont(, "Segoe UI Emoji")
-        win.AddText("x236 y19 w18", "🐞").OnEvent("Click", (*) => this.Owner.ReportBug())
-        win.SetFont(, "Segoe UI")
+        bugIcon := this.Owner.BugIconFile
+        if bugIcon != "" && FileExist(bugIcon)
+            win.AddPicture("x236 y20 w16 h16", bugIcon).OnEvent("Click", (*) => this.Owner.ReportBug())
         win.AddLink("x256 y20 w110", '<a id="bug">' T("header.bug") '</a>').OnEvent("Click", (*) => this.Owner.ReportBug())
         this.WisprStatus := win.AddText("x370 y20 w214 Right", "")
 

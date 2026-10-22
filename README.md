@@ -210,4 +210,7 @@ More about OnAirKey: [onairkey.com](https://onairkey.com)
 
 [MIT](LICENSE) © 2026 Patryk Szulczewski
 
+The bug icon comes from [Ionicons](https://ionic.io/ionicons)
+([MIT](assets/src/LICENSE-ionicons.txt), © Ionic).
+
 OnAirKey is an independent project, not affiliated with Wispr AI (Wispr Flow) or SayoDevice.

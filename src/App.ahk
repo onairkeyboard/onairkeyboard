@@ -32,6 +32,7 @@ class App {
         this.WisprRunning := true  ; until the first check says otherwise
         this.Tray := TrayUI(this)
         this.LogoFile := ""
+        this.BugIconFile := ""
         this.SettingsShown := false
     }
 
@@ -39,7 +40,8 @@ class App {
         this.Cfg := Config.Load(this.ConfigPath)
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
-        this.LogoFile := App._LogoFile(dir)
+        this.LogoFile := App._UiImage(dir, "logo-ui.png")
+        this.BugIconFile := App._UiImage(dir, "bug-ui.png")
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
 
@@ -91,14 +93,18 @@ class App {
         this.Tray.Build()
     }
 
-    ; The script uses the asset directly; the EXE carries it inside and unpacks it once.
-    static _LogoFile(dataDir) {
+    ; Images of the settings window. The script uses the assets directly; the EXE carries them
+    ; inside and unpacks them once.
+    static _UiImage(dataDir, name) {
         if !A_IsCompiled
-            return TrayUI._FullPath(A_LineFile "\..\..\assets\logo-ui.png")
-        target := dataDir "\logo-ui.png"
-        ; FileInstall must start its own line, or Ahk2Exe won't embed the file
+            return TrayUI._FullPath(A_LineFile "\..\..\assets\" name)
+        target := dataDir "\" name
+        ; FileInstall needs a literal source and must start its own line, or Ahk2Exe won't embed the file
         try {
-            FileInstall("..\assets\logo-ui.png", target, 1)
+            if name = "logo-ui.png"
+                FileInstall("..\assets\logo-ui.png", target, 1)
+            else if name = "bug-ui.png"
+                FileInstall("..\assets\bug-ui.png", target, 1)
         }
         return target
     }
@@ -157,7 +163,7 @@ class App {
             , this.WisprRunning ? "detected" : "not running", cfg.Lock, shortcuts, Lang.Current
             , cfg.Debug ? this.DataDir "\onairkey.log" : "off")
         Log.Write("bug report opened")
-        BugReportWindow.Open(diag)
+        BugReportWindow.Open(diag, cfg.Debug ? this.DataDir "\onairkey.log" : "")
     }
 
     ; Commands run on a timer so the sender's PostMessage returns immediately.

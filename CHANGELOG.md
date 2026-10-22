@@ -26,6 +26,7 @@ First version.
   Wispr Flow exits mid-recording); the tray tooltip and the settings header, in red, say so.
 - Report a bug (settings header, tray menu, About): a window with the address bug@onairkey.com,
   a subject and a ready e-mail text with technical details, and buttons to copy them into any
-  mailbox (no mail app needed).
+  mailbox (no mail app needed). It says clearly that the text is a template to complete and
+  links the diagnostic log file to attach.
 - Ready-made SayoDevice 2x2 setup (`presets/WisprFlow_2x2.sayobak`), linked from How it works
   and the README with restore steps.

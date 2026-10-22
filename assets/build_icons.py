@@ -9,6 +9,7 @@ Requires Inkscape on PATH. Produces:
   assets/logo-on-dark.svg    the same wordmark on its own dark plate (works on any background)
   assets/logo-light.svg      wordmark for light backgrounds
   assets/logo-ui.png         logo for the settings window header
+  assets/bug-ui.png          bug icon of the "Report a bug" link (Ionicons, MIT)
 """
 
 import struct
@@ -69,6 +70,11 @@ def main() -> None:
     # Logo shown in the settings window header (light window background)
     subprocess.run(["inkscape", str(SRC / "logo-light.svg"), "--export-type=png",
                     f"--export-filename={ASSETS / 'logo-ui.png'}", "-h", "64"],
+                   check=True, capture_output=True)
+
+    # Bug icon next to "Report a bug" in the header; 2x size, shown at 16 px
+    subprocess.run(["inkscape", str(SRC / "icon-bug.svg"), "--export-type=png",
+                    f"--export-filename={ASSETS / 'bug-ui.png'}", "-w", "32", "-h", "32"],
                    check=True, capture_output=True)
 
 
