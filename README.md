@@ -59,16 +59,18 @@ and run it. On the first start the settings window opens on *How it works*.
 > **More info → Run anyway**. See [SmartScreen and antivirus](#smartscreen-and-antivirus).
 
 **1. Keyboard.** In your keyboard's software, give each key a shortcut and set the LEDs to the
-Lock indicator. Example for a 4-key SayoDevice macro pad:
+Lock indicator. Example for a SayoDevice 2x2 macro pad (SayoDevice numbers the keys row by row):
 
-| Key | Shortcut | Wispr Flow action | LED |
+| Key (SayoDevice ID) | Shortcut | Wispr Flow action | LED |
 |---|---|---|---|
-| 1 | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
-| 2 | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
-| 3 | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
-| 4 | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
+| Top left (ID 0) | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
+| Top right (ID 1) | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
+| Bottom left (ID 2) | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
+| Bottom right (ID 3) | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
 
-F13–F24 exist in the USB standard but not on regular keyboards, so they don't clash with other apps.
+**Why F13 and above?** A regular keyboard only has F1–F12, so no program has a reason to use
+F13–F24. They still exist in the USB standard, and macro pads can send them. `Ctrl+Shift` adds a
+second safety net: even if some program reacts to a plain F13, the combination stays free.
 
 > **Have a SayoDevice 2x2?** Skip the manual setup: download
 > [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), a backup with exactly the keys and LEDs
@@ -78,9 +80,31 @@ F13–F24 exist in the USB standard but not on regular keyboards, so they don't 
 >    the keyboard) and connect your macro pad.
 > 2. Go to **Backup & Restore → Restore**, pick the downloaded file, select what to restore (keys
 >    and lights) and confirm.
+> 3. Click **Save** to store the settings on the keyboard.
 >
 > If the app warns that the backup doesn't match the device, you have a different model: cancel
 > and set the keys by hand.
+
+<details>
+<summary><b>Setting the keys by hand in SayoDevice</b></summary>
+
+1. Open [sayodevice.com](https://sayodevice.com) in Chrome or Edge, connect the macro pad and go
+   to **Configuration → Binding**.
+2. Click a key, set **Key Mode** to **Keyboard**, then click the keyboard icon in the shortcut
+   field.
+
+   <img src="docs/img/sayo-keys-2x2.png" alt="SayoDevice: key bindings of a 2x2 macro pad" width="600">
+
+3. Select **Ctrl** and **Shift** on the keyboard and the F key in the bar below it (F13–F24 are
+   there), then click **OK**.
+
+   <img src="docs/img/sayo-key-picker.png" alt="SayoDevice: choosing Ctrl+Shift+F14" width="700">
+
+4. Repeat for the other keys. In **Configuration → Light**, set the LEDs to Indicator → Scroll Lock
+   and pick a colour (red fits "on air").
+5. Click **Save** to store the settings on the keyboard.
+
+</details>
 
 **2. OnAirKey.** On the *Shortcuts* tab, click **Record** next to each action and press the key on
 your macro pad. Paste last transcript doesn't need to be recorded: it doesn't change the recording

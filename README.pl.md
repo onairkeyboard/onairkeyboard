@@ -61,17 +61,19 @@ i uruchom. Przy pierwszym starcie okno ustawień otworzy się na zakładce *Jak 
 > [SmartScreen i antywirusy](#smartscreen-i-antywirusy).
 
 **1. Klawiatura.** W programie klawiatury przypisz każdemu klawiszowi skrót, a diody ustaw na
-wskaźnik Locka. Przykład dla 4-klawiszowej klawiatury SayoDevice:
+wskaźnik Locka. Przykład dla klawiatury SayoDevice 2x2 (SayoDevice numeruje klawisze wierszami):
 
-| Klawisz | Skrót | Akcja w Wispr Flow | Dioda |
+| Klawisz (ID w SayoDevice) | Skrót | Akcja w Wispr Flow | Dioda |
 |---|---|---|---|
-| 1 | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
-| 2 | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
-| 3 | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
-| 4 | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
+| Lewy górny (ID 0) | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
+| Prawy górny (ID 1) | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
+| Lewy dolny (ID 2) | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
+| Prawy dolny (ID 3) | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
 
-Klawisze F13–F24 istnieją w standardzie USB, ale nie ma ich na zwykłych klawiaturach, więc nie
-kolidują z innymi programami.
+**Dlaczego F13 i wyżej?** Zwykła klawiatura ma tylko F1–F12, więc żaden program nie ma powodu
+używać F13–F24. Te klawisze istnieją jednak w standardzie USB i klawiatury makro potrafią je
+wysyłać. `Ctrl+Shift` to drugi bezpiecznik: nawet jeśli jakiś program reaguje na samo F13,
+kombinacja z modyfikatorami pozostaje wolna.
 
 > **Masz SayoDevice 2x2?** Pomiń ręczną konfigurację: pobierz
 > [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), kopię zapasową z dokładnie takimi
@@ -81,9 +83,30 @@ kolidują z innymi programami.
 >    połączą się z klawiaturą) i podłącz klawiaturę makro.
 > 2. Wejdź w **Backup & Restore → Restore**, wybierz pobrany plik, zaznacz, co przywrócić
 >    (klawisze i podświetlenie), i potwierdź.
+> 3. Kliknij **Save**, żeby zapisać ustawienia w klawiaturze.
 >
 > Jeśli program ostrzeże, że kopia nie pasuje do urządzenia, masz inny model: anuluj i ustaw
 > klawisze ręcznie.
+
+<details>
+<summary><b>Ręczne ustawienie klawiszy w SayoDevice</b></summary>
+
+1. Otwórz [sayodevice.com](https://sayodevice.com) w Chrome albo Edge, podłącz klawiaturę makro
+   i wejdź w **Configuration → Binding**.
+2. Kliknij klawisz, ustaw **Key Mode** na **Keyboard** i kliknij ikonę klawiatury w polu skrótu.
+
+   <img src="docs/img/sayo-keys-2x2.png" alt="SayoDevice: przypisania klawiszy klawiatury 2x2" width="600">
+
+3. Zaznacz na klawiaturze **Ctrl** i **Shift**, a z paska pod nią wybierz klawisz F (są tam
+   F13–F24), potem kliknij **OK**.
+
+   <img src="docs/img/sayo-key-picker.png" alt="SayoDevice: wybór Ctrl+Shift+F14" width="700">
+
+4. Powtórz dla pozostałych klawiszy. W **Configuration → Light** ustaw diody na Indicator →
+   Scroll Lock i wybierz kolor (czerwony pasuje do „na antenie”).
+5. Kliknij **Save**, żeby zapisać ustawienia w klawiaturze.
+
+</details>
 
 **2. OnAirKey.** W zakładce *Skróty* kliknij **Nagraj** przy każdej akcji i naciśnij klawisz na
 klawiaturze makro. Paste last transcript nie trzeba nagrywać, bo nie zmienia stanu nagrywania.
