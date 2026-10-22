@@ -22,3 +22,5 @@ First version.
   injected keys after dictation stops), refreshed after startup, keyboard replug and wake, and
   the keyboard hook is reinstalled after Wispr Flow starts.
 - Support links (Buycoffee.to, GitHub Sponsors) and onairkey.com.
+- Ready-made SayoDevice 2x2 setup (`presets/WisprFlow_2x2.sayobak`), linked from How it works
+  and the README with restore steps.

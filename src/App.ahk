@@ -8,6 +8,9 @@ class App {
     static WebsiteName := "onairkey.com"
     ; GitHub organisation until the public repository exists
     static RepoUrl := "https://github.com/onairkey"
+    ; Ready SayoDevice 2x2 setup (keys and LEDs as in the README), restored in the Sayo web app
+    static SayoPresetUrl := "https://github.com/onairkey/onairkey/raw/main/presets/WisprFlow_2x2.sayobak"
+    static SayoAppUrl := "https://sayodevice.com"
 
     ; Private window message for test / automation commands (wParam = command)
     static WM_COMMAND := 0x8001

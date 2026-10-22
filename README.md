@@ -70,6 +70,18 @@ Lock indicator. Example for a 4-key SayoDevice macro pad:
 
 F13–F24 exist in the USB standard but not on regular keyboards, so they don't clash with other apps.
 
+> **Have a SayoDevice 2x2?** Skip the manual setup: download
+> [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), a backup with exactly the keys and LEDs
+> from the table above.
+>
+> 1. Open [sayodevice.com](https://sayodevice.com) in Chrome or Edge (other browsers can't talk to
+>    the keyboard) and connect your macro pad.
+> 2. Go to **Backup & Restore → Restore**, pick the downloaded file, select what to restore (keys
+>    and lights) and confirm.
+>
+> If the app warns that the backup doesn't match the device, you have a different model: cancel
+> and set the keys by hand.
+
 **2. OnAirKey.** On the *Shortcuts* tab, click **Record** next to each action and press the key on
 your macro pad. Paste last transcript doesn't need to be recorded: it doesn't change the recording
 state.

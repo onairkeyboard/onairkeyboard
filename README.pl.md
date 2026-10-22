@@ -73,6 +73,18 @@ wskaźnik Locka. Przykład dla 4-klawiszowej klawiatury SayoDevice:
 Klawisze F13–F24 istnieją w standardzie USB, ale nie ma ich na zwykłych klawiaturach, więc nie
 kolidują z innymi programami.
 
+> **Masz SayoDevice 2x2?** Pomiń ręczną konfigurację: pobierz
+> [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), kopię zapasową z dokładnie takimi
+> klawiszami i diodami jak w tabeli powyżej.
+>
+> 1. Otwórz [sayodevice.com](https://sayodevice.com) w Chrome albo Edge (inne przeglądarki nie
+>    połączą się z klawiaturą) i podłącz klawiaturę makro.
+> 2. Wejdź w **Backup & Restore → Restore**, wybierz pobrany plik, zaznacz, co przywrócić
+>    (klawisze i podświetlenie), i potwierdź.
+>
+> Jeśli program ostrzeże, że kopia nie pasuje do urządzenia, masz inny model: anuluj i ustaw
+> klawisze ręcznie.
+
 **2. OnAirKey.** W zakładce *Skróty* kliknij **Nagraj** przy każdej akcji i naciśnij klawisz na
 klawiaturze makro. Paste last transcript nie trzeba nagrywać, bo nie zmienia stanu nagrywania.
 

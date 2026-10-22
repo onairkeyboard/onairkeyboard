@@ -73,15 +73,19 @@ class SettingsWindow {
         win.AddText("x28 y116 w544 h76", T("howto.problem"))
         win.AddText("x28 y196 w544 h48", T("howto.solution"))
         win.SetFont("s10 bold")
-        win.AddText("x28 y254 w544", T("howto.steps_title"))
+        win.AddText("x28 y248 w544", T("howto.steps_title"))
         win.SetFont("s9 norm")
-        y := 280
+        y := 272
         for i, step in ["howto.step1", "howto.step2", "howto.step3"] {
             win.SetFont("bold")
             win.AddText(Format("x28 y{} w20", y), i ".")
             win.SetFont("norm")
             win.AddText(Format("x48 y{} w524 h32", y), T(step))
-            y += 38
+            if i = 1 {  ; SayoDevice 2x2 owners can skip step 1 with the ready backup
+                win.AddLink(Format("x48 y{} w524 h32", y + 34), T("howto.sayo", App.SayoPresetUrl, App.SayoAppUrl))
+                y += 70
+            } else
+                y += 28
         }
         win.AddText(Format("x28 y{} w544 {}", y + 4, muted), T("howto.no_led"))
         win.AddLink(Format("x28 y{} w544", y + 30), T("howto.more") " " SettingsWindow.WebsiteLink())
