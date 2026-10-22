@@ -46,7 +46,7 @@ class SettingsWindow {
         this._UpdateWisprStatus()
         this._statusTimer := ObjBindMethod(this, "_UpdateWisprStatus")
         SetTimer(this._statusTimer, 2000)
-        this.Win.Show("w600")
+        this.Win.Show("w600 h572")
         this.Tabs.Focus()  ; otherwise the header link gets the focus rectangle
     }
 
@@ -189,17 +189,17 @@ class SettingsWindow {
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---
-        win.AddText("x16 y466 w568 h32", T("support.cta"))
+        win.AddText("x16 y478 w568 h32", T("support.cta"))
         x := 16
         for link in Support.Links(Lang.Current) {
             width := link.Name = "GitHub Sponsors" ? 120 : 100
-            win.AddButton(Format("x{} y506 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
+            win.AddButton(Format("x{} y526 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
             x += width + 6
         }
 
         ; --- Footer ---
-        win.AddButton("x396 y506 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
-        win.AddButton("x494 y506 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
+        win.AddButton("x396 y526 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
+        win.AddButton("x494 y526 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
     }
 
     _FillAdvanced(source) {
