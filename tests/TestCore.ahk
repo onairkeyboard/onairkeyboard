@@ -92,7 +92,7 @@ Names(links) {
         text .= (text = "" ? "" : ", ") link.Name
     return text
 }
-Check("support pl", Names(Support.Links("pl")), "Suppi.pl, Buycoffee.to")
+Check("support pl", Names(Support.Links("pl")), "Buycoffee.to")
 Check("support en", Names(Support.Links("en")), "GitHub Sponsors")
 
 ; --- RecState ---
