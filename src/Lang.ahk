@@ -89,7 +89,7 @@ class Lang {
             "adv.hint", "Change these only if something doesn't work.",
             "btn.restore", "Restore defaults",
 
-            "support.cta", "Hi, I'm Patryk Szulczewski. I built OnAirKey to stop losing my dictated thoughts. If it made your day easier too, buy me a coffee:",
+            "support.cta", "Hi, I'm Patryk Szulczewski. I built OnAirKey to make my life simpler. If it made yours simpler too, here's your chance to say thanks.",
             "btn.open_config", "Open config.ini",
             "btn.cancel", "Cancel",
             "btn.save", "Save",
@@ -183,7 +183,7 @@ class Lang {
             "adv.hint", "Zmieniaj tylko, jeśli coś nie działa.",
             "btn.restore", "Przywróć domyślne",
 
-            "support.cta", "Cześć, tu Patryk Szulczewski. Zrobiłem OnAirKey, żeby przestać gubić podyktowane myśli. Jeśli Tobie też coś ułatwił, postaw mi kawę:",
+            "support.cta", "Cześć, tu Patryk Szulczewski. Stworzyłem OnAirKey, aby uprościć sobie życie. Jeśli udało mi się uprościć również Twoje, to poniżej masz okazję, aby mi się odwdzięczyć.",
             "btn.open_config", "Otwórz config.ini",
             "btn.cancel", "Anuluj",
             "btn.save", "Zapisz",

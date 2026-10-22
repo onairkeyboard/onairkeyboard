@@ -142,28 +142,22 @@ class SettingsWindow {
         }
         this._FillAdvanced(cfg)
         win.AddButton(Format("x28 y{} w150 h26", y + 2), T("btn.restore")).OnEvent("Click", (*) => this._FillAdvanced(Config()))
+        win.AddButton(Format("x186 y{} w150 h26", y + 2), T("btn.open_config")).OnEvent("Click", (*) => Run('notepad.exe "' this.Owner.Cfg.Path '"'))
         win.AddText(Format("x28 y{} w544 {}", y + 40, muted), T("adv.hint"))
         tabs.UseTab()
 
-        ; --- Support bar (visible on every tab); buttons right-aligned, story fills the rest ---
-        links := Support.Links(Lang.Current)
-        x := 588
-        buttons := []
-        Loop links.Length {
-            link := links[links.Length - A_Index + 1]  ; from the right, so they read in order
+        ; --- Support (visible on every tab): the story, then donation buttons below it ---
+        win.AddText("x16 y466 w568 h32", T("support.cta"))
+        x := 16
+        for link in Support.Links(Lang.Current) {
             width := link.Name = "GitHub Sponsors" ? 120 : 100
-            x -= width
-            buttons.Push([x, width, link])
-            x -= 6
+            win.AddButton(Format("x{} y506 w{} h28", x, width), link.Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(link))
+            x += width + 6
         }
-        win.AddText(Format("x16 y466 w{} h44", x - 16 - 6), T("support.cta"))
-        for b in buttons
-            win.AddButton(Format("x{} y472 w{} h28", b[1], b[2]), b[3].Name).OnEvent("Click", ((l, *) => Support.Open(l)).Bind(b[3]))
 
         ; --- Footer ---
-        win.AddButton("x16 y520 w140 h28", T("btn.open_config")).OnEvent("Click", (*) => Run('notepad.exe "' this.Owner.Cfg.Path '"'))
-        win.AddButton("x396 y520 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
-        win.AddButton("x494 y520 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
+        win.AddButton("x396 y506 w90 h28", T("btn.cancel")).OnEvent("Click", (*) => this.Close())
+        win.AddButton("x494 y506 w90 h28 Default", T("btn.save")).OnEvent("Click", (*) => this.Save())
     }
 
     _FillAdvanced(source) {
