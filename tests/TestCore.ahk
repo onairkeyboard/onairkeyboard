@@ -5,21 +5,7 @@
 #Include %A_LineFile%\..\..\src\Log.ahk
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\State.ahk
-
-failures := 0
-passed := 0
-
-Check(name, actual, expected) {
-    global failures, passed
-    if actual == expected
-        passed++
-    else {
-        failures++
-        Out("FAIL " name ": expected [" expected "], got [" actual "]")
-    }
-}
-
-Out(text) => FileAppend(text "`n", "*", "UTF-8")
+#Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
     dir := A_Temp "\onairkey-test-" A_TickCount "-" Random(1000, 9999)
@@ -114,5 +100,4 @@ try {
 } catch ValueError
     Check("bad hold throws", true, true)
 
-Out(passed " passed, " failures " failed")
-ExitApp(failures)
+Finish()

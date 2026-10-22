@@ -7,6 +7,9 @@ Persistent
 #Include %A_LineFile%\..\State.ahk
 #Include %A_LineFile%\..\Indicator.ahk
 #Include %A_LineFile%\..\WisprWatch.ahk
+#Include %A_LineFile%\..\Shortcut.ahk
+#Include %A_LineFile%\..\ModSession.ahk
+#Include %A_LineFile%\..\Hotkeys.ahk
 
 APP_NAME := "OnAirKey"
 APP_VERSION := "0.1.0"
@@ -35,6 +38,11 @@ led.Start(cfg.SyncIntervalMs, cfg.ResyncDelayMs)
 OnMessage(0x0219, (*) => led.ScheduleResync(1000))  ; WM_DEVICECHANGE
 OnMessage(0x0218, (*) => led.ScheduleResync(1000))  ; WM_POWERBROADCAST
 
+hotkeys := HotkeyEngine(state)
+hotkeys.Register(Shortcut.ValidShortcuts(cfg.Shortcuts, cfg.Lock, &issues))
+for issue in issues
+    Log.Write(Format("shortcut {1} for {2}: {3} {4}", issue.Level, issue.Action, issue.Code, issue.Detail))
+
 wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs)
 wispr.Start()
 
@@ -46,6 +54,7 @@ OnRecordingChange(recording) {
 }
 
 OnAppExit(*) {
+    hotkeys.Unregister()
     wispr.Stop()
     led.Stop()
     Log.Write(APP_NAME " stopped")
