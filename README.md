@@ -186,6 +186,14 @@ powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # try it from source
 
 Icons are generated from `assets/src` with `python -I assets/build_icons.py` (needs Inkscape).
 
+## Report a bug
+
+Something doesn't work? Click **🐞 Report a bug** at the top of the settings window (or in the
+tray menu). It opens an e-mail to [bug@onairkey.com](mailto:bug@onairkey.com) with three short
+questions and the technical details OnAirKey adds for you (version, Windows, shortcuts; nothing
+personal). Attaching the diagnostic log helps a lot: turn it on in *Settings → General*, make the
+problem happen again and attach `onairkey.log`.
+
 ## Support
 
 Hi, I'm Patryk Szulczewski. I built OnAirKey to make my life simpler. If it made yours simpler too,

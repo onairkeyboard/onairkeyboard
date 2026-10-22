@@ -143,6 +143,7 @@ Command(4, 1)  ; record push to talk
 Check("recording ptt starts", WaitLog("recording shortcut for PushToTalk"), true)
 Send("{Ctrl down}{Shift down}{F23}{Shift up}{Ctrl up}")
 Check("ptt recorded", WaitLog("recorded PushToTalk: Ctrl+Shift+F23"), true)
+Check("one settings window", WinGetList(settingsWin).Length, 1)  ; open + record must not open two
 Command(4, 3)  ; record cancel: Escape must be recorded, not close anything
 Check("recording cancel starts", WaitLog("recording shortcut for Cancel"), true)
 Send("{Escape}")

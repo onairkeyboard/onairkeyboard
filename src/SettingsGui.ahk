@@ -21,6 +21,10 @@ class SettingsWindow {
             SettingsWindow.Instance.Win.Show()
             return SettingsWindow.Instance
         }
+        ; Building the window takes longer than AutoHotkey's 15 ms before another thread may
+        ; interrupt. Without Critical, a queued command (open, record) would find no instance
+        ; yet and open a second window; a shortcut recorded there was lost on save.
+        Critical
         return SettingsWindow.Instance := SettingsWindow(owner, tab)
     }
 
@@ -34,9 +38,6 @@ class SettingsWindow {
         this.Rows := Map()
         this.LockRadios := Map()
         this._Build()
-        ; Registered before Show(): showing the window pumps messages, and a command arriving
-        ; meanwhile (open settings, record) must reuse this window instead of opening a second one
-        SettingsWindow.Instance := this
         if !tab
             tab := owner.Cfg.IsFirstRun && !owner.SettingsShown ? SettingsWindow.TAB_HOWTO : SettingsWindow.TAB_SHORTCUTS
         owner.SettingsShown := true
@@ -61,8 +62,13 @@ class SettingsWindow {
         logo := this.Owner.LogoFile
         if logo != "" && FileExist(logo)
             win.AddPicture("x16 y10 h32 w-1", logo)
-        win.AddLink("x140 y20 w150", SettingsWindow.WebsiteLink())
-        this.WisprStatus := win.AddText("x300 y20 w284 Right", "")
+        win.AddLink("x140 y20 w90", SettingsWindow.WebsiteLink())
+        ; The bug icon needs its own control: a link control doesn't fall back to the emoji font
+        win.SetFont(, "Segoe UI Emoji")
+        win.AddText("x236 y19 w18", "🐞").OnEvent("Click", (*) => this.Owner.ReportBug())
+        win.SetFont(, "Segoe UI")
+        win.AddLink("x256 y20 w110", '<a id="bug">' T("header.bug") '</a>').OnEvent("Click", (*) => this.Owner.ReportBug())
+        this.WisprStatus := win.AddText("x370 y20 w214 Right", "")
 
         tabs := win.AddTab3("x12 y52 w576 h404",
             [T("tab.howto"), T("tab.shortcuts"), T("tab.indicator"), T("tab.general"), T("tab.advanced"), T("tab.about")])
@@ -172,9 +178,10 @@ class SettingsWindow {
         win.AddText("x28 y226 w544 h32", T("about.oss"))
         win.AddLink("x28 y262 w544", Format('<a href="{1}">{1}</a>', App.RepoUrl))
         win.AddLink("x28 y288 w544", T("about.website") " " SettingsWindow.WebsiteLink())
-        win.AddText("x28 y318 w544", T("about.author"))
-        win.AddText(Format("x28 y340 w544 h32 {}", muted), T("about.disclaimer"))
-        win.AddText(Format("x28 y376 w544 h32 {}", muted), T("about.config", this.Owner.Cfg.Path))
+        win.AddLink("x28 y312 w544", T("about.bug", Support.BugEmail)).OnEvent("Click", (*) => this.Owner.ReportBug())
+        win.AddText("x28 y342 w544", T("about.author"))
+        win.AddText(Format("x28 y364 w544 h32 {}", muted), T("about.disclaimer"))
+        win.AddText(Format("x28 y400 w544 h32 {}", muted), T("about.config", this.Owner.Cfg.Path))
         tabs.UseTab()
 
         ; --- Support (visible on every tab): the story, then donation buttons below it ---

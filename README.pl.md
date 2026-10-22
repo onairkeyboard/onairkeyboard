@@ -188,6 +188,14 @@ powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # uruchomienie ze ź
 
 Ikony powstają z `assets/src` poleceniem `python -I assets/build_icons.py` (wymaga Inkscape).
 
+## Zgłoś błąd
+
+Coś nie działa? Kliknij **🐞 Zgłoś błąd** u góry okna ustawień (albo w menu w zasobniku).
+Otworzy się e-mail na [bug@onairkey.com](mailto:bug@onairkey.com) z trzema krótkimi pytaniami
+i danymi technicznymi, które OnAirKey dopisze za Ciebie (wersja, Windows, skróty; nic
+osobistego). Bardzo pomaga dziennik diagnostyczny: włącz go w *Ustawienia → Ogólne*, powtórz
+problem i załącz plik `onairkey.log`.
+
 ## Wesprzyj
 
 Cześć, tu Patryk Szulczewski. Stworzyłem OnAirKey, aby uprościć sobie życie. Jeśli udało mi się

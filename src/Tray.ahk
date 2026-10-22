@@ -34,6 +34,7 @@ class TrayUI {
         this.PauseLabel := T(owner.Paused ? "tray.resume" : "tray.pause")
         tray.Add(this.PauseLabel, (*) => owner.TogglePause())
         tray.Add(T("tray.open_log"), (*) => owner.OpenLog())
+        tray.Add(T("tray.report_bug"), (*) => owner.ReportBug())
         tray.Add()
         tray.Add(T("tray.website"), (*) => Run(App.WebsiteUrl))
         tray.Add(T("tray.about"), (*) => owner.ShowAbout())

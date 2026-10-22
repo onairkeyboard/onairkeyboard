@@ -145,6 +145,27 @@ class App {
 
     ShowAbout() => SettingsWindow.Open(this, SettingsWindow.TAB_ABOUT)
 
+    ; Opens a prefilled bug report e-mail. The address also goes to the clipboard, because
+    ; mailto: does nothing useful for people who only use webmail.
+    ReportBug() {
+        cfg := this.Cfg
+        shortcuts := ""
+        for action in Config.Actions
+            shortcuts .= (shortcuts = "" ? "" : ", ") action "=" cfg.Shortcuts[action]
+        diag := Format("OnAirKey {1} ({2})`nWindows {3}`nWispr Flow: {4}`nIndicator: {5}`nShortcuts: {6}`nLanguage: {7}`nDiagnostic log: {8}"
+            , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion
+            , this.WisprRunning ? "detected" : "not running", cfg.Lock, shortcuts, Lang.Current
+            , cfg.Debug ? this.DataDir "\onairkey.log" : "off")
+        A_Clipboard := Support.BugEmail
+        Log.Write("bug report opened")
+        try Run(Support.BugMailto(App.Version, diag))
+        catch {
+            MsgBox(T("bug.no_mail", Support.BugEmail), App.Name, "Iconi")
+            return
+        }
+        TrayTip(T("bug.copied", Support.BugEmail), App.Name)
+    }
+
     ; Commands run on a timer so the sender's PostMessage returns immediately.
     OnCommand(wParam, lParam, *) {
         switch wParam {
