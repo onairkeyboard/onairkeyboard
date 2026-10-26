@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to OnAirKey are documented here.
+All notable changes to OnAir keyboard are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
@@ -11,7 +11,8 @@ First version.
 ### Added
 - Keyboard LED shows when Wispr Flow is recording, driven by a Lock key state (Scroll Lock by
   default, Num Lock or Caps Lock to choose).
-- Tray icon turns red while recording, so OnAirKey works even without a keyboard LED.
+- Tray icon turns red while recording, so OnAir keyboard works even without a keyboard LED.
+  At rest it's black on a light taskbar and white on a dark one, following Windows live.
 - Actions: Push to talk and Command Mode (hold), Hands-free (toggle), Cancel (reset).
 - Settings window: How it works, Shortcuts, Indicator, General, Advanced and About tabs.
 - Shortcut recording by pressing the keys, including F13–F24, Escape and modifier-only
@@ -21,15 +22,15 @@ First version.
 - Reliability fixes from real use: the LED state is enforced on a timer (Wispr briefly blocks
   injected keys after dictation stops), refreshed after startup, keyboard replug and wake, and
   the keyboard hook is reinstalled after Wispr Flow starts.
-- Support links (Buycoffee.to, GitHub Sponsors) and onairkey.com.
+- Support links (Buycoffee.to, GitHub Sponsors) and onairkeyboard.com.
 - While Wispr Flow isn't running, shortcuts are ignored and the LED stays off (it turns off if
   Wispr Flow exits mid-recording); the tray tooltip and the settings header, in red, say so.
-- Self-install on request: the first start asks to copy OnAirKey to
-  `%LOCALAPPDATA%\Programs\OnAirKey` with a Start menu shortcut (no administrator rights);
+- Self-install on request: the first start asks to copy OnAir keyboard to
+  `%LOCALAPPDATA%\Programs\OnAirKeyboard` with a Start menu shortcut (no administrator rights);
   a newer download offers to replace the installed copy; "No" runs it from where it is and is
   remembered (`Portable=1`).
 - How it works scrolls, and tells how to keep the tray icon visible on the taskbar.
-- Report a bug (settings header, tray menu, About): a window with the address bug@onairkey.com,
+- Report a bug (settings header, tray menu, About): a window with the address hello@onairkeyboard.com,
   a subject and a ready e-mail text with technical details, and buttons to copy them into any
   mailbox (no mail app needed). It says clearly that the text is a template to complete and
   links the diagnostic log file to attach.

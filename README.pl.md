@@ -12,10 +12,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/onairkey/onairkey/releases/latest"><img src="https://img.shields.io/badge/Pobierz-OnAirKey.exe-1F1E1D?logo=windows&logoColor=white" alt="Pobierz"></a>
-  <a href="https://onairkey.com"><img src="https://img.shields.io/badge/onairkey.com-strona-E24B4A" alt="Strona"></a>
-  <a href="https://buycoffee.to/onairkey"><img src="https://img.shields.io/badge/Buycoffee.to-wesprzyj-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
-  <a href="https://github.com/sponsors/onairkey"><img src="https://img.shields.io/badge/GitHub_Sponsors-wesprzyj-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
+  <a href="https://github.com/onairkeyboard/onairkeyboard/releases/latest"><img src="https://img.shields.io/badge/Pobierz-OnAirKeyboard.exe-2A2A2A?logo=windows&logoColor=white" alt="Pobierz"></a>
+  <a href="https://onairkeyboard.com"><img src="https://img.shields.io/badge/onairkeyboard.com-strona-E63A3A" alt="Strona"></a>
+  <a href="https://buycoffee.to/onairkeyboard"><img src="https://img.shields.io/badge/Buycoffee.to-wesprzyj-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
+  <a href="https://github.com/sponsors/onairkeyboard"><img src="https://img.shields.io/badge/GitHub_Sponsors-wesprzyj-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
   <img src="https://img.shields.io/badge/licencja-MIT-blue" alt="Licencja MIT">
 </p>
 
@@ -30,23 +30,23 @@ przyspieszyć pracę. Ale skróty w stylu `Ctrl+Win+Space` to gimnastyka dla pal
 czy nagrywanie trwa, kończy się klasyką: kilka minut monologu, który nigdy się nie nagrał, albo
 rozmowa, która nagrywa się w najlepsze.
 
-OnAirKey zamienia małą klawiaturę makro w pilota do dyktowania: osobny klawisz na każdą funkcję
+OnAir keyboard zamienia małą klawiaturę makro w pilota do dyktowania: osobny klawisz na każdą funkcję
 i lampka, która świeci na czerwono dokładnie wtedy, gdy jesteś „na antenie”. Jedno naciśnięcie
 i od razu wiesz, co się dzieje.
 
-<p align="center"><img src="docs/img/settings-howto-pl.png" alt="Ustawienia OnAirKey: Jak to działa" width="600"></p>
+<p align="center"><img src="docs/img/settings-howto-pl.png" alt="Ustawienia OnAir keyboard: Jak to działa" width="600"></p>
 
 ## Co potrafi
 
 - **Dioda klawiatury jako lampka „na antenie”.** Działa z każdą klawiaturą, której diody umieją
   pokazywać stan Locka (np. klawiatury makro SayoDevice): domyślnie Scroll Lock, do wyboru Num Lock
   albo Caps Lock.
-- **Czerwona ikona w zasobniku podczas nagrywania**, więc OnAirKey pomaga także bez diody.
+- **Czerwona ikona w zasobniku podczas nagrywania**, więc OnAir keyboard pomaga także bez diody.
 - **Wszystkie akcje nagrywania Wispr Flow:** Push to talk, Hands-free, Cancel i Command Mode.
 - **Skróty nagrywasz, naciskając je**, także F13–F24 i domyślne skróty Wispr, np. `Ctrl+Win`.
 - **Po polsku i po angielsku**, uruchamia się z Windows, jeden mały plik EXE, który na życzenie
   sam się instaluje (bez uprawnień administratora i osobnego instalatora).
-- **Prywatny z założenia:** OnAirKey tylko nasłuchuje Twoich skrótów. Niczego nie blokuje, nie czyta
+- **Prywatny z założenia:** OnAir keyboard tylko nasłuchuje Twoich skrótów. Niczego nie blokuje, nie czyta
   tekstu, nie zbiera danych i nie łączy się z internetem.
 
 ## Wymagania
@@ -57,18 +57,18 @@ i od razu wiesz, co się dzieje.
 
 ## Pierwsze kroki
 
-**0. Pobierz** `OnAirKey.exe` z [Releases](https://github.com/onairkey/onairkey/releases/latest)
-i uruchom. Przy pierwszym starcie OnAirKey zapyta, czy się zainstalować: **Tak** kopiuje go do
-`%LOCALAPPDATA%\Programs\OnAirKey` i dodaje skrót w menu Start (bez uprawnień administratora),
+**0. Pobierz** `OnAirKeyboard.exe` z [Releases](https://github.com/onairkeyboard/onairkeyboard/releases/latest)
+i uruchom. Przy pierwszym starcie OnAir keyboard zapyta, czy się zainstalować: **Tak** kopiuje go do
+`%LOCALAPPDATA%\Programs\OnAirKeyboard` i dodaje skrót w menu Start (bez uprawnień administratora),
 więc pobrany plik możesz usunąć; **Nie** uruchamia go tam, gdzie leży, i więcej nie pyta. Potem
 okno ustawień otworzy się na zakładce *Jak to działa*. Aktualizacja: pobierz nową wersję
-i uruchom ją, a OnAirKey zaproponuje zastąpienie zainstalowanej kopii (ustawienia zostają).
+i uruchom ją, a OnAir keyboard zaproponuje zastąpienie zainstalowanej kopii (ustawienia zostają).
 
 > Windows może pokazać „System Windows ochronił ten komputer”, bo plik nie ma jeszcze podpisu
 > cyfrowego. Kliknij **Więcej informacji → Uruchom mimo to**. Zobacz
 > [SmartScreen i antywirusy](#smartscreen-i-antywirusy).
 
-**1. Klawiatura.** W programie klawiatury przypisz każdemu klawiszowi skrót, a diody ustaw na
+**1. Klawiatura makro.** W programie klawiatury przypisz każdemu klawiszowi skrót, a diody ustaw na
 wskaźnik Locka. Przykład dla klawiatury SayoDevice 2x2 (SayoDevice numeruje klawisze wierszami):
 
 | Klawisz (ID w SayoDevice) | Skrót | Akcja w Wispr Flow | Dioda |
@@ -116,10 +116,10 @@ kombinacja z modyfikatorami pozostaje wolna.
 
 </details>
 
-**2. OnAirKey.** W zakładce *Skróty* kliknij **Nagraj** przy każdej akcji i naciśnij klawisz na
+**2. OnAir keyboard.** W zakładce *Skróty* kliknij **Nagraj** przy każdej akcji i naciśnij klawisz na
 klawiaturze makro. Paste last transcript nie trzeba nagrywać, bo nie zmienia stanu nagrywania.
 
-<p align="center"><img src="docs/img/settings-shortcuts-pl.png" alt="Ustawienia OnAirKey: Skróty" width="600"></p>
+<p align="center"><img src="docs/img/settings-shortcuts-pl.png" alt="Ustawienia OnAir keyboard: Skróty" width="600"></p>
 
 **3. Wispr Flow.** W *Settings → General → Shortcuts* ustaw te same skróty dla Push to talk,
 Hands-free i Cancel.
@@ -130,17 +130,17 @@ Gotowe: naciśnij Push to talk albo Hands-free, a dioda zaświeci na czerwono.
 
 Umówmy się: Wispr Flow potrafi dużo więcej. Ale większość ludzi nie korzysta z tych bajerów, tylko
 rozmawia ze swoim AI za pomocą podstaw: **Push to talk, Hands-free i Cancel**. Jest jeszcze Command
-Mode i OnAirKey też go obsługuje, ale na pewno używa się go dużo rzadziej. Czwarty klawisz na
+Mode i OnAir keyboard też go obsługuje, ale na pewno używa się go dużo rzadziej. Czwarty klawisz na
 klawiaturze trafia do **Paste last transcript** (o tym niżej).
 
-OnAirKey to konkretne rozwiązanie konkretnego problemu dla konkretnej grupy użytkowników, a nie
+OnAir keyboard to konkretne rozwiązanie konkretnego problemu dla konkretnej grupy użytkowników, a nie
 uniwersalny kombajn do wszystkiego. Może kiedyś pokusimy się o bardziej uniwersalną wersję, ale na
 pewno nie teraz, bo to nie jest teraz istotne.
 
 ## Dlaczego Wispr Flow?
 
 Korzystałem z kilku alternatywnych narzędzi i uważam, że Wispr Flow działa najlepiej ze wszystkich.
-Sam używam go na co dzień, a OnAirKey powstał dokładnie pod to, jak z nim pracuję.
+Sam używam go na co dzień, a OnAir keyboard powstał dokładnie pod to, jak z nim pracuję.
 
 ## Dlaczego Paste last transcript na czwartym klawiszu?
 
@@ -148,47 +148,47 @@ Każdemu się zdarza: dyktujesz, ale kursor nie stał w polu tekstowym (albo okn
 i tekst nigdzie nie trafił. Wispr Flow go pamięta. Kliknij w pole, naciśnij czwarty klawisz i ostatnie
 dyktowanie się pojawi. Bez przepisywania, bez mówienia wszystkiego od nowa i bez zapamiętywania skrótu.
 
-OnAirKey nie musi znać tego klawisza: wklejanie nie zmienia stanu nagrywania.
+OnAir keyboard nie musi znać tego klawisza: wklejanie nie zmienia stanu nagrywania.
 
 ## Dlaczego nie Escape?
 
 Domyślny Cancel w Wispr Flow to `Escape`, ale Escape przerywa też inne programy. Jeśli Claude Code
 czy ChatGPT właśnie pracuje, jednym naciśnięciem anulujesz dyktowanie i zatrzymasz pracę AI.
-Przypisz Cancel do osobnego klawisza na klawiaturze makro. OnAirKey obsługuje Escape, ale ostrzega
+Przypisz Cancel do osobnego klawisza na klawiaturze makro. OnAir keyboard obsługuje Escape, ale ostrzega
 przed nim.
 
 ## Warto wiedzieć
 
 - **Trzymaj ikonę w zasobniku na widoku.** Windows chowa nowe ikony pod strzałką **^** obok
-  zegara. Przeciągnij stamtąd ikonę OnAirKey na pasek zadań, żeby czerwona ikona była zawsze
+  zegara. Przeciągnij stamtąd ikonę OnAir keyboard na pasek zadań, żeby czerwona ikona była zawsze
   widoczna. W Windows 11 możesz ją też włączyć w *Ustawienia → Personalizacja → Pasek zadań*,
   w sekcji z pozostałymi ikonami zasobnika.
-- **OnAirKey śledzi Twoje skróty, a nie samego Wispr.** Jeśli nagrywanie zmieni się inaczej
+- **OnAir keyboard śledzi Twoje skróty, a nie samego Wispr.** Jeśli nagrywanie zmieni się inaczej
   (podwójne naciśnięcie Push to talk, zatrzymanie myszką w Flow Bar, automatyczny koniec po
   20 minutach), dioda może zostać zapalona. Naciśnij Cancel i wszystko wraca do normy.
 - **Lock naprawdę się przełącza.** Gdy wskaźnikiem jest Scroll Lock, strzałki w Excelu przewijają
   arkusz podczas dyktowania. Przy Caps Locku litery będą wielkie.
 - Skrót może mieć jeden klawisz oprócz Ctrl / Alt / Shift / Win (Wispr pozwala też na dwa, np.
-  `Ctrl+A+B`; OnAirKey jeszcze nie).
+  `Ctrl+A+B`; OnAir keyboard jeszcze nie).
 - Jeśli wyskakuje powiadomienie „Scroll Lock włączony”, pochodzi ono z programu myszy lub
   klawiatury (np. Logitech SetPoint), a nie z Windows. Wyłączysz je w tamtym programie.
 
 ## SmartScreen i antywirusy
 
-OnAirKey jest napisany w [AutoHotkey](https://www.autohotkey.com) i skompilowany do pliku EXE.
+OnAir keyboard jest napisany w [AutoHotkey](https://www.autohotkey.com) i skompilowany do pliku EXE.
 Takie pliki nie mają jeszcze podpisu cyfrowego, więc Windows SmartScreen ostrzega przed nimi,
 a niektóre antywirusy mylnie je oznaczają, zwłaszcza że program nasłuchuje klawiatury. Pełny kod
 źródłowy jest w tym repozytorium i możesz [zbudować EXE samodzielnie](#budowanie-ze-źródeł).
 
 ## Ustawienia i odinstalowanie
 
-Ustawienia są w `%APPDATA%\OnAirKey\config.ini` (ścieżkę pokazuje zakładka *O programie*). Żeby
-usunąć OnAirKey: odznacz *Uruchamiaj z Windows*, zamknij program z menu w zasobniku, a potem usuń:
+Ustawienia są w `%APPDATA%\OnAirKeyboard\config.ini` (ścieżkę pokazuje zakładka *O programie*). Żeby
+usunąć OnAir keyboard: odznacz *Uruchamiaj z Windows*, zamknij program z menu w zasobniku, a potem usuń:
 
-- folder programu `%LOCALAPPDATA%\Programs\OnAirKey` (albo sam `OnAirKey.exe` tam, skąd go
+- folder programu `%LOCALAPPDATA%\Programs\OnAirKeyboard` (albo sam `OnAirKeyboard.exe` tam, skąd go
   uruchamiasz, jeśli nie był instalowany),
-- skrót *OnAirKey* w menu Start (prawy klik → *Otwórz lokalizację pliku*),
-- folder ustawień `%APPDATA%\OnAirKey`.
+- skrót *OnAir keyboard* w menu Start (prawy klik → *Otwórz lokalizację pliku*),
+- folder ustawień `%APPDATA%\OnAirKeyboard`.
 
 ## Budowanie ze źródeł
 
@@ -197,7 +197,7 @@ Wymagania: [AutoHotkey v2.0](https://www.autohotkey.com) i Ahk2Exe 1.1.37 lub no
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\run.ps1      # testy
-powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKey.exe
+powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKeyboard.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe # testy łącznie z EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # uruchomienie ze źródeł
 ```
@@ -207,21 +207,21 @@ Ikony powstają z `assets/src` poleceniem `python -I assets/build_icons.py` (wym
 ## Zgłoś błąd
 
 Coś nie działa? Kliknij **🐞 Zgłoś błąd** u góry okna ustawień (albo w menu w zasobniku).
-Okienko pokaże adres [bug@onairkey.com](mailto:bug@onairkey.com), temat i gotową treść e-maila:
-trzy krótkie pytania oraz dane techniczne, które OnAirKey uzupełni za Ciebie (wersja, Windows,
+Okienko pokaże adres [hello@onairkeyboard.com](mailto:hello@onairkeyboard.com), temat i gotową treść e-maila:
+trzy krótkie pytania oraz dane techniczne, które OnAir keyboard uzupełni za Ciebie (wersja, Windows,
 skróty; nic osobistego). Przyciski **Kopiuj adres** i **Kopiuj treść** wrzucają je do schowka,
 więc zgłoszenie wyślesz z dowolnej poczty, także z Gmaila. Bardzo pomaga dziennik
-diagnostyczny: włącz go w *Ustawienia → Ogólne*, powtórz problem i załącz plik `onairkey.log`.
+diagnostyczny: włącz go w *Ustawienia → Ogólne*, powtórz problem i załącz plik `onairkeyboard.log`.
 
 ## Wesprzyj
 
-Cześć, tu Patryk Szulczewski. Stworzyłem OnAirKey, aby uprościć sobie życie. Jeśli udało mi się
+Cześć, tu Patryk Szulczewski. Stworzyłem OnAir keyboard, aby uprościć sobie życie. Jeśli udało mi się
 uprościć również Twoje, to poniżej masz okazję, aby mi się odwdzięczyć:
 
-<a href="https://buycoffee.to/onairkey"><img src="https://img.shields.io/badge/Buycoffee.to-wesprzyj-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
-<a href="https://github.com/sponsors/onairkey"><img src="https://img.shields.io/badge/GitHub_Sponsors-wesprzyj-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
+<a href="https://buycoffee.to/onairkeyboard"><img src="https://img.shields.io/badge/Buycoffee.to-wesprzyj-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
+<a href="https://github.com/sponsors/onairkeyboard"><img src="https://img.shields.io/badge/GitHub_Sponsors-wesprzyj-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
 
-Więcej o OnAirKey: [onairkey.com](https://onairkey.com)
+Więcej o OnAir keyboard: [onairkeyboard.com](https://onairkeyboard.com)
 
 ## Licencja
 
@@ -230,4 +230,4 @@ Więcej o OnAirKey: [onairkey.com](https://onairkey.com)
 Ikona owada pochodzi z [Ionicons](https://ionic.io/ionicons)
 ([MIT](assets/src/LICENSE-ionicons.txt), © Ionic).
 
-OnAirKey to niezależny projekt, niepowiązany z Wispr AI (Wispr Flow) ani z SayoDevice.
+OnAir keyboard to niezależny projekt, niepowiązany z Wispr AI (Wispr Flow) ani z SayoDevice.
