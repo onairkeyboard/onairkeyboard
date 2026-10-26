@@ -1,5 +1,5 @@
 ; Tray icon and menu. The icon mirrors the recording state (red keycap while recording), so
-; OnAirKey works as an indicator even without a keyboard LED. The idle keycap is black on a
+; OnAir keyboard works as an indicator even without a keyboard LED. The idle keycap is black on a
 ; light taskbar and white on a dark one, so it never blends in.
 class TrayUI {
     __New(owner) {

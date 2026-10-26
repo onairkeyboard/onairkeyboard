@@ -1,13 +1,13 @@
 #Requires AutoHotkey v2.0
-; End-to-end test: starts OnAirKey with a temporary config and drives it with simulated keys.
+; End-to-end test: starts OnAir keyboard with a temporary config and drives it with simulated keys.
 ; Uses Caps Lock as the indicator and Ctrl+Shift+F20..F22, which neither Wispr Flow nor the
-; legacy script listen to. Keys are sent with SendLevel 1 so OnAirKey's hotkeys see them.
-; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk [--exe dist\OnAirKey.exe]
+; legacy script listen to. Keys are sent with SendLevel 1 so OnAir keyboard's hotkeys see them.
+; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk [--exe dist\OnAirKeyboard.exe]
 ; With --exe the compiled program is tested instead of the script.
 
 #Include %A_LineFile%\..\TestLib.ahk
 
-target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKey.ahk"'
+target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk"'
 exePath := ""
 for i, arg in A_Args
     if arg = "--exe" && i < A_Args.Length
@@ -39,7 +39,7 @@ TestConfig(folder, helperProcess) {
 }
 
 SplitPath(A_AhkPath, &ahkExe)
-dir := A_Temp "\onairkey-integration"
+dir := A_Temp "\onairkeyboard-integration"
 TestConfig(dir, ahkExe)
 
 SetCapsLockState(false)
@@ -116,7 +116,7 @@ Check("blink off", Caps(), 0)
 Sleep(1600)
 Check("blink ends off", Caps(), 0)
 
-logText := FileRead(dir "\onairkey.log")
+logText := FileRead(dir "\onairkeyboard.log")
 Check("tray icon goes red", InStr(logText, "tray icon tray-rec") > 0, true)
 Check("tray icon back to idle", InStr(logText, "tray icon tray-idle") > 0, true)
 Check("paused logged", InStr(logText, "paused") > 0, true)
@@ -125,7 +125,7 @@ Check("no runtime errors", InStr(logText, "ERROR"), 0)
 ; Settings window: record shortcuts with simulated keys, save, use them without a restart
 ; Waits until the app's log contains text (instead of guessing delays), up to timeoutMs
 WaitLog(text, timeoutMs := 4000, logDir := "") {
-    file := (logDir = "" ? dir : logDir) "\onairkey.log"
+    file := (logDir = "" ? dir : logDir) "\onairkeyboard.log"
     start := A_TickCount
     while A_TickCount - start < timeoutMs {
         try {  ; the app may be writing the log right now
@@ -142,7 +142,7 @@ settingsWin := "ahk_class AutoHotkeyGUI ahk_pid " pid
 ; Report a bug: a window with the address and a prefilled text, no mail app involved
 Command(6)
 Check("bug report window opens", WinWait(settingsWin, , 5) != 0, true)
-Check("bug report address", ControlGetText("Edit1", settingsWin), "bug@onairkey.com")
+Check("bug report address", ControlGetText("Edit1", settingsWin), "hello@onairkeyboard.com")
 Check("bug report details", InStr(ControlGetText("Edit3", settingsWin), "Cancel=Ctrl+Shift+F22") > 0, true)
 WinClose(settingsWin)
 Check("bug report closes", WinWaitClose(settingsWin, , 3) != 0, true)
@@ -211,12 +211,12 @@ WinClose("ahk_class AutoHotkey ahk_pid " pid)
 Check("exits cleanly", ProcessWaitClose(pid, 3), 0)
 SetCapsLockState(false)
 if failures
-    Out(FileRead(dir "\onairkey.log"))
+    Out(FileRead(dir "\onairkeyboard.log"))
 
 ; Wispr Flow not running: shortcuts are ignored and the LED stays off. When the helper exits
 ; while recording, the LED turns off. A hidden ping process stands in for the helper.
 failuresBefore := failures
-wDir := A_Temp "\onairkey-nowispr"
+wDir := A_Temp "\onairkeyboard-nowispr"
 TestConfig(wDir, "PING.EXE")
 Run(target ' --config "' wDir '\config.ini"', , , &pid3)
 Check("missing helper logged", WaitLog("Wispr helper not running", 6000, wDir), true)
@@ -236,12 +236,12 @@ WinClose("ahk_class AutoHotkey ahk_pid " pid3)
 ProcessWaitClose(pid3, 3)
 SetCapsLockState(false)
 if failures > failuresBefore
-    Out(FileRead(wDir "\onairkey.log"))
+    Out(FileRead(wDir "\onairkeyboard.log"))
 
 ; First run (no config yet): settings open by themselves on "How it works";
 ; opening them again later shows "Shortcuts".
 ; Note: a fresh config uses Scroll Lock, so the keyboard LED may blink once here.
-freshDir := A_Temp "\onairkey-firstrun"
+freshDir := A_Temp "\onairkeyboard-firstrun"
 try DirDelete(freshDir, true)
 Run(target ' --config "' freshDir '\config.ini"', , , &pid2)
 firstWin := "ahk_class AutoHotkeyGUI ahk_pid " pid2
@@ -258,10 +258,10 @@ Check("later opens shortcuts", ControlGetIndex("SysTabControl321", firstWin), 2)
 WinClose("ahk_class AutoHotkey ahk_pid " pid2)
 ProcessWaitClose(pid2, 3)
 
-; Process id of the OnAirKey.exe running from the test install folder, 0 if none
+; Process id of the OnAirKeyboard.exe running from the test install folder, 0 if none
 InstalledPid() {
-    for hwnd in WinGetList("ahk_class AutoHotkey ahk_exe OnAirKey.exe")
-        if WinGetProcessPath(hwnd) = instDir "\OnAirKey.exe"
+    for hwnd in WinGetList("ahk_class AutoHotkey ahk_exe OnAirKeyboard.exe")
+        if WinGetProcessPath(hwnd) = instDir "\OnAirKeyboard.exe"
             return WinGetPID(hwnd)
     return 0
 }
@@ -279,18 +279,18 @@ WaitInstalledPid(oldPid := 0) {
 ; Note: fresh configs use Scroll Lock, so the keyboard LED may blink here.
 if exePath != "" {
     DetectHiddenWindows(true)
-    dlDir := A_Temp "\onairkey-download", instDir := A_Temp "\onairkey-install"
-    for folder in [dlDir, instDir, A_Temp "\onairkey-install-no", A_Temp "\onairkey-inst-cfg", A_Temp "\onairkey-portable-cfg"]
+    dlDir := A_Temp "\onairkeyboard-download", instDir := A_Temp "\onairkeyboard-install"
+    for folder in [dlDir, instDir, A_Temp "\onairkeyboard-install-no", A_Temp "\onairkeyboard-inst-cfg", A_Temp "\onairkeyboard-portable-cfg"]
         try DirDelete(folder, true)
     DirCreate(dlDir)
-    FileCopy(exePath, dlDir "\OnAirKey.exe")
-    downloaded := '"' dlDir '\OnAirKey.exe" --install-dir "' instDir '"'
+    FileCopy(exePath, dlDir "\OnAirKeyboard.exe")
+    downloaded := '"' dlDir '\OnAirKeyboard.exe" --install-dir "' instDir '"'
 
-    instCfg := A_Temp "\onairkey-inst-cfg\config.ini"
+    instCfg := A_Temp "\onairkeyboard-inst-cfg\config.ini"
     Run(downloaded ' --config "' instCfg '" --install-answer yes', , , &dlPid)
     Check("download exits after install", ProcessWaitClose(dlPid, 10), 0)
-    Check("exe installed", FileExist(instDir "\OnAirKey.exe") != "", true)
-    Check("start menu shortcut", FileExist(instDir "\Start Menu\OnAirKey.lnk") != "", true)
+    Check("exe installed", FileExist(instDir "\OnAirKeyboard.exe") != "", true)
+    Check("start menu shortcut", FileExist(instDir "\Start Menu\OnAir keyboard.lnk") != "", true)
     instPid := WaitInstalledPid()
     Check("installed copy runs", instPid != 0, true)
     Check("installed copy sees first run", WinWait("ahk_class AutoHotkeyGUI ahk_pid " instPid, , 5) != 0, true)
@@ -303,11 +303,11 @@ if exePath != "" {
     ProcessWaitClose(instPid2, 3)
 
     ; "No": runs from Downloads, installs nothing and remembers Portable=1
-    portableCfg := A_Temp "\onairkey-portable-cfg\config.ini"
-    Run('"' dlDir '\OnAirKey.exe" --install-dir "' A_Temp '\onairkey-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
+    portableCfg := A_Temp "\onairkeyboard-portable-cfg\config.ini"
+    Run('"' dlDir '\OnAirKeyboard.exe" --install-dir "' A_Temp '\onairkeyboard-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
     Sleep(2000)
     Check("no keeps running here", ProcessExist(portablePid) != 0, true)
-    Check("no installs nothing", FileExist(A_Temp "\onairkey-install-no\OnAirKey.exe"), "")
+    Check("no installs nothing", FileExist(A_Temp "\onairkeyboard-install-no\OnAirKeyboard.exe"), "")
     Check("no is remembered", InStr(FileRead(portableCfg, "UTF-16"), "Portable=1") > 0, true)
     WinClose("ahk_class AutoHotkey ahk_pid " portablePid)
     ProcessWaitClose(portablePid, 3)

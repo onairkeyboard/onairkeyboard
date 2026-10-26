@@ -135,7 +135,7 @@ Check("rec stray up ignored", Record("-LShift +LControl +F1"), "Ctrl+F1")
 Check("rec parses back", ParseText(Record("+LShift +LControl +F24")), "Ctrl+Shift+F24")
 
 ; --- Autostart (temporary folder, never the real Startup folder) ---
-startDir := A_Temp "\onairkey-autostart-" A_TickCount
+startDir := A_Temp "\onairkeyboard-autostart-" A_TickCount
 DirCreate(startDir)
 Autostart.Sync(true, startDir, A_AhkPath)
 Check("autostart creates link", FileExist(Autostart.LinkPath(startDir)) != "", true)

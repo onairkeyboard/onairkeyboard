@@ -1,11 +1,11 @@
-; Self-install: the EXE offers to copy itself to %LOCALAPPDATA%\Programs\OnAirKey (no
+; Self-install: the EXE offers to copy itself to %LOCALAPPDATA%\Programs\OnAirKeyboard (no
 ; administrator rights needed) and to add a Start menu shortcut, so it no longer runs from
 ; Downloads, where a cleanup would silently break "Start with Windows". It asks first: a program
 ; that quietly copies itself and starts with Windows looks like malware, to people and to
 ; antivirus programs alike. "No" runs it from where it is and is remembered (Portable=1).
 class Installer {
-    static ExeName := "OnAirKey.exe"
-    static DefaultDir() => EnvGet("LOCALAPPDATA") "\Programs\OnAirKey"
+    static ExeName := "OnAirKeyboard.exe"
+    static DefaultDir() => EnvGet("LOCALAPPDATA") "\Programs\OnAirKeyboard"
 
     ; What to do when the EXE starts (pure logic, unit-tested):
     ;   ""  nothing (this is the installed copy, or the user chose to run it from where it is)
@@ -38,14 +38,14 @@ class Installer {
             Lang.Set(Config.ResolveLanguage(Config.Peek(configPath, "General", "Language", "auto")))
             if answer = "" {
                 text := action = "install" ? T("install.ask", installDir) : T("install.update_ask", installed, version, installDir)
-                answer := MsgBox(text, "OnAirKey", "YesNo Iconi") = "Yes" ? "yes" : "no"
+                answer := MsgBox(text, "OnAir keyboard", "YesNo Iconi") = "Yes" ? "yes" : "no"
             }
             if answer != "yes"
                 return action = "install" ? "portable" : ""
             ; Tests install into a temporary folder; they get a Start menu folder there too
             startMenu := installDir = Installer.DefaultDir() ? A_Programs : installDir "\Start Menu"
             if !Installer._Copy(target, installDir, startMenu) {
-                MsgBox(T("install.failed", installDir), "OnAirKey", "Icon!")
+                MsgBox(T("install.failed", installDir), "OnAir keyboard", "Icon!")
                 return ""
             }
         }
@@ -72,7 +72,7 @@ class Installer {
             return false
         try {
             DirCreate(startMenuDir)
-            FileCreateShortcut(target, startMenuDir "\OnAirKey.lnk", installDir, , "OnAirKey", target)
+            FileCreateShortcut(target, startMenuDir "\OnAir keyboard.lnk", installDir, , "OnAir keyboard", target)
         }
         return true
     }

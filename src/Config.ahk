@@ -1,11 +1,11 @@
-; Settings stored in %APPDATA%\OnAirKey\config.ini (UTF-16, so Windows INI functions read it reliably).
+; Settings stored in %APPDATA%\OnAirKeyboard\config.ini (UTF-16, so Windows INI functions read it reliably).
 ; Missing values fall back to defaults silently; invalid values fall back with a warning.
 class Config {
     static Actions := ["PushToTalk", "HandsFree", "Cancel", "CommandMode"]
     static Locks := ["ScrollLock", "NumLock", "CapsLock"]
     static Languages := ["auto", "pl", "en"]
 
-    static DataDir() => A_AppData "\OnAirKey"
+    static DataDir() => A_AppData "\OnAirKeyboard"
     static DefaultPath() => Config.DataDir() "\config.ini"
 
     __New() {
@@ -172,8 +172,8 @@ class Config {
         b(v) => v ? "1" : "0"
         return Format("
         (
-; OnAirKey settings. The easiest way to change them: tray icon > Settings.
-; Edits made in this file take effect after OnAirKey restarts.
+; OnAir keyboard settings. The easiest way to change them: tray icon > Settings.
+; Edits made in this file take effect after OnAir keyboard restarts.
 
 [Shortcuts]
 ; Format: Ctrl / Alt / Shift / Win + key, for example Ctrl+Shift+F13.
@@ -193,9 +193,9 @@ TrayIconShowsState={6}
 ; auto, pl or en
 Language={7}
 StartWithWindows={8}
-; 1: write a diagnostic log (onairkey.log) next to this file
+; 1: write a diagnostic log (onairkeyboard.log) next to this file
 Debug={9}
-; 1: run OnAirKey from where its EXE is and don't offer to install it
+; 1: run OnAir keyboard from where its EXE is and don't offer to install it
 Portable={14}
 
 [Advanced]

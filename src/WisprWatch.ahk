@@ -1,7 +1,7 @@
 ; Watches the Wispr Flow helper process.
 ;
 ; The most recently installed keyboard hook sees keys first. When the helper starts after
-; OnAirKey (typical at Windows startup), it intercepts its own shortcuts and OnAirKey never
+; OnAir keyboard (typical at Windows startup), it intercepts its own shortcuts and OnAir keyboard never
 ; sees them. After every (re)start of the helper we reinstall our hook to be first again;
 ; more than one attempt, because the helper may install its hook with a delay.
 ; onChange(running) is called after the first check and whenever the helper starts or exits.

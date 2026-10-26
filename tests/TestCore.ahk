@@ -11,7 +11,7 @@
 #Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
-    dir := A_Temp "\onairkey-test-" A_TickCount "-" Random(1000, 9999)
+    dir := A_Temp "\onairkeyboard-test-" A_TickCount "-" Random(1000, 9999)
     DirCreate(dir)
     return dir "\config.ini"
 }
@@ -81,7 +81,7 @@ for key in Lang.Strings["pl"]
     Check("en has " key, Lang.Strings["en"].Has(key), true)
 Lang.Set("pl")
 Check("T pl", T("tray.exit"), "Wyjście")
-Check("T format", T("about.title", "9.9.9"), "OnAirKey 9.9.9")
+Check("T format", T("about.title", "9.9.9"), "OnAir keyboard 9.9.9")
 Lang.Set("xx")
 Check("unknown language falls back", Lang.Current, "en")
 Check("missing key returns key", T("no.such.key"), "no.such.key")
@@ -96,10 +96,10 @@ Names(links) {
 Check("support pl", Names(Support.Links("pl")), "Buycoffee.to, GitHub Sponsors")
 Check("support en", Names(Support.Links("en")), "GitHub Sponsors, Buycoffee.to")
 Check("support urls", Support.BuyCoffee.Url " " Support.Sponsors.Url,
-    "https://buycoffee.to/onairkey https://github.com/sponsors/onairkey")
+    "https://buycoffee.to/onairkeyboard https://github.com/sponsors/onairkeyboard")
 
 ; --- Bug report e-mail text: current language, details at the end ---
-Check("bug address", Support.BugEmail, "bug@onairkey.com")
+Check("bug address", Support.BugEmail, "hello@onairkeyboard.com")
 Lang.Set("pl")
 body := Support.BugBody("Windows 10`nShortcuts: Cancel=Ctrl+Shift+F16")
 Check("bug body pl", InStr(body, "Co się stało?") = 1, true)

@@ -3,13 +3,13 @@
 Persistent
 
 ; Compiler settings (build.ps1 checks that the version matches App.Version)
-;@Ahk2Exe-SetName OnAirKey
-;@Ahk2Exe-SetDescription OnAirKey - shows when Wispr Flow is recording
+;@Ahk2Exe-SetName OnAir keyboard
+;@Ahk2Exe-SetDescription OnAir keyboard - shows when Wispr Flow is recording
 ;@Ahk2Exe-SetVersion 0.1.0
 ;@Ahk2Exe-SetProductVersion 0.1.0
 ;@Ahk2Exe-SetCopyright (c) 2026 Patryk Szulczewski - MIT License
-;@Ahk2Exe-SetCompanyName OnAirKey - onairkey.com
-;@Ahk2Exe-SetOrigFilename OnAirKey.exe
+;@Ahk2Exe-SetCompanyName OnAir keyboard - onairkeyboard.com
+;@Ahk2Exe-SetOrigFilename OnAirKeyboard.exe
 ;@Ahk2Exe-SetMainIcon ..\assets\app.ico
 ;@Ahk2Exe-AddResource ..\assets\tray-idle-light.ico, 160
 ;@Ahk2Exe-AddResource ..\assets\tray-rec.ico, 161
@@ -53,5 +53,5 @@ for i, arg in A_Args {
     }
 }
 
-OnAirKeyApp := App(configPath, installDir, installAnswer)
-OnAirKeyApp.Start()
+OnAirKeyboardApp := App(configPath, installDir, installAnswer)
+OnAirKeyboardApp.Start()

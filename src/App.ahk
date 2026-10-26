@@ -1,15 +1,15 @@
 ; Wires the modules together. Apply() can be called again after settings change,
 ; so new settings take effect without restarting the program.
 class App {
-    static Name := "OnAirKey"
+    static Name := "OnAir keyboard"
     static Version := "0.1.0"
     ; Product website (videos, tutorials, FAQ and feedback will live there)
-    static WebsiteUrl := "https://onairkey.com"
-    static WebsiteName := "onairkey.com"
+    static WebsiteUrl := "https://onairkeyboard.com"
+    static WebsiteName := "onairkeyboard.com"
     ; GitHub organisation until the public repository exists
-    static RepoUrl := "https://github.com/onairkey"
+    static RepoUrl := "https://github.com/onairkeyboard"
     ; Ready SayoDevice 2x2 setup (keys and LEDs as in the README), restored in the Sayo web app
-    static SayoPresetUrl := "https://github.com/onairkey/onairkey/raw/main/presets/WisprFlow_2x2.sayobak"
+    static SayoPresetUrl := "https://github.com/onairkeyboard/onairkeyboard/raw/main/presets/WisprFlow_2x2.sayobak"
     static SayoAppUrl := "https://sayodevice.com"
 
     ; Private window message for test / automation commands (wParam = command)
@@ -76,7 +76,7 @@ class App {
     ; (Re)applies the current settings to every module.
     Apply() {
         cfg := this.Cfg
-        Log.Init(this.DataDir "\onairkey.log", cfg.Debug)
+        Log.Init(this.DataDir "\onairkeyboard.log", cfg.Debug)
         for warning in cfg.Warnings
             Log.Write(warning)
         Lang.Set(Config.ResolveLanguage(cfg.Language))
@@ -163,7 +163,7 @@ class App {
     OpenSettings() => SettingsWindow.Open(this)
 
     OpenLog() {
-        file := this.DataDir "\onairkey.log"
+        file := this.DataDir "\onairkeyboard.log"
         if this.Cfg.Debug && FileExist(file)
             Run('notepad.exe "' file '"')
         else
@@ -178,12 +178,12 @@ class App {
         shortcuts := ""
         for action in Config.Actions
             shortcuts .= (shortcuts = "" ? "" : ", ") action "=" cfg.Shortcuts[action]
-        diag := Format("OnAirKey {1} ({2})`nWindows {3}`nWispr Flow: {4}`nIndicator: {5}`nShortcuts: {6}`nLanguage: {7}`nDiagnostic log: {8}"
+        diag := Format("OnAir keyboard {1} ({2})`nWindows {3}`nWispr Flow: {4}`nIndicator: {5}`nShortcuts: {6}`nLanguage: {7}`nDiagnostic log: {8}"
             , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion
             , this.WisprRunning ? "detected" : "not running", cfg.Lock, shortcuts, Lang.Current
-            , cfg.Debug ? this.DataDir "\onairkey.log" : "off")
+            , cfg.Debug ? this.DataDir "\onairkeyboard.log" : "off")
         Log.Write("bug report opened")
-        BugReportWindow.Open(diag, cfg.Debug ? this.DataDir "\onairkey.log" : "")
+        BugReportWindow.Open(diag, cfg.Debug ? this.DataDir "\onairkeyboard.log" : "")
     }
 
     ; Commands run on a timer so the sender's PostMessage returns immediately.

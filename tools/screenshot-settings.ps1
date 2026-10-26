@@ -1,16 +1,16 @@
-# Opens the settings window of a temporary OnAirKey instance and saves a PNG of every tab,
+# Opens the settings window of a temporary OnAir keyboard instance and saves a PNG of every tab,
 # then one of the "Report a bug" window.
 #   powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl -OutDir <folder>
 # The instance uses Caps Lock and test shortcuts, so it doesn't interfere with a running setup.
 # -Showcase uses a clean, typical setup (for README images) instead of one that shows validation messages.
-param([string]$Language = 'pl', [string]$OutDir = (Join-Path $env:TEMP 'onairkey-shots'), [switch]$Showcase)
+param([string]$Language = 'pl', [string]$OutDir = (Join-Path $env:TEMP 'onairkeyboard-shots'), [switch]$Showcase)
 
 $ErrorActionPreference = 'Stop'
 $ahk = 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe'
 $root = Split-Path $PSScriptRoot -Parent
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 
-$dir = Join-Path $env:TEMP "onairkey-shot-$Language"
+$dir = Join-Path $env:TEMP "onairkeyboard-shot-$Language"
 Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory $dir | Out-Null
 $cfg = Join-Path $dir 'config.ini'
@@ -22,7 +22,7 @@ if ($Showcase) {
 $ini = "[Shortcuts]`r`n$shortcuts[Indicator]`r`nLock=CapsLock`r`n[General]`r`nLanguage=$Language`r`n"
 [IO.File]::WriteAllText($cfg, $ini, [Text.Encoding]::Unicode)
 
-$app = Start-Process $ahk -ArgumentList "`"$root\src\OnAirKey.ahk`"", '--config', "`"$cfg`"" -PassThru
+$app = Start-Process $ahk -ArgumentList "`"$root\src\OnAirKeyboard.ahk`"", '--config', "`"$cfg`"" -PassThru
 Start-Sleep -Seconds 2
 
 # Helper: opens settings (first call), switches to the next tab or swaps settings for the

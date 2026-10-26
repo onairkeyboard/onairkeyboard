@@ -1,13 +1,13 @@
 # Runs syntax validation and all test scripts. Exit code 0 when everything passes.
 #   powershell -ExecutionPolicy Bypass -File tests\run.ps1 [-Exe]
-# -Exe also runs the integration test against dist\OnAirKey.exe (build it first with build.ps1).
+# -Exe also runs the integration test against dist\OnAirKeyboard.exe (build it first with build.ps1).
 param([switch]$Exe)
 $ErrorActionPreference = 'Stop'
 $ahk = 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe'
 $root = Split-Path $PSScriptRoot -Parent
 $failed = 0
 
-& $ahk /Validate /ErrorStdOut (Join-Path $root 'src\OnAirKey.ahk') 2>&1 | Out-String | Write-Host
+& $ahk /Validate /ErrorStdOut (Join-Path $root 'src\OnAirKeyboard.ahk') 2>&1 | Out-String | Write-Host
 if ($LASTEXITCODE -ne 0) { Write-Host 'validate FAILED'; $failed++ } else { Write-Host 'validate ok' }
 
 $runs = @(
@@ -16,14 +16,14 @@ $runs = @(
     @{ Name = 'TestIntegration'; Args = @() }
 )
 if ($Exe) {
-    $exePath = Join-Path $root 'dist\OnAirKey.exe'
+    $exePath = Join-Path $root 'dist\OnAirKeyboard.exe'
     if (-not (Test-Path $exePath)) { throw "Missing $exePath, run build.ps1 first" }
     $runs += @{ Name = 'TestIntegration'; Args = @('--exe', "`"$exePath`""); Label = 'TestIntegration (EXE)' }
 }
 
 foreach ($run in $runs) {
     $label = if ($run.Label) { $run.Label } else { $run.Name }
-    $out = Join-Path $env:TEMP "onairkey-$($run.Name).out"
+    $out = Join-Path $env:TEMP "onairkeyboard-$($run.Name).out"
     $argList = @('/ErrorStdOut', "`"$(Join-Path $root "tests\$($run.Name).ahk")`"") + $run.Args
     $p = Start-Process $ahk -ArgumentList $argList -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError "$out.err"
     $null = $p.Handle  # caches the handle; without it ExitCode stays empty
@@ -34,8 +34,8 @@ foreach ($run in $runs) {
 }
 
 # Leftover test instances of the app, if a test died midway
-Get-CimInstance Win32_Process -Filter "Name='AutoHotkey64.exe' OR Name='OnAirKey.exe'" |
-    Where-Object { $_.CommandLine -like '*--config*onairkey-*' } |
+Get-CimInstance Win32_Process -Filter "Name='AutoHotkey64.exe' OR Name='OnAirKeyboard.exe'" |
+    Where-Object { $_.CommandLine -like '*--config*onairkeyboard-*' } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 
 exit $failed
