@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/logo-on-dark.svg" alt="OnAirKey" height="90">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo-bright.svg" alt="OnAir keyboard" width="360">
+  </picture>
 </p>
 
 <h3 align="center">Jeden klawisz. Zero zgadywania.</h3>
@@ -157,7 +160,7 @@ przed nim.
 ## Warto wiedzieć
 
 - **Trzymaj ikonę w zasobniku na widoku.** Windows chowa nowe ikony pod strzałką **^** obok
-  zegara. Przeciągnij stamtąd ikonę OnAirKey na pasek zadań, żeby czerwona kropka była zawsze
+  zegara. Przeciągnij stamtąd ikonę OnAirKey na pasek zadań, żeby czerwona ikona była zawsze
   widoczna. W Windows 11 możesz ją też włączyć w *Ustawienia → Personalizacja → Pasek zadań*,
   w sekcji z pozostałymi ikonami zasobnika.
 - **OnAirKey śledzi Twoje skróty, a nie samego Wispr.** Jeśli nagrywanie zmieni się inaczej

@@ -77,7 +77,7 @@ class SettingsWindow {
         ; --- Header: logo (opens the website), Wispr status in the middle, Report a bug on the right ---
         logo := this.Owner.LogoFile
         if logo != "" && FileExist(logo)
-            win.AddPicture("x16 y10 h32 w-1", logo).OnEvent("Click", (*) => Run(App.WebsiteUrl))
+            win.AddPicture("x16 y7 h40 w-1", logo).OnEvent("Click", (*) => Run(App.WebsiteUrl))
         win.SetFont("bold")
         this.WisprStatus := win.AddText("x150 y20 w300 Center", "")
         win.SetFont("norm")

@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/logo-on-dark.svg" alt="OnAirKey" height="90">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo-bright.svg" alt="OnAir keyboard" width="360">
+  </picture>
 </p>
 
 <h3 align="center">One key. No guessing.</h3>
@@ -155,7 +158,7 @@ dedicated key of your macro pad. OnAirKey still supports Escape, but warns you a
 ## Good to know
 
 - **Keep the tray icon in sight.** Windows hides new tray icons under the **^** arrow next to the
-  clock. Drag the OnAirKey icon from there onto the taskbar, so the red dot is always visible.
+  clock. Drag the OnAirKey icon from there onto the taskbar, so the red icon is always visible.
   On Windows 11 you can also turn it on in *Settings → Personalization → Taskbar → Other system
   tray icons*.
 - **OnAirKey follows your shortcuts, not Wispr itself.** If recording changes some other way

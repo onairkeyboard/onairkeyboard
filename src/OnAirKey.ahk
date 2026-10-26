@@ -10,9 +10,10 @@ Persistent
 ;@Ahk2Exe-SetCopyright (c) 2026 Patryk Szulczewski - MIT License
 ;@Ahk2Exe-SetCompanyName OnAirKey - onairkey.com
 ;@Ahk2Exe-SetOrigFilename OnAirKey.exe
-;@Ahk2Exe-SetMainIcon ..\assets\onairkey.ico
-;@Ahk2Exe-AddResource ..\assets\tray-idle.ico, 160
+;@Ahk2Exe-SetMainIcon ..\assets\app.ico
+;@Ahk2Exe-AddResource ..\assets\tray-idle-light.ico, 160
 ;@Ahk2Exe-AddResource ..\assets\tray-rec.ico, 161
+;@Ahk2Exe-AddResource ..\assets\tray-idle-dark.ico, 162
 
 #Include %A_LineFile%\..\Log.ahk
 #Include %A_LineFile%\..\Lang.ahk

@@ -57,13 +57,14 @@ class App {
         }
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
-        this.LogoFile := App._UiImage(dir, "logo-ui.png")
+        this.LogoFile := App._UiImage(dir, A_ScreenDPI > 120 ? "logo-ui-2x.png" : "logo-ui.png")
         this.BugIconFile := App._UiImage(dir, "bug-ui.png")
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
 
         OnMessage(0x0219, (*) => this.Led.ScheduleResync(1000))  ; WM_DEVICECHANGE
         OnMessage(0x0218, (*) => this.Led.ScheduleResync(1000))  ; WM_POWERBROADCAST
+        OnMessage(0x001A, (*) => this.Tray.Update())  ; WM_SETTINGCHANGE: the taskbar may turn light / dark
         OnMessage(App.WM_COMMAND, ObjBindMethod(this, "OnCommand"))
         OnExit(ObjBindMethod(this, "Shutdown"))
 
@@ -120,6 +121,8 @@ class App {
         try {
             if name = "logo-ui.png"
                 FileInstall("..\assets\logo-ui.png", target, 1)
+            else if name = "logo-ui-2x.png"
+                FileInstall("..\assets\logo-ui-2x.png", target, 1)
             else if name = "bug-ui.png"
                 FileInstall("..\assets\bug-ui.png", target, 1)
         }

@@ -1,5 +1,6 @@
-; Tray icon and menu. The icon mirrors the recording state (grey / red dot), so OnAirKey
-; works as an indicator even without a keyboard LED.
+; Tray icon and menu. The icon mirrors the recording state (red keycap while recording), so
+; OnAirKey works as an indicator even without a keyboard LED. The idle keycap is black on a
+; light taskbar and white on a dark one, so it never blends in.
 class TrayUI {
     __New(owner) {
         this.Owner := owner
@@ -14,7 +15,10 @@ class TrayUI {
     }
 
     ; Resource numbers of the tray icons embedded by Ahk2Exe (see build script)
-    static IconResource := Map("tray-idle", -160, "tray-rec", -161)
+    static IconResource := Map("tray-idle-light", -160, "tray-rec", -161, "tray-idle-dark", -162)
+
+    ; Windows 10 / 11 taskbar colour (the "Windows mode" setting; absent before 1903 = dark)
+    static LightTaskbar() => RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "SystemUsesLightTheme", 0) = 1
 
     Build() {
         ; Note: AutoHotkey names are case-insensitive, so locals must not be called
@@ -53,7 +57,10 @@ class TrayUI {
         }
 
         recording := !owner.Paused && owner.State.IsRecording
-        icon := recording && owner.Cfg.TrayIconShowsState ? "tray-rec" : "tray-idle"
+        if recording && owner.Cfg.TrayIconShowsState
+            icon := "tray-rec"
+        else
+            icon := TrayUI.LightTaskbar() ? "tray-idle-light" : "tray-idle-dark"
         if icon != this.Icon {
             if A_IsCompiled
                 TraySetIcon(A_ScriptFullPath, TrayUI.IconResource[icon])
