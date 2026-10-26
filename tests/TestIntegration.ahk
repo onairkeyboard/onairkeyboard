@@ -2,7 +2,7 @@
 ; End-to-end test: starts OnAir keyboard with a temporary config and drives it with simulated keys.
 ; Uses Caps Lock as the indicator and Ctrl+Shift+F20..F22, which neither Wispr Flow nor the
 ; legacy script listen to. Keys are sent with SendLevel 1 so OnAir keyboard's hotkeys see them.
-; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk [--exe dist\OnAirKeyboard.exe]
+; Run: AutoHotkey64.exe /ErrorStdOut tests\TestIntegration.ahk [--exe dist\OnAirKeyboard-<version>.exe]
 ; With --exe the compiled program is tested instead of the script.
 
 #Include %A_LineFile%\..\TestLib.ahk
@@ -261,8 +261,10 @@ ProcessWaitClose(pid2, 3)
 ; Process id of the OnAirKeyboard.exe running from the test install folder, 0 if none
 InstalledPid() {
     for hwnd in WinGetList("ahk_class AutoHotkey ahk_exe OnAirKeyboard.exe")
-        if WinGetProcessPath(hwnd) = instDir "\OnAirKeyboard.exe"
-            return WinGetPID(hwnd)
+        try {  ; a closing copy's window may vanish between the list and the lookup
+            if WinGetProcessPath(hwnd) = instDir "\OnAirKeyboard.exe"
+                return WinGetPID(hwnd)
+        }
     return 0
 }
 WaitInstalledPid(oldPid := 0) {
@@ -283,8 +285,11 @@ if exePath != "" {
     for folder in [dlDir, instDir, A_Temp "\onairkeyboard-install-no", A_Temp "\onairkeyboard-inst-cfg", A_Temp "\onairkeyboard-portable-cfg"]
         try DirDelete(folder, true)
     DirCreate(dlDir)
-    FileCopy(exePath, dlDir "\OnAirKeyboard.exe")
-    downloaded := '"' dlDir '\OnAirKeyboard.exe" --install-dir "' instDir '"'
+    ; Downloaded under its release name (OnAirKeyboard-<version>.exe); installed as OnAirKeyboard.exe
+    SplitPath(exePath, &dlName)
+    dlExe := dlDir "\" dlName
+    FileCopy(exePath, dlExe)
+    downloaded := '"' dlExe '" --install-dir "' instDir '"'
 
     instCfg := A_Temp "\onairkeyboard-inst-cfg\config.ini"
     Run(downloaded ' --config "' instCfg '" --install-answer yes', , , &dlPid)
@@ -304,7 +309,7 @@ if exePath != "" {
 
     ; "No": runs from Downloads, installs nothing and remembers Portable=1
     portableCfg := A_Temp "\onairkeyboard-portable-cfg\config.ini"
-    Run('"' dlDir '\OnAirKeyboard.exe" --install-dir "' A_Temp '\onairkeyboard-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
+    Run('"' dlExe '" --install-dir "' A_Temp '\onairkeyboard-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
     Sleep(2000)
     Check("no keeps running here", ProcessExist(portablePid) != 0, true)
     Check("no installs nothing", FileExist(A_Temp "\onairkeyboard-install-no\OnAirKeyboard.exe"), "")

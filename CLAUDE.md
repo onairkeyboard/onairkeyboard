@@ -26,7 +26,7 @@ roadmap and current to-do. Never copy their contents into this public repository
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\run.ps1        # validation + all tests
-powershell -ExecutionPolicy Bypass -File build.ps1            # dist\OnAirKeyboard.exe
+powershell -ExecutionPolicy Bypass -File build.ps1            # dist\OnAirKeyboard-<version>.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe   # tests incl. the compiled EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1   # demo instance (temp config, Caps Lock)
 powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl [-Showcase]  # + Report a bug window

@@ -69,7 +69,7 @@ class SettingsWindow {
     _Build() {
         cfg := this.Owner.Cfg
         muted := SettingsWindow.ColorMuted
-        win := Gui("-MaximizeBox -MinimizeBox", T("settings.title"))
+        win := Gui("-MaximizeBox -MinimizeBox", T("settings.title", App.Version))
         win.SetFont("s9", "Segoe UI")
         win.OnEvent("Close", (*) => this.Close())
         this.Win := win
@@ -360,7 +360,7 @@ class SettingsWindow {
                 errors.Push(T("action." issue.Action) ": " SettingsWindow.IssueText(issue))
         if errors.Length {
             this.ShowTab(SettingsWindow.TAB_SHORTCUTS)
-            MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(errors), T("settings.title"), "Icon!")
+            MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(errors), T("settings.title", App.Version), "Icon!")
             return false
         }
 
@@ -377,7 +377,7 @@ class SettingsWindow {
             advErrors.Push(T("save.invalid_list", T("adv.hook")))
         if advErrors.Length {
             this.ShowTab(SettingsWindow.TAB_ADVANCED)
-            MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(advErrors), T("settings.title"), "Icon!")
+            MsgBox(T("save.errors") "`n`n" SettingsWindow._Lines(advErrors), T("settings.title", App.Version), "Icon!")
             return false
         }
 

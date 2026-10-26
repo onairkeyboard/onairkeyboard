@@ -52,7 +52,7 @@ class Lang {
             "about.disclaimer", "An independent project, not affiliated with Wispr AI (Wispr Flow) or SayoDevice.",
             "about.config", "Settings file: {1}",
 
-            "settings.title", "OnAir keyboard settings",
+            "settings.title", "OnAir keyboard {1} settings",
             "tab.howto", "How it works",
             "tab.shortcuts", "Shortcuts",
 
@@ -184,7 +184,7 @@ class Lang {
             "about.disclaimer", "Niezależny projekt, niepowiązany z Wispr AI (Wispr Flow) ani z SayoDevice.",
             "about.config", "Plik ustawień: {1}",
 
-            "settings.title", "OnAir keyboard — ustawienia",
+            "settings.title", "OnAir keyboard {1} — ustawienia",
             "tab.howto", "Jak to działa",
             "tab.shortcuts", "Skróty",
 

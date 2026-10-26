@@ -1,6 +1,6 @@
 # Runs syntax validation and all test scripts. Exit code 0 when everything passes.
 #   powershell -ExecutionPolicy Bypass -File tests\run.ps1 [-Exe]
-# -Exe also runs the integration test against dist\OnAirKeyboard.exe (build it first with build.ps1).
+# -Exe also runs the integration test against dist\OnAirKeyboard-<version>.exe (build it first with build.ps1).
 param([switch]$Exe)
 $ErrorActionPreference = 'Stop'
 $ahk = 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe'
@@ -16,7 +16,8 @@ $runs = @(
     @{ Name = 'TestIntegration'; Args = @() }
 )
 if ($Exe) {
-    $exePath = Join-Path $root 'dist\OnAirKeyboard.exe'
+    $version = (Select-String -Path (Join-Path $root 'src\App.ahk') -Pattern 'static Version := "(.+)"').Matches[0].Groups[1].Value
+    $exePath = Join-Path $root "dist\OnAirKeyboard-$version.exe"
     if (-not (Test-Path $exePath)) { throw "Missing $exePath, run build.ps1 first" }
     $runs += @{ Name = 'TestIntegration'; Args = @('--exe', "`"$exePath`""); Label = 'TestIntegration (EXE)' }
 }

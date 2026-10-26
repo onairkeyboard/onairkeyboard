@@ -18,6 +18,8 @@ First version.
 - Shortcut recording by pressing the keys, including F13–F24, Escape and modifier-only
   shortcuts such as Wispr's default Ctrl+Win; validation the way Wispr Flow accepts shortcuts.
 - Polish and English, detected from Windows or chosen in settings.
+- The version shows in the settings window title and in the name of the downloaded EXE
+  (`OnAirKeyboard-0.1.0.exe`); installed, it is always `OnAirKeyboard.exe`.
 - Start with Windows, pause / resume, LED test, diagnostic log.
 - Reliability fixes from real use: the LED state is enforced on a timer (Wispr briefly blocks
   injected keys after dictation stops), refreshed after startup, keyboard replug and wake, and

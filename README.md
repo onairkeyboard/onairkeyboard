@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/onairkeyboard/onairkeyboard/releases/latest"><img src="https://img.shields.io/badge/Download-OnAirKeyboard.exe-2A2A2A?logo=windows&logoColor=white" alt="Download"></a>
+  <a href="https://github.com/onairkeyboard/onairkeyboard/releases/latest"><img src="https://img.shields.io/badge/Download-for_Windows-2A2A2A?logo=windows&logoColor=white" alt="Download"></a>
   <a href="https://onairkeyboard.com"><img src="https://img.shields.io/badge/onairkeyboard.com-website-E63A3A" alt="Website"></a>
   <a href="https://github.com/sponsors/onairkeyboard"><img src="https://img.shields.io/badge/GitHub_Sponsors-support-ea4aaa?logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
   <a href="https://buycoffee.to/onairkeyboard"><img src="https://img.shields.io/badge/Buycoffee.to-support-6F4E37?logo=buymeacoffee&logoColor=white" alt="Buycoffee.to"></a>
@@ -53,7 +53,7 @@ red exactly when you're on air. One press, and you always know what's going on.
 
 ## Get started
 
-**0. Download** `OnAirKeyboard.exe` from [Releases](https://github.com/onairkeyboard/onairkeyboard/releases/latest)
+**0. Download** `OnAirKeyboard-<version>.exe` from [Releases](https://github.com/onairkeyboard/onairkeyboard/releases/latest)
 and run it. On the first start OnAir keyboard asks whether to install itself: **Yes** copies it to
 `%LOCALAPPDATA%\Programs\OnAirKeyboard` and adds a Start menu shortcut (no administrator rights needed),
 so you can delete the downloaded file; **No** runs it from where it is and doesn't ask again.
@@ -180,7 +180,7 @@ this repository, and you can [build the EXE yourself](#build-from-source).
 Settings live in `%APPDATA%\OnAirKeyboard\config.ini` (the path is shown on the *About* tab). To remove
 OnAir keyboard: untick *Start with Windows*, exit from the tray menu, then delete:
 
-- the program folder `%LOCALAPPDATA%\Programs\OnAirKeyboard` (or `OnAirKeyboard.exe` wherever you run it
+- the program folder `%LOCALAPPDATA%\Programs\OnAirKeyboard` (or the downloaded EXE wherever you run it
   from, if you didn't install it),
 - the *OnAir keyboard* shortcut in the Start menu (right-click → *Open file location*),
 - the settings folder `%APPDATA%\OnAirKeyboard`.
@@ -192,7 +192,7 @@ Requirements: [AutoHotkey v2.0](https://www.autohotkey.com) and Ahk2Exe 1.1.37 o
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\run.ps1      # tests
-powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKeyboard.exe
+powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKeyboard-<version>.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe # tests incl. the EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # try it from source
 ```
