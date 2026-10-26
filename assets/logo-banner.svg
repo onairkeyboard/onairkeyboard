@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   width="2730.6433"
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420"><rect width="1200" height="420" rx="36" fill="#2A2A2A"/>
+<svg x="108" y="67.2" width="984" height="285.6"
+  
    zoomAndPan="magnify"
    viewBox="0 0 2047.9825 622.95982"
-   height="830.6131"
+  
    preserveAspectRatio="xMidYMid"
    version="1.0"
    id="svg1266"
@@ -14,7 +14,7 @@
     <g
        id="g2" />
     <clipPath
-       id="f8f49411f2">
+       id="78d726b102">
       <rect
          x="0"
          width="634"
@@ -23,7 +23,7 @@
          id="rect4" />
     </clipPath>
     <clipPath
-       id="5e5ba4609e">
+       id="ed04ef51ce">
       <rect
          x="0"
          width="526"
@@ -32,14 +32,14 @@
          id="rect7" />
     </clipPath>
     <clipPath
-       id="7cb8fdb650">
+       id="fbec7b7746">
       <path
          d="m 1152,0 h 162.2383 V 601 H 1152 Z m 0,0"
          clip-rule="nonzero"
          id="path10" />
     </clipPath>
     <clipPath
-       id="55c655a440">
+       id="b1b1022d7a">
       <rect
          x="0"
          width="163"
@@ -48,14 +48,14 @@
          id="rect13" />
     </clipPath>
     <clipPath
-       id="665c6233b0">
+       id="c69f436075">
       <path
          d="m 406,451 h 828 V 709.92187 H 406 Z m 0,0"
          clip-rule="nonzero"
          id="path16" />
     </clipPath>
     <clipPath
-       id="ff8a20b84b">
+       id="3155d5033f">
       <rect
          x="0"
          width="828"
@@ -64,7 +64,7 @@
          id="rect19" />
     </clipPath>
     <clipPath
-       id="f3ced1636e">
+       id="48b37f7a05">
       <rect
          x="0"
          width="1315"
@@ -73,28 +73,28 @@
          id="rect22" />
     </clipPath>
     <clipPath
-       id="fb404b6a37">
+       id="aa1ad840fc">
       <path
          d="m 104.25,75 h 600 v 600 h -600 z m 0,0"
          clip-rule="nonzero"
          id="path25" />
     </clipPath>
     <clipPath
-       id="0f11390e7e">
+       id="177ea84fcd">
       <path
          d="m 179.25,75 h 450 c 41.42187,0 75,33.57813 75,75 v 450 c 0,41.42187 -33.57813,75 -75,75 h -450 c -41.42188,0 -75,-33.57813 -75,-75 V 150 c 0,-41.42187 33.57812,-75 75,-75 z m 0,0"
          clip-rule="nonzero"
          id="path28" />
     </clipPath>
     <clipPath
-       id="f715749ac0">
+       id="3f8b61b873">
       <path
          d="m 0.25,0 h 600 v 600 h -600 z m 0,0"
          clip-rule="nonzero"
          id="path31" />
     </clipPath>
     <clipPath
-       id="7f90ec4203">
+       id="c5d72195ce">
       <path
          d="m 75.25,0 h 450 c 41.42187,0 75,33.578125 75,75 v 450 c 0,41.42187 -33.57813,75 -75,75 h -450 c -41.421875,0 -75,-33.57813 -75,-75 V 75 c 0,-41.421875 33.578125,-75 75,-75 z m 0,0"
          clip-rule="nonzero"
@@ -107,7 +107,7 @@
        x2="256"
        gradientUnits="userSpaceOnUse"
        y2="256"
-       id="196f8b6c63">
+       id="60dae2a892">
       <stop
          stop-opacity="1"
          stop-color="rgb(100%, 28.239441%, 28.239441%)"
@@ -1395,7 +1395,7 @@
          id="stop549" />
     </linearGradient>
     <clipPath
-       id="594185ad27">
+       id="c1f0cd474a">
       <rect
          x="0"
          width="601"
@@ -1404,28 +1404,28 @@
          id="rect552" />
     </clipPath>
     <clipPath
-       id="5a12aa7f43">
+       id="d8f33cb0af">
       <path
          d="M 175.5,130.5 H 633 V 588 H 175.5 Z m 0,0"
          clip-rule="nonzero"
          id="path555" />
     </clipPath>
     <clipPath
-       id="b12c8de3c8">
+       id="23e0c80846">
       <path
          d="M 573,588 H 235.5 c -15.91406,0 -31.17578,-6.32031 -42.42578,-17.57422 C 181.82031,559.17578 175.5,543.91406 175.5,528 V 190.5 c 0,-15.91406 6.32031,-31.17578 17.57422,-42.42578 C 204.32422,136.82031 219.58594,130.5 235.5,130.5 H 573 c 15.91406,0 31.17578,6.32031 42.42578,17.57422 C 626.67969,159.32422 633,174.58594 633,190.5 V 528 c 0,15.91406 -6.32031,31.17578 -17.57422,42.42578 C 604.17578,581.67969 588.91406,588 573,588 Z m 0,0"
          clip-rule="nonzero"
          id="path558" />
     </clipPath>
     <clipPath
-       id="2897b3a292">
+       id="c0aa782715">
       <path
          d="M 0.5,0.5 H 458 V 458 H 0.5 Z m 0,0"
          clip-rule="nonzero"
          id="path561" />
     </clipPath>
     <clipPath
-       id="ed019aa21e">
+       id="f7655e4d9e">
       <path
          d="M 398,458 H 60.5 C 44.585938,458 29.324219,451.67969 18.074219,440.42578 6.820312,429.17578 0.5,413.91406 0.5,398 V 60.5 C 0.5,44.585938 6.820312,29.324219 18.074219,18.074219 29.324219,6.820312 44.585938,0.5 60.5,0.5 H 398 c 15.91406,0 31.17578,6.320312 42.42578,17.574219 C 451.67969,29.324219 458,44.585938 458,60.5 V 398 c 0,15.91406 -6.32031,31.17578 -17.57422,42.42578 C 429.17578,451.67969 413.91406,458 398,458 Z m 0,0"
          clip-rule="nonzero"
@@ -1438,7 +1438,7 @@
        x2="256"
        gradientUnits="userSpaceOnUse"
        y2="256"
-       id="74da85def5">
+       id="58821820d6">
       <stop
          stop-opacity="1"
          stop-color="rgb(100%, 28.239441%, 28.239441%)"
@@ -2726,7 +2726,7 @@
          id="stop1079" />
     </linearGradient>
     <clipPath
-       id="9e7687fb2d">
+       id="803f87a855">
       <rect
          x="0"
          width="458"
@@ -2735,21 +2735,21 @@
          id="rect1082" />
     </clipPath>
     <clipPath
-       id="37dafeea66">
+       id="40155f4707">
       <path
          d="m 421.77344,138.07031 h 161.25 v 161.25 h -161.25 z m 0,0"
          clip-rule="nonzero"
          id="path1085" />
     </clipPath>
     <clipPath
-       id="59e6af8cda">
+       id="fe88edad25">
       <path
          d="m 418.79687,368.08984 h 207.75 v 207.75 h -207.75 z m 0,0"
          clip-rule="nonzero"
          id="path1088" />
     </clipPath>
     <clipPath
-       id="469a98e3bd">
+       id="66db870e18">
       <path
          d="m 182.12109,205.57422 h 307.5 V 513 h -307.5 z m 0,0"
          clip-rule="nonzero"
@@ -2760,15 +2760,15 @@
      transform="translate(735.75,-75)"
      id="g1222">
     <g
-       clip-path="url(#f3ced1636e)"
+       clip-path="url(#48b37f7a05)"
        id="g1220">
       <g
          id="g1114">
         <g
-           clip-path="url(#f8f49411f2)"
+           clip-path="url(#78d726b102)"
            id="g1112">
           <g
-             fill="#2a2a2a"
+             fill="#fbfbfb"
              fill-opacity="1"
              id="g1102">
             <g
@@ -2783,7 +2783,7 @@
             </g>
           </g>
           <g
-             fill="#2a2a2a"
+             fill="#fbfbfb"
              fill-opacity="1"
              id="g1110">
             <g
@@ -2803,7 +2803,7 @@
          transform="translate(654)"
          id="g1134">
         <g
-           clip-path="url(#5e5ba4609e)"
+           clip-path="url(#ed04ef51ce)"
            id="g1132">
           <g
              fill="#e63a3a"
@@ -2838,16 +2838,16 @@
         </g>
       </g>
       <g
-         clip-path="url(#7cb8fdb650)"
+         clip-path="url(#fbec7b7746)"
          id="g1148">
         <g
            transform="translate(1152)"
            id="g1146">
           <g
-             clip-path="url(#55c655a440)"
+             clip-path="url(#b1b1022d7a)"
              id="g1144">
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1142">
               <g
@@ -2865,16 +2865,16 @@
         </g>
       </g>
       <g
-         clip-path="url(#665c6233b0)"
+         clip-path="url(#c69f436075)"
          id="g1218">
         <g
            transform="translate(406,451)"
            id="g1216">
           <g
-             clip-path="url(#ff8a20b84b)"
+             clip-path="url(#3155d5033f)"
              id="g1214">
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1156">
               <g
@@ -2889,7 +2889,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1164">
               <g
@@ -2904,7 +2904,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1172">
               <g
@@ -2919,7 +2919,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1180">
               <g
@@ -2934,7 +2934,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1188">
               <g
@@ -2949,7 +2949,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1196">
               <g
@@ -2964,7 +2964,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1204">
               <g
@@ -2979,7 +2979,7 @@
               </g>
             </g>
             <g
-               fill="#2a2a2a"
+               fill="#fbfbfb"
                fill-opacity="1"
                id="g1212">
               <g
@@ -2999,30 +2999,30 @@
     </g>
   </g>
   <g
-     clip-path="url(#fb404b6a37)"
+     clip-path="url(#aa1ad840fc)"
      id="g1236"
      transform="translate(-104.25,-75)">
     <g
-       clip-path="url(#0f11390e7e)"
+       clip-path="url(#177ea84fcd)"
        id="g1234">
       <g
          transform="translate(104,75)"
          id="g1232">
         <g
-           clip-path="url(#594185ad27)"
+           clip-path="url(#c1f0cd474a)"
            id="g1230">
           <g
-             clip-path="url(#f715749ac0)"
+             clip-path="url(#3f8b61b873)"
              id="g1228">
             <g
-               clip-path="url(#7f90ec4203)"
+               clip-path="url(#c5d72195ce)"
                id="g1226">
               <path
-                 fill="url(#196f8b6c63)"
+                 fill="url(#60dae2a892)"
                  d="m 0.25,0 v 600 h 600 V 0 Z m 0,0"
                  fill-rule="nonzero"
                  id="path1224"
-                 style="fill:url(#196f8b6c63)" />
+                 style="fill:url(#60dae2a892)" />
             </g>
           </g>
         </g>
@@ -3030,30 +3030,30 @@
     </g>
   </g>
   <g
-     clip-path="url(#5a12aa7f43)"
+     clip-path="url(#d8f33cb0af)"
      id="g1252"
      transform="translate(-104.25,-75)">
     <g
-       clip-path="url(#b12c8de3c8)"
+       clip-path="url(#23e0c80846)"
        id="g1250">
       <g
          transform="translate(175,130)"
          id="g1246">
         <g
-           clip-path="url(#9e7687fb2d)"
+           clip-path="url(#803f87a855)"
            id="g1244">
           <g
-             clip-path="url(#2897b3a292)"
+             clip-path="url(#c0aa782715)"
              id="g1242">
             <g
-               clip-path="url(#ed019aa21e)"
+               clip-path="url(#f7655e4d9e)"
                id="g1240">
               <path
-                 fill="url(#74da85def5)"
+                 fill="url(#58821820d6)"
                  d="M 458,458 V 0.5 H 0.5 V 458 Z m 0,0"
                  fill-rule="nonzero"
                  id="path1238"
-                 style="fill:url(#74da85def5)" />
+                 style="fill:url(#58821820d6)" />
             </g>
           </g>
         </g>
@@ -3072,7 +3072,7 @@
     </g>
   </g>
   <g
-     clip-path="url(#37dafeea66)"
+     clip-path="url(#40155f4707)"
      id="g1256"
      transform="translate(-104.25,-75)">
     <path
@@ -3083,7 +3083,7 @@
        id="path1254" />
   </g>
   <g
-     clip-path="url(#59e6af8cda)"
+     clip-path="url(#fe88edad25)"
      id="g1260"
      transform="translate(-104.25,-75)">
     <path
@@ -3094,7 +3094,7 @@
        id="path1258" />
   </g>
   <g
-     clip-path="url(#469a98e3bd)"
+     clip-path="url(#66db870e18)"
      id="g1264"
      transform="translate(-104.25,-75)">
     <path
@@ -3104,4 +3104,5 @@
        fill-rule="evenodd"
        id="path1262" />
   </g>
+</svg>
 </svg>

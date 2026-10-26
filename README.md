@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="assets/logo-bright.svg#gh-light-mode-only" alt="OnAir keyboard" width="360">
-  <img src="assets/logo-dark.svg#gh-dark-mode-only" alt="OnAir keyboard" width="360">
+  <img src="assets/logo-banner.svg" alt="OnAir keyboard" width="480">
 </p>
 
 <h3 align="center">One key. No guessing.</h3>

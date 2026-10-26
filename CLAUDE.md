@@ -18,8 +18,9 @@ roadmap and current to-do. Never copy their contents into this public repository
   fit: `OnAirKeyboard` (EXE, folders, script) and `onairkeyboard` (domain, GitHub, log, e-mail).
 - Brand colours from the logo: red `#E63A3A`, dark text `#2A2A2A`, light text `#FBFBFB`.
 - Icons and logos come from `assets\src` (keycap in several colours, logos for light and dark
-  backgrounds). The app uses the colour logo for light backgrounds; the README picks the logo
-  by the reader's GitHub theme.
+  backgrounds). The app uses the colour logo for light backgrounds. The README shows
+  `logo-banner.svg` (dark-mode logo on a dark plate): theme-dependent README images follow the
+  OS, not GitHub's theme setting (`<picture>` and `#gh-*-mode-only` both failed).
 
 ## Commands
 

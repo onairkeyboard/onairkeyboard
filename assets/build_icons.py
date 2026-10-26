@@ -5,8 +5,9 @@ Requires Inkscape on PATH. Produces:
   assets/tray-idle-light.ico   tray icon, idle, light taskbar (black keycap)
   assets/tray-idle-dark.ico    tray icon, idle, dark taskbar (white keycap)
   assets/tray-rec.ico          tray icon, recording (red keycap)
-  assets/logo-bright.svg       logo for light backgrounds, cropped to the drawing
-  assets/logo-dark.svg         logo for dark backgrounds, cropped to the drawing
+  assets/logo-banner.svg       README logo: the dark-mode logo on a dark plate, so it reads
+                               the same in every GitHub theme (theme-dependent images follow
+                               the OS, not GitHub's own theme setting)
   assets/logo-ui.png           logo for the settings window header (100% display scale)
   assets/logo-ui-2x.png        the same for scaled displays
   assets/bug-ui.png            bug icon of the "Report a bug" link (Ionicons, MIT)
@@ -36,6 +37,8 @@ LOGOS = ["logo-bright", "logo-dark", "logo-mono-bright", "logo-mono-dark"]
 # Height of the logo in the settings window header (h40 in SettingsGui.ahk)
 LOGO_UI_HEIGHT = 40
 SOCIAL_SIZE = (1280, 640)
+BANNER_SIZE = (1200, 420)
+BANNER_PLATE = "#2A2A2A"  # brand dark
 
 
 def inkscape(source: Path, *args: str) -> None:
@@ -65,21 +68,20 @@ def write_ico(path: Path, pngs: dict[int, Path]) -> None:
     path.write_bytes(header + entries + data)
 
 
-def social_preview(logo: Path, out: Path) -> None:
-    """GitHub social preview: the logo centred on white, inside the safe area."""
-    w, h = SOCIAL_SIZE
+def framed_logo(logo: Path, out: Path, size: tuple[int, int], background: str,
+                radius: float, margin: tuple[float, float]) -> None:
+    """SVG with the logo centred on a (rounded) plate; margin is a fraction of each side."""
+    w, h = size
+    mx, my = margin
     inner = logo.read_text(encoding="utf-8")
     inner = re.sub(r"<\?xml[^>]*\?>", "", inner)
-    inner = re.sub(r"(<svg\b[^>]*?)\s(width|height)=\"[^\"]*\"", r"\1", inner, count=1)
-    inner = re.sub(r"(<svg\b[^>]*?)\s(width|height)=\"[^\"]*\"", r"\1", inner, count=1)
-    inner = inner.replace("<svg", f'<svg x="{w * 0.12:g}" y="{h * 0.2:g}" '
-                                  f'width="{w * 0.76:g}" height="{h * 0.6:g}"', 1)
-    wrapper = PNG / "social-preview.svg"
-    wrapper.write_text(f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
-                       f'viewBox="0 0 {w} {h}"><rect width="{w}" height="{h}" fill="#ffffff"/>'
-                       f"{inner}</svg>", encoding="utf-8")
-    inkscape(wrapper, "--export-type=png", f"--export-filename={out}")
-    wrapper.unlink()
+    for _ in ("width", "height"):
+        inner = re.sub(r"(<svg\b[^>]*?)\s(width|height)=\"[^\"]*\"", r"\1", inner, count=1)
+    inner = inner.replace("<svg", f'<svg x="{w * mx:g}" y="{h * my:g}" '
+                                  f'width="{w * (1 - 2 * mx):g}" height="{h * (1 - 2 * my):g}"', 1)
+    out.write_text(f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+                   f'viewBox="0 0 {w} {h}"><rect width="{w}" height="{h}" rx="{radius:g}" '
+                   f'fill="{background}"/>{inner}</svg>', encoding="utf-8")
 
 
 def main() -> None:
@@ -96,8 +98,8 @@ def main() -> None:
                  f"--export-filename={PNG / f'{logo}.svg'}")
         inkscape(SRC / f"{logo}.svg", "--export-type=png", "--export-area-drawing",
                  f"--export-filename={PNG / f'{logo}.png'}", "-h", "300")
-    for logo in ("logo-bright", "logo-dark"):  # README picks one by the reader's GitHub theme
-        (ASSETS / f"{logo}.svg").write_bytes((PNG / f"{logo}.svg").read_bytes())
+    framed_logo(PNG / "logo-dark.svg", ASSETS / "logo-banner.svg", BANNER_SIZE, BANNER_PLATE,
+                radius=36, margin=(0.09, 0.16))
 
     # Logo shown in the settings window header (light window background), at its exact size
     # on 100% displays and at double size for scaled ones (Windows shrinks bitmaps roughly)
@@ -105,7 +107,11 @@ def main() -> None:
         inkscape(SRC / "logo-bright.svg", "--export-type=png", "--export-area-drawing",
                  f"--export-filename={ASSETS / name}", "-h", str(height))
 
-    social_preview(PNG / "logo-bright.svg", PNG / "social-preview.png")
+    # GitHub social preview: the logo on white, inside the safe area
+    social = PNG / "social-preview.svg"
+    framed_logo(PNG / "logo-bright.svg", social, SOCIAL_SIZE, "#ffffff", radius=0, margin=(0.12, 0.2))
+    inkscape(social, "--export-type=png", f"--export-filename={PNG / 'social-preview.png'}")
+    social.unlink()
 
     # Bug icon next to "Report a bug" in the header; 2x size, shown at 16 px
     inkscape(SRC / "icon-bug.svg", "--export-type=png",
