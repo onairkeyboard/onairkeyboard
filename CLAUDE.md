@@ -19,7 +19,7 @@ powershell -ExecutionPolicy Bypass -File tests\run.ps1        # validation + all
 powershell -ExecutionPolicy Bypass -File build.ps1            # dist\OnAirKey.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe   # tests incl. the compiled EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1   # demo instance (temp config, Caps Lock)
-powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl [-Showcase]
+powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl [-Showcase]  # + Report a bug window
 python -I assets\build_icons.py                               # icons/logos from assets\src (Inkscape)
 ```
 
@@ -41,3 +41,19 @@ Run the tests after every change; commit after each finished step.
   start its own line or Ahk2Exe won't embed the file.
 - Wispr Flow blocks injected keys right after dictation stops (hence the LED sync timer), and
   its helper process can install its keyboard hook after ours (hence the hook reinstall).
+- **Integration tests fail at random** when the author types or dictates meanwhile (Wispr then
+  blocks the simulated keys) or when a demo instance runs (it also drives Caps Lock). Check for
+  stray `AutoHotkey64.exe` instances and rerun before hunting a bug.
+- A static method passed as a callback (`OnMessage`, a stored function) needs
+  `ObjBindMethod(Class, "Name")`; a plain `Class.Name` reference misses its hidden `this`.
+- AutoHotkey limits the length of one declaration: the translation tables are one `Map` per
+  language (`Lang.En`, `Lang.Pl`).
+- Building a window takes longer than the 15 ms after which another thread may interrupt, so
+  windows are created inside `Critical` (otherwise a queued command opened a second one).
+- Tab3 shows its controls in a dialog window that paints over sibling windows: a child window
+  on a tab page (`ScrollPane`) must live inside that dialog, shown / hidden with the tab.
+- Link controls: `&` must be written `&&`, and emoji don't render (no font fallback); read-only
+  edits are grey unless given `BackgroundWhite`.
+- The self-install runs only in the EXE on the default settings file. Tests use
+  `--install-dir <folder>` and `--install-answer yes|no` (see `tests\TestIntegration.ahk`), so
+  the real installation, Start menu and Startup folder are never touched.
