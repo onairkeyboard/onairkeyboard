@@ -1,8 +1,6 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
-    <img src="assets/logo-bright.svg" alt="OnAir keyboard" width="360">
-  </picture>
+  <img src="assets/logo-bright.svg#gh-light-mode-only" alt="OnAir keyboard" width="360">
+  <img src="assets/logo-dark.svg#gh-dark-mode-only" alt="OnAir keyboard" width="360">
 </p>
 
 <h3 align="center">Jeden klawisz. Zero zgadywania.</h3>
