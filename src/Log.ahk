@@ -12,10 +12,17 @@ class Log {
     static Write(msg) {
         if !Log.Enabled || Log.File = ""
             return
-        try {
-            if FileExist(Log.File) && FileGetSize(Log.File) > Log.MaxBytes
-                FileMove(Log.File, RegExReplace(Log.File, "\.log$", ".old.log"), true)
-            FileAppend(FormatTime(, "yyyy-MM-dd HH:mm:ss") "." A_MSec "  " msg "`n", Log.File, "UTF-8")
+        line := FormatTime(, "yyyy-MM-dd HH:mm:ss") "." A_MSec "  " msg "`n"
+        ; Someone reading the log (a test, an editor) may hold it for a moment: retry briefly
+        ; instead of losing the line
+        loop 5 {
+            try {
+                if FileExist(Log.File) && FileGetSize(Log.File) > Log.MaxBytes
+                    FileMove(Log.File, RegExReplace(Log.File, "\.log$", ".old.log"), true)
+                FileAppend(line, Log.File, "UTF-8")
+                return
+            }
+            Sleep(10)
         }
     }
 }
