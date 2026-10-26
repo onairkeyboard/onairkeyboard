@@ -6,8 +6,8 @@ class App {
     ; Product website (videos, tutorials, FAQ and feedback will live there)
     static WebsiteUrl := "https://onairkeyboard.com"
     static WebsiteName := "onairkeyboard.com"
-    ; GitHub organisation until the public repository exists
-    static RepoUrl := "https://github.com/onairkeyboard"
+    ; Source code, releases and issues
+    static RepoUrl := "https://github.com/onairkeyboard/onairkeyboard"
     ; Ready SayoDevice 2x2 setup (keys and LEDs as in the README), restored in the Sayo web app
     static SayoPresetUrl := "https://github.com/onairkeyboard/onairkeyboard/raw/main/presets/WisprFlow_2x2.sayobak"
     static SayoAppUrl := "https://sayodevice.com"
