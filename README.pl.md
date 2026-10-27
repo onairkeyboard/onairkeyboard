@@ -34,7 +34,7 @@ OnAir keyboard zapala lampkę „na antenie”: diodę na klawiaturze (np. małe
 i czerwoną ikonę w zasobniku. Świeci dokładnie wtedy, gdy wybrana aplikacja używa mikrofonu.
 Instalujesz i działa, bez ustawiania skrótów.
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-pl-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-pl-light.png"><img src="docs/img/window-main-pl-light.png" alt="Okno OnAir keyboard: na antenie, Wispr Flow używa mikrofonu" width="560"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-pl-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-pl-light.png"><img src="docs/img/window-main-pl-light.png" alt="Okno OnAir keyboard: na antenie, Wispr Flow używa mikrofonu" width="640"></picture></p>
 
 ## Co potrafi
 

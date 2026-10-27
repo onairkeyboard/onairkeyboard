@@ -34,7 +34,7 @@ OnAir keyboard turns on an "on air" light: your keyboard LED (a small macro pad,
 red tray icon. It glows exactly while a chosen app uses the microphone. Install it and it works,
 no shortcuts to set up.
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-en-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-en-light.png"><img src="docs/img/window-main-en-light.png" alt="OnAir keyboard window: on air, Wispr Flow is using the microphone" width="560"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-en-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-en-light.png"><img src="docs/img/window-main-en-light.png" alt="OnAir keyboard window: on air, Wispr Flow is using the microphone" width="640"></picture></p>
 
 ## Features
 
