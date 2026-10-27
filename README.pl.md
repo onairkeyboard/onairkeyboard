@@ -44,8 +44,8 @@ Instalujesz i działa, bez ustawiania skrótów.
 - **Dioda klawiatury jako lampka „na antenie”.** Działa z każdą klawiaturą, której diody umieją
   pokazywać stan Locka (np. SayoDevice): domyślnie Scroll Lock, do wyboru Num Lock albo Caps Lock.
 - **Czerwona ikona w zasobniku**, więc OnAir keyboard pomaga także bez diody.
-- **Dla zaawansowanych: skróty Wispr Flow** (dioda zapala się w chwili naciśnięcia klawisza)
-  albo hybryda: skrót zapala od razu, mikrofon poprawia.
+- **Dla zaawansowanych: skróty Wispr Flow** (dioda zapala się w chwili puszczenia klawisza)
+  albo hybryda: skrót zapala, mikrofon poprawia.
 - **Motyw jasny i ciemny** za ustawieniem Windows, po polsku i po angielsku, jeden mały plik EXE,
   który na życzenie sam się instaluje (bez uprawnień administratora).
 
@@ -127,7 +127,7 @@ Dwukrotne kliknięcie ikony w zasobniku otwiera okno; **Ustawienia zaawansowane 
 prowadzi do reszty:
 
 - **Źródło sygnału:** *Mikrofon* (zalecane), *Skróty klawiszowe* (dioda zapala się w chwili
-  naciśnięcia skrótu Wispr Flow, ale tylko dla Wispr Flow) albo *Oba* (skrót zapala od razu,
+  puszczenia skrótu Wispr Flow, ale tylko dla Wispr Flow) albo *Oba* (skrót zapala diodę,
   a gdy mikrofon Wispr Flow nie otworzy się w ciągu kilku sekund, dioda gaśnie).
 - **Skróty Wispr Flow:** przy skrótach kliknij **Przypisz** i naciśnij ten sam klawisz, którego
   używasz w Wispr Flow. Najpierw ustaw skróty w Wispr Flow: OnAir keyboard zapala diodę,
@@ -140,8 +140,9 @@ prowadzi do reszty:
 - **Przeglądarka to jedna aplikacja.** Windows nie mówi, która karta używa mikrofonu, więc
   zaznaczony Chrome zapali diodę także przy rozmowie w Meet.
 - **Dioda zapala się ok. pół sekundy po starcie nagrywania**, czyli wtedy, gdy aplikacja naprawdę
-  słucha. Push to talk w Wispr Flow otwiera mikrofon z opóźnieniem (bywa, że kilka sekund):
-  mów, gdy dioda się zapali.
+  słucha. **Przy Push to talk dioda nie świeci**, dopóki trzymasz klawisz: wciśnięcie Locka
+  w środku skrótu Wispr Flow opóźniłoby albo przerwało nagrywanie. Stan pokazuje czerwona ikona
+  w zasobniku.
 - **Trzymaj ikonę w zasobniku na widoku.** Windows chowa nowe ikony pod strzałką **^** obok
   zegara. Przeciągnij stamtąd ikonę OnAir keyboard na pasek zadań.
 - **Lock naprawdę się przełącza.** Gdy wskaźnikiem jest Scroll Lock, strzałki w Excelu przewijają

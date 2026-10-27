@@ -43,8 +43,8 @@ no shortcuts to set up.
 - **Your keyboard LED as an "on air" light.** Works with any keyboard whose LEDs can show a Lock
   state (SayoDevice, for example): Scroll Lock by default, Num Lock or Caps Lock to choose.
 - **A red tray icon**, so OnAir keyboard helps even without an LED.
-- **For the advanced: Wispr Flow shortcuts** (the LED turns on the moment you press a key) or a
-  hybrid: a shortcut turns it on at once, the microphone corrects it.
+- **For the advanced: Wispr Flow shortcuts** (the LED turns on as you release the key) or a
+  hybrid: a shortcut turns it on, the microphone corrects it.
 - **Light and dark theme** following Windows, Polish and English, one small EXE that installs itself
   on request (no administrator rights).
 
@@ -125,8 +125,8 @@ shortcuts wait in the advanced settings.
 Double-click the tray icon to open the window; **Advanced settings →** in its footer leads to the
 rest:
 
-- **Signal source:** *Microphone* (recommended), *Keyboard shortcuts* (the LED turns on the moment
-  you press a Wispr Flow shortcut, Wispr Flow only) or *Both* (a shortcut turns it on at once; when
+- **Signal source:** *Microphone* (recommended), *Keyboard shortcuts* (the LED turns on as you
+  release a Wispr Flow shortcut, Wispr Flow only) or *Both* (a shortcut turns it on; when
   Wispr Flow's microphone doesn't open within a few seconds, the LED goes off).
 - **Wispr Flow shortcuts:** for the shortcut sources, click **Assign** and press the same key you
   use in Wispr Flow. Set the shortcuts in Wispr Flow first: OnAir keyboard lights the LED by
@@ -139,8 +139,8 @@ rest:
 - **A browser is one app.** Windows doesn't say which tab uses the microphone, so a ticked Chrome
   also lights the LED during a Meet call.
 - **The LED turns on about half a second after recording starts**, which is when the app really
-  listens. Wispr Flow's Push to talk opens the microphone late (sometimes a few seconds): speak
-  when the LED lights up.
+  listens. **With Push to talk the LED stays off** while you hold the key: a Lock press in the
+  middle of a Wispr Flow shortcut would delay or end the recording. The red tray icon shows it.
 - **Keep the tray icon in sight.** Windows hides new tray icons under the **^** arrow next to the
   clock. Drag the OnAir keyboard icon from there onto the taskbar.
 - **The Lock really toggles.** With Scroll Lock as the indicator, the arrow keys scroll the sheet in
