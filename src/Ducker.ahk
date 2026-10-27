@@ -67,7 +67,7 @@ class Ducker {
         } else if levelChanged && this.Managed.Count {
             for key, m in this.Managed
                 m.Target := Ducker.TargetOf(m.Original, this.Level)
-            if this.Phase = "held" || this.Phase = "down"
+            if this.Phase = "held"  ; while going down the fade heads for the new target
                 this._Refresh(now, true)
         }
         this._Update(now)
@@ -116,7 +116,7 @@ class Ducker {
 
     _RefreshNow(now) {
         if this.Active
-            this._Refresh(now, true)
+            this._Refresh(now, this.Phase = "held")  ; while going down the fade sets the volumes
     }
 
     ; Back to the original volumes at once (pause, turned off, sleep, exit)

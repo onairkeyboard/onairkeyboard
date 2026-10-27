@@ -75,6 +75,9 @@ class App {
         }
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
+        ; Before anything can be lowered: closing the program during the start must bring the
+        ; sound back too
+        OnExit(ObjBindMethod(this, "Shutdown"))
         this.Ducker := Ducker(this._Mixer(), dir "\ducking.ini", ObjBindMethod(this, "DuckExcluded")
             , ObjBindMethod(this, "OnDuckChange"))
         Log.Init(dir "\onairkeyboard.log", this.Cfg.Debug)
@@ -90,7 +93,6 @@ class App {
         OnMessage(App.WM_COMMAND, ObjBindMethod(this, "OnCommand"))
         if this.IsTestInstance
             OnMessage(0x004A, ObjBindMethod(this, "OnCopyData"))  ; WM_COPYDATA
-        OnExit(ObjBindMethod(this, "Shutdown"))
 
         ; First run: no welcome screen, the window opens on "How it works"
         if this.Cfg.IsFirstRun

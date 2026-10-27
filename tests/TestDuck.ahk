@@ -88,6 +88,8 @@ Check("idle before", d.Phase, "idle")
 d.SetOnAir(true, , 1000)
 Check("goes down", d.Phase, "down")
 Check("nothing set at the start", mx.Vol(spotify), 0.6)
+d.Refresh(1050)  ; the microphone changes as it goes on air: no jump to the target
+Check("refresh while going down sets nothing", mx.Vol(spotify), 0.6)
 d.Tick(1125)
 Check("half way down", mx.Vol(spotify), 0.36)
 d.Tick(1250)
