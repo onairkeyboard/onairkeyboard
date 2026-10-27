@@ -316,7 +316,8 @@ class AppWindow {
         stamp := App.Version " " FileGetTime(A_ScriptFullPath)
         current := ""
         try current := FileRead(ui "\build.txt")
-        if current != stamp {
+        loader := dir "\WebView2Loader.dll"
+        if current != stamp || !FileExist(loader) || FileGetSize(loader) = 0 {
             DirCreate(ui)
             ; FileInstall needs a literal source and must start its own line (Ahk2Exe)
             FileInstall("..\ui\index.html", ui "\index.html", 1)
@@ -324,13 +325,16 @@ class AppWindow {
             FileInstall("..\ui\app.js", ui "\app.js", 1)
             FileInstall("..\ui\logo-bright.svg", ui "\logo-bright.svg", 1)
             FileInstall("..\ui\logo-dark.svg", ui "\logo-dark.svg", 1)
-            ; Another running copy may hold the DLL; the one there is then used
-            try FileInstall("..\lib\WebView2\64bit\WebView2Loader.dll", dir "\WebView2Loader.dll", 1)
+            ; Another running copy may hold the DLL; the one there is then used.
+            ; (Not "try FileInstall(...)" on one line: Ahk2Exe would not embed the file.)
+            try {
+                FileInstall("..\lib\WebView2\64bit\WebView2Loader.dll", loader, 1)
+            }
             try FileDelete(ui "\build.txt")
             FileAppend(stamp, ui "\build.txt", "UTF-8-RAW")
             Log.Write("window files unpacked to " ui)
         }
-        return {Ui: ui, Loader: dir "\WebView2Loader.dll"}
+        return {Ui: ui, Loader: loader}
     }
 
     static _SetIcon(hwnd) {

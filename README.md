@@ -5,7 +5,7 @@
 <h3 align="center">One key. No guessing.</h3>
 
 <p align="center">
-  Your keyboard LED lights up red while Wispr Flow is recording.
+  Your keyboard LED lights up red while you dictate.
 </p>
 
 <p align="center">
@@ -23,191 +23,195 @@
 ## Why
 
 Dictating with [Wispr Flow](https://wisprflow.ai) and similar apps can make you several times faster.
-But shortcuts like `Ctrl+Win+Space` are finger gymnastics, and with no clear sign that recording is
-on, the classics happen: minutes of talking that were never captured, or a conversation that keeps
-getting transcribed.
+But with no clear sign that recording is on, the classics happen: minutes of talking that were
+never captured, or a conversation that keeps getting transcribed.
 
-OnAir keyboard turns a small macro pad into a dictation remote: one key per action and a light that glows
-red exactly when you're on air. One press, and you always know what's going on.
+OnAir keyboard turns on an "on air" light: your keyboard LED (a small macro pad, for example) and a
+red tray icon. It glows exactly while a chosen app uses the microphone. Install it and it works,
+no shortcuts to set up.
 
-<p align="center"><img src="docs/img/settings-howto-en.png" alt="OnAir keyboard settings: How it works" width="600"></p>
+<p align="center"><img src="docs/img/window-main-en.png" alt="OnAir keyboard window: on air, Wispr Flow is using the microphone" width="560"></p>
 
 ## Features
 
-- **Keyboard LED as an "on air" light.** Works with any keyboard whose LEDs can show a Lock key
-  state (for example SayoDevice macro pads): Scroll Lock by default, Num Lock or Caps Lock to choose.
-- **Red tray icon while recording**, so OnAir keyboard helps even without a keyboard LED.
-- **All Wispr Flow recording actions:** Push to talk, Hands-free, Cancel and Command Mode.
-- **Record shortcuts by pressing them**, including F13–F24 and Wispr's default shortcuts such as
-  `Ctrl+Win`.
-- **Polish and English**, starts with Windows, a single small EXE that installs itself on request
-  (no administrator rights, no separate installer).
-- **Private by design:** OnAir keyboard only listens for your shortcuts. It never blocks keys, reads no
-  text, collects no data and makes no internet connections.
+- **The LED is on while an app uses the microphone:** Wispr Flow, Claude, ChatGPT, Aqua Voice and
+  any other you tick. The list comes from the microphone history in Windows: nothing to type in.
+- **Your keyboard LED as an "on air" light.** Works with any keyboard whose LEDs can show a Lock
+  state (SayoDevice, for example): Scroll Lock by default, Num Lock or Caps Lock to choose.
+- **A red tray icon**, so OnAir keyboard helps even without an LED.
+- **For the advanced: Wispr Flow shortcuts** (the LED turns on the moment you press a key) or a
+  hybrid: a shortcut turns it on at once, the microphone corrects it.
+- **Light and dark theme** following Windows, Polish and English, one small EXE that installs itself
+  on request (no administrator rights).
 
 ## Requirements
 
-- Windows 10 or 11
-- [Wispr Flow](https://wisprflow.ai) for desktop
-- Optional: a keyboard whose LEDs can follow a Lock key (otherwise use the tray icon)
+- Windows 10 or 11 (the window uses Microsoft Edge WebView2, which Windows 11 always has and
+  Windows 10 almost always; without it OnAir keyboard keeps working from the tray and tells you
+  where to get it)
+- A dictation app, such as [Wispr Flow](https://wisprflow.ai)
+- Optional: a keyboard whose LEDs can show a Lock state (without one, the tray icon does the job)
 
-## Get started
+## Getting started
 
-**0. Download** `OnAirKeyboard-<version>.exe` from [Releases](https://github.com/onairkeyboard/onairkeyboard/releases/latest)
-and run it. On the first start OnAir keyboard asks whether to install itself: **Yes** copies it to
-`%LOCALAPPDATA%\Programs\OnAirKeyboard` and adds a Start menu shortcut (no administrator rights needed),
-so you can delete the downloaded file; **No** runs it from where it is and doesn't ask again.
-Then the settings window opens on *How it works*. To update, download the new version and run it:
-OnAir keyboard offers to replace the installed copy and keeps your settings.
+Three programs, one order: **SayoDevice → Wispr Flow → OnAir keyboard**. OnAir keyboard comes last
+and needs no setting up.
 
-> Windows may show "Windows protected your PC" because the EXE isn't code-signed yet. Click
-> **More info → Run anyway**. See [SmartScreen and antivirus](#smartscreen-and-antivirus).
+<p align="center"><img src="docs/img/window-howto-en.png" alt="How it works: three steps" width="720"></p>
 
-**1. Macro pad.** In your keyboard's software, give each key a shortcut and set the LEDs to the
-Lock indicator. Example for a SayoDevice 2x2 macro pad (SayoDevice numbers the keys row by row):
+**1. Macro pad.** Have a SayoDevice 2x2? Download
+[WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), open [sayodevice.com](https://sayodevice.com)
+in Chrome or Edge, connect the pad and choose **Backup & Restore → Restore**, then **Save**. Keys and
+LEDs are set at once:
 
-| Key (SayoDevice ID) | Shortcut | Wispr Flow action | LED |
-|---|---|---|---|
-| Top left (ID 0) | `Ctrl+Shift+F16` | Cancel | Indicator → Scroll Lock |
-| Top right (ID 1) | `Ctrl+Shift+F15` | Paste last transcript | Indicator → Scroll Lock |
-| Bottom left (ID 2) | `Ctrl+Shift+F13` | Push to talk | Indicator → Scroll Lock |
-| Bottom right (ID 3) | `Ctrl+Shift+F14` | Hands-free | Indicator → Scroll Lock |
+| Key (SayoDevice ID) | Shortcut | Wispr Flow action |
+|---|---|---|
+| Top left (ID 0) | `Ctrl+Shift+F16` | Cancel |
+| Top right (ID 1) | `Ctrl+Shift+F15` | Paste last transcript |
+| Bottom left (ID 2) | `Ctrl+Shift+F13` | Push to talk |
+| Bottom right (ID 3) | `Ctrl+Shift+F14` | Hands-free |
 
-**Why F13 and above?** A regular keyboard only has F1–F12, so no program has a reason to use
-F13–F24. They still exist in the USB standard, and macro pads can send them. `Ctrl+Shift` adds a
-second safety net: even if some program reacts to a plain F13, the combination stays free.
-
-> **Have a SayoDevice 2x2?** Skip the manual setup: download
-> [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), a backup with exactly the keys and LEDs
-> from the table above.
->
-> 1. Open [sayodevice.com](https://sayodevice.com) in Chrome or Edge (other browsers can't talk to
->    the keyboard) and connect your macro pad.
-> 2. Go to **Backup & Restore → Restore**, pick the downloaded file, select what to restore (keys
->    and lights) and confirm.
-> 3. Click **Save** to store the settings on the keyboard.
->
-> If the app warns that the backup doesn't match the device, you have a different model: cancel
-> and set the keys by hand.
+Another macro pad: give its keys such shortcuts in its software and set the LEDs to the Scroll Lock
+indicator.
 
 <details>
 <summary><b>Setting the keys by hand in SayoDevice</b></summary>
 
-1. Open [sayodevice.com](https://sayodevice.com) in Chrome or Edge, connect the macro pad and go
-   to **Configuration → Binding**.
-2. Click a key, set **Key Mode** to **Keyboard**, then click the keyboard icon in the shortcut
-   field.
+1. Open [sayodevice.com](https://sayodevice.com) in Chrome or Edge, connect the macro pad and go to
+   **Configuration → Binding**.
+2. Click a key, set **Key Mode** to **Keyboard** and click the keyboard icon in the shortcut field.
 
-   <img src="docs/img/sayo-keys-2x2.png" alt="SayoDevice: key bindings of a 2x2 macro pad" width="600">
+   <img src="docs/img/sayo-keys-2x2.png" alt="SayoDevice: key bindings of the 2x2 pad" width="600">
 
-3. Select **Ctrl** and **Shift** on the keyboard and the F key in the bar below it (F13–F24 are
-   there), then click **OK**.
+3. Select **Ctrl** and **Shift** on the on-screen keyboard, pick the F key from the bar below it
+   (F13–F24 are there), then click **OK**.
 
-   <img src="docs/img/sayo-key-picker.png" alt="SayoDevice: choosing Ctrl+Shift+F14" width="700">
+   <img src="docs/img/sayo-key-picker.png" alt="SayoDevice: picking Ctrl+Shift+F14" width="700">
 
 4. Repeat for the other keys. In **Configuration → Light**, set the LEDs to Indicator → Scroll Lock
-   and pick a colour (red fits "on air").
-5. Click **Save** to store the settings on the keyboard.
+   and pick a colour (red suits "on air").
+5. Click **Save** to store the settings on the pad.
+
+If restoring the backup warns that it doesn't match the device, you have another model: cancel and
+set the keys by hand. **Why F13 and up?** Ordinary keyboards stop at F12, so no program uses them,
+and `Ctrl+Shift` is a second safety catch.
 
 </details>
 
-**2. OnAir keyboard.** On the *Shortcuts* tab, click **Record** next to each action and press the key on
-your macro pad. Paste last transcript doesn't need to be recorded: it doesn't change the recording
-state.
-
-<p align="center"><img src="docs/img/settings-shortcuts-en.png" alt="OnAir keyboard settings: Shortcuts" width="600"></p>
-
-**3. Wispr Flow.** In *Settings → General → Shortcuts*, set the same shortcuts for Push to talk,
+**2. Wispr Flow.** In *Settings → Shortcuts*, press the macro pad keys one by one for Push to talk,
 Hands-free and Cancel.
 
-Done: press Push to talk or Hands-free and the LED turns red.
+**3. OnAir keyboard.** Download `OnAirKeyboard-<version>.exe` from
+[Releases](https://github.com/onairkeyboard/onairkeyboard/releases/latest) and run it. On the first
+start it asks whether to install itself: **Yes** copies it to `%LOCALAPPDATA%\Programs\OnAirKeyboard`
+and adds a Start menu shortcut (you can delete the downloaded file); **No** runs it from where it
+is. Nothing else to set.
 
-## Why only four keys?
+Done: **speak when the LED lights up.**
 
-Let's be honest: Wispr Flow can do a lot more. But most people don't use the bells and whistles.
-They talk to their AI with the basics: **Push to talk, Hands-free and Cancel**. Command Mode is there
-too, and OnAir keyboard supports it, but it's used far less often. The fourth key on the pad goes to
-**Paste last transcript** (see below).
+> Windows may show "Windows protected your PC", because the file isn't digitally signed yet. Click
+> **More info → Run anyway**. See [SmartScreen and antivirus](#smartscreen-and-antivirus).
 
-OnAir keyboard is a specific solution to a specific problem for a specific group of users, not a
-do-it-all multitool. A more universal version may come one day, but not now: that's not what
-matters.
+Updating: download the new version and run it; OnAir keyboard offers to replace the installed copy.
+Your settings stay; after updating from 0.1 the signal source is the microphone, and your
+shortcuts wait in the advanced settings.
 
-## Why Wispr Flow?
+## Advanced settings
 
-I've tried several alternatives, and Wispr Flow works best of them all. I use it every day myself,
-and OnAir keyboard is built around exactly how I work with it.
+Double-click the tray icon to open the window; **Advanced settings →** in its footer leads to the
+rest:
 
-## Why Paste last transcript on the fourth key?
-
-It happens to everyone: you dictate, but the cursor wasn't in a text field (or the window lost
-focus), and the text lands nowhere. Wispr Flow keeps it. Click into the field, press the fourth key,
-and your last dictation appears. No retyping, no saying it all again, no shortcut to remember.
-
-OnAir keyboard doesn't need this key recorded: pasting doesn't change the recording state.
-
-## Why not Escape?
-
-Wispr Flow's default Cancel is `Escape`, but Escape also interrupts other programs. If Claude Code
-or ChatGPT is working, one press cancels your dictation and stops the AI too. Put Cancel on a
-dedicated key of your macro pad. OnAir keyboard still supports Escape, but warns you about it.
+- **Signal source:** *Microphone* (recommended), *Keyboard shortcuts* (the LED turns on the moment
+  you press a Wispr Flow shortcut, Wispr Flow only) or *Both* (a shortcut turns it on at once; when
+  Wispr Flow's microphone doesn't open within a few seconds, the LED goes off).
+- **Wispr Flow shortcuts:** for the shortcut sources, click **Assign** and press the same key you
+  use in Wispr Flow. Set the shortcuts in Wispr Flow first: OnAir keyboard lights the LED by
+  pressing Scroll Lock for you, and that extra key press would spoil a combination being recorded
+  in Wispr Flow. That's why OnAir keyboard pauses itself while a Wispr Flow window is active.
+- **Indicator, General, Diagnostics, About.**
 
 ## Good to know
 
+- **A browser is one app.** Windows doesn't say which tab uses the microphone, so a ticked Chrome
+  also lights the LED during a Meet call.
+- **The LED turns on about half a second after recording starts**, which is when the app really
+  listens. Wispr Flow's Push to talk opens the microphone late (sometimes a few seconds): speak
+  when the LED lights up.
 - **Keep the tray icon in sight.** Windows hides new tray icons under the **^** arrow next to the
-  clock. Drag the OnAir keyboard icon from there onto the taskbar, so the red icon is always visible.
-  On Windows 11 you can also turn it on in *Settings → Personalization → Taskbar → Other system
-  tray icons*.
-- **OnAir keyboard follows your shortcuts, not Wispr itself.** If recording changes some other way
-  (double-tapping Push to talk, stopping it with the mouse in the Flow Bar, the automatic stop
-  after 20 minutes), the LED can stay on. Press Cancel and it's back in sync.
-- **The Lock key really toggles.** With Scroll Lock as the indicator, arrow keys scroll the sheet in
+  clock. Drag the OnAir keyboard icon from there onto the taskbar.
+- **The Lock really toggles.** With Scroll Lock as the indicator, the arrow keys scroll the sheet in
   Excel while you dictate. With Caps Lock, letters come out in capitals.
-- A shortcut can have one key besides Ctrl / Alt / Shift / Win (Wispr also allows two, such as
-  `Ctrl+A+B`; OnAir keyboard doesn't yet).
-- If a "Scroll Lock on" notification pops up, it comes from your mouse or keyboard software
-  (for example Logitech SetPoint), not from Windows. You can turn it off there.
+- If a "Scroll Lock on" notification pops up, it comes from your mouse or keyboard software (such
+  as Logitech SetPoint), not from Windows. Turn it off there.
+
+<details>
+<summary><b>Why Wispr Flow? Why four keys? Why not Escape?</b></summary>
+
+**Why Wispr Flow?** I've tried several alternatives, and Wispr Flow works best of them all. I use it
+every day myself, and OnAir keyboard is built around exactly how I work with it. The microphone LED
+works with any app, though.
+
+**Why four keys?** Most people talk to their AI with the basics: **Push to talk, Hands-free and
+Cancel**. The fourth key goes to **Paste last transcript**: when the cursor wasn't in a text field
+and the text landed nowhere, click into the field, press the fourth key, and your last dictation
+appears.
+
+**Why not Escape?** Wispr Flow's default Cancel is `Escape`, but Escape also interrupts other
+programs. If Claude Code or ChatGPT is working, one press cancels your dictation and stops the AI
+too. Put Cancel on a dedicated key of your macro pad.
+
+</details>
+
+## Privacy
+
+OnAir keyboard reads only the microphone usage timestamps and app names from the Windows registry
+(the same entry Windows draws its microphone icon from). It never touches audio, reads no text,
+collects no data and doesn't connect to the internet, except for opening links in your browser
+when you click them. The window shows only files stored on your computer. With the Shortcuts
+source, OnAir keyboard only listens to the Wispr Flow shortcuts and blocks nothing.
 
 ## SmartScreen and antivirus
 
-OnAir keyboard is written in [AutoHotkey](https://www.autohotkey.com) and compiled into an EXE. Such files
-aren't code-signed yet, so Windows SmartScreen warns about them and some antivirus programs flag
-them by mistake, especially because the program listens to the keyboard. The full source code is in
-this repository, and you can [build the EXE yourself](#build-from-source).
+OnAir keyboard is written in [AutoHotkey](https://www.autohotkey.com) and compiled to an EXE. Such
+files aren't digitally signed yet, so Windows SmartScreen warns about them and some antivirus
+programs flag them by mistake. The full source code is in this repository, and you can
+[build the EXE yourself](#building-from-source).
 
 ## Settings and uninstalling
 
-Settings live in `%APPDATA%\OnAirKeyboard\config.ini` (the path is shown on the *About* tab). To remove
-OnAir keyboard: untick *Start with Windows*, exit from the tray menu, then delete:
+Settings live in `%APPDATA%\OnAirKeyboard\config.ini` (*About* shows the path), the window's files
+in `%LOCALAPPDATA%\OnAirKeyboard`. To remove OnAir keyboard: untick *Start with Windows*, exit it from
+the tray menu, then delete:
 
-- the program folder `%LOCALAPPDATA%\Programs\OnAirKeyboard` (or the downloaded EXE wherever you run it
-  from, if you didn't install it),
-- the *OnAir keyboard* shortcut in the Start menu (right-click → *Open file location*),
-- the settings folder `%APPDATA%\OnAirKeyboard`.
+- the program folder `%LOCALAPPDATA%\Programs\OnAirKeyboard` (or just the downloaded EXE, if it
+  wasn't installed),
+- the *OnAir keyboard* Start menu shortcut (right-click → *Open file location*),
+- the folders `%APPDATA%\OnAirKeyboard` and `%LOCALAPPDATA%\OnAirKeyboard`.
 
-## Build from source
+## Building from source
 
-Requirements: [AutoHotkey v2.0](https://www.autohotkey.com) and Ahk2Exe 1.1.37 or newer
-(AutoHotkey Dash → Compile installs it).
+Requirements: [AutoHotkey v2.0](https://www.autohotkey.com) and Ahk2Exe 1.1.37 or newer (installed by
+AutoHotkey Dash → Compile). The WebView2 library is in `lib/` (see [lib/README.md](lib/README.md)),
+the window's page in `ui/`.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\run.ps1      # tests
 powershell -ExecutionPolicy Bypass -File build.ps1          # dist\OnAirKeyboard-<version>.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe # tests incl. the EXE
-powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # try it from source
+powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1 # run from source
 ```
 
 Icons are generated from `assets/src` with `python -I assets/build_icons.py` (needs Inkscape).
 
 ## Report a bug
 
-Something doesn't work? Click **🐞 Report a bug** at the top of the settings window (or in the
-tray menu). A window shows the address [hello@onairkeyboard.com](mailto:hello@onairkeyboard.com), a subject and
-a ready e-mail text: three short questions plus the technical details OnAir keyboard fills in for you
-(version, Windows, shortcuts; nothing personal). **Copy address** and **Copy text** put them on
-the clipboard, so you can send the report from any mailbox, Gmail included. Attaching the
-diagnostic log helps a lot: turn it on in *Settings → General*, make the problem happen again and
-attach `onairkeyboard.log`.
+Something doesn't work? Click **Report a bug** in the window's footer (or in the tray menu). The
+window shows the address [hello@onairkeyboard.com](mailto:hello@onairkeyboard.com), a subject and a
+ready e-mail text: three short questions plus the technical details OnAir keyboard fills in for you
+(version, Windows, signal source, shortcuts; nothing personal). The **Copy** buttons put them on the
+clipboard, so you can send the report from any mailbox. Attaching the diagnostic log helps a lot:
+turn it on in *Advanced settings → Diagnostics*, make the problem happen again and attach
+`onairkeyboard.log`.
 
 ## Support
 
@@ -221,9 +225,8 @@ More about OnAir keyboard: [onairkeyboard.com](https://onairkeyboard.com)
 
 ## License
 
-[MIT](LICENSE) © 2026 Patryk Szulczewski
-
-The bug icon comes from [Ionicons](https://ionic.io/ionicons)
-([MIT](assets/src/LICENSE-ionicons.txt), © Ionic).
+[MIT](LICENSE) © 2026 Patryk Szulczewski. The window uses
+[WebView2 for AutoHotkey](https://github.com/thqby/ahk2_lib) (thqby, MIT) and Microsoft's
+WebView2Loader.dll.
 
 OnAir keyboard is an independent project, not affiliated with Wispr AI (Wispr Flow) or SayoDevice.

@@ -4,6 +4,50 @@ All notable changes to OnAir keyboard are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - Unreleased
+
+Install it and it works: the LED follows the microphone, no shortcuts to set up.
+
+### Added
+- **Microphone as the signal source (the default).** The LED is on while a ticked app uses the
+  microphone, read from the registry Windows keeps for its microphone icon. Works with any app;
+  dictation apps and AI assistants (Wispr Flow, Claude, ChatGPT, Aqua Voice) are ticked by
+  default, messengers and browsers aren't. The LED turns on when the app really listens (about
+  0.5 s after the start) and off 0.1–0.25 s after the end.
+- **Signal sources in the advanced settings:** Microphone, Keyboard shortcuts (as in 0.1) and Both
+  (a shortcut turns the LED on at once; when Wispr Flow's microphone stays closed for 6 s, it
+  goes off).
+- **Self-protection while setting up Wispr Flow:** with the shortcut sources, an active Wispr Flow
+  window puts OnAir keyboard's shortcuts on hold and leaves the Lock alone, so Wispr Flow can
+  record its shortcuts.
+- **New window**, built in WebView2: a simple main view (on air / off air card, keyboard LED with a
+  test, apps from the microphone history as checkboxes, start with Windows) and advanced settings
+  with a sidebar (signal source, Wispr Flow shortcuts, indicator, general, diagnostics, about).
+  Every change applies at once, there is no Save button.
+- **Light and dark ("Grafit") theme**, following the Windows app mode, also while the window is
+  open.
+- How it works as three step cards: SayoDevice → Wispr Flow → OnAir keyboard, and why that order.
+- The tray tooltip says who is on air ("on air (Wispr Flow)").
+
+### Changed
+- Settings from 0.1 move over by themselves: the source becomes Microphone with the default apps;
+  your shortcuts are kept for the shortcut sources.
+- "Record" is now "Assign"; an assigned shortcut is saved at once, or refused with the reason when
+  Wispr Flow wouldn't accept it.
+- Tray menu: "Open OnAir keyboard" (also a double click), Support, Test the LED, Pause, Show log,
+  Website, Report a bug, About, Exit.
+- Report a bug opens in the window, with the signal source among the technical details.
+- README in both languages: shorter, with the setup order and a Privacy section.
+
+### Removed
+- The native settings window with tabs.
+
+### Known limitations
+- A browser is one app for Windows: a ticked browser lights the LED for any tab using the
+  microphone.
+- Without the Microsoft Edge WebView2 Runtime (rare on Windows 10) the window can't open;
+  OnAir keyboard keeps working from the tray and links the runtime installer.
+
 ## [0.1.0] - 2026-10-26
 
 First version.

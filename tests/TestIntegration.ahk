@@ -368,9 +368,22 @@ fakeWispr.Hide()
 Check("guard: window inactive", WaitLog("Wispr Flow window inactive", 3000, guardDir), true)
 Tap("F21")
 Check("guard: shortcuts work again", Caps(), 1)
+; Windows may refuse to bring a window back to the front at once: retry until the guard sees it
+GuardActivations() {
+    text := ""
+    try text := FileRead(guardDir "\onairkeyboard.log")
+    StrReplace(text, "window active, shortcuts on hold", , , &count)
+    return count
+}
 fakeWispr.Show()
-WinActivate(fakeWispr.Hwnd)
-Sleep(600)
+loop 20 {
+    WinActivate(fakeWispr.Hwnd)
+    DllCall("SetForegroundWindow", "Ptr", fakeWispr.Hwnd)
+    Sleep(150)
+    if GuardActivations() >= 2
+        break
+}
+Check("guard: window active again", GuardActivations() >= 2, true)
 Tap("F21")
 Check("guard: hands-free kept, Lock left alone", Caps(), 1)
 fakeWispr.Destroy()

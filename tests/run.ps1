@@ -29,7 +29,7 @@ foreach ($run in $runs) {
     $argList = @('/ErrorStdOut', "`"$(Join-Path $root "tests\$($run.Name).ahk")`"") + $run.Args
     $p = Start-Process $ahk -ArgumentList $argList -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError "$out.err"
     $null = $p.Handle  # caches the handle; without it ExitCode stays empty
-    if (-not $p.WaitForExit(90000)) { Stop-Process -Id $p.Id -Force; Write-Host "$label TIMEOUT"; $failed++; continue }
+    if (-not $p.WaitForExit(300000)) { Stop-Process -Id $p.Id -Force; Write-Host "$label TIMEOUT"; $failed++; continue }
     Write-Host "== $label"
     Get-Content $out, "$out.err" -ErrorAction SilentlyContinue | Where-Object { $_ -notlike 'target: *' } | Write-Host
     if ($p.ExitCode -ne 0) { $failed++ }

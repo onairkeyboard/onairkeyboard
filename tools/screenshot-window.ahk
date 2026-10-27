@@ -85,9 +85,10 @@ Show(view, section := "") {
     Sleep(500)
 }
 
-; The instance drives Caps Lock (like the tests), the pictures show the recommended Scroll Lock
+; The instance drives Caps Lock (like the tests), the pictures show the recommended Scroll Lock;
+; and they show the installed program, which manages autostart
 Shot(name) {
-    Eval("S.settings.lock = 'ScrollLock'; render(); 1")
+    Eval("S.settings.lock = 'ScrollLock'; S.settings.autostartManaged = 1; render(); 1")
     Sleep(150)
     hwnd := WinExist(Win)
     WinGetPos(, , &w, &h, hwnd)
