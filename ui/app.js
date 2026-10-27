@@ -104,10 +104,13 @@ function logos() {
     h('img.logo.dark', { src: 'logo-dark.svg', alt: 'OnAir keyboard' })];
 }
 
-// The logo with the version under it (a link to About): main view and the advanced side menu
+// The logo (a link to the website) with the version under it (a link to About): main view and
+// the advanced side menu
 function brand() {
-  return h('div.brand', logos(),
-    h('a.ver', { href: '#', title: t('section.about'), on: { click: (e) => { e.preventDefault(); go('advanced', 'about'); } } },
+  return h('div.brand',
+    h('a.home', { href: '#', title: t('tray.website'), 'aria-label': t('tray.website'),
+      on: { click: (e) => { e.preventDefault(); send('open', { url: S.links.website }); } } }, logos()),
+    h('a.ver',{ href: '#', title: t('section.about'), on: { click: (e) => { e.preventDefault(); go('advanced', 'about'); } } },
       S.version ? 'v' + S.version : ''));
 }
 

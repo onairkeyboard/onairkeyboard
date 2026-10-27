@@ -11,20 +11,24 @@ Music and videos go quiet while you dictate.
 
 ### Added
 - **Lowering other sounds while on air** (off by default; *Lower other sounds to:* in the main
-  view). Other apps go down to the level you choose, in percent of their own volume (20% by
-  default), on every output device, and come back with a fade a second after you go off air. The
+  view). Other apps go down to the level you choose, 0–50% of their own volume in steps of 1%
+  (20% by default), on every output device, and come back with a fade a second after you go off
+  air. The fades follow the ear: going down the sound drops quickly at first and gently at the
+  end. The
   app using the microphone (a voice chat) and Wispr Flow keep their sound; a volume you change
   meanwhile is left as is. Pause, sleep and closing OnAir keyboard bring the sound back at once,
   and after a crash the next start does, also for an app that was closed while lowered.
-- **Sound** section in the advanced settings: level, *Test lowering*, fade and delay times,
-  system sounds (lowered by default) and the apps lowered right now.
+- **Sound** section in the advanced settings: level, *Test lowering*, fade and delay times in
+  milliseconds, system sounds (lowered by default) and the apps lowered right now.
 - **Explanations behind an "i"** next to the settings: the bubble opens on hover, with the
   keyboard or with a click, and Esc closes it. The help texts under the settings moved there.
 
 ### Changed
 - **A larger, calmer main window** (760×640): the logo with the version and the status card side by
   side, then the apps, lowering and the keyboard LED. *Start with Windows* moved to Advanced
-  settings → General.
+  settings → General. The logo opens the website, the version under it About; the advanced
+  settings show the same logo and version in their side menu. *Show all* opens up to 4 rows of
+  apps, then the list scrolls.
 - The advanced settings are 640 px tall, like the main view (720 px didn't fit a 1080p laptop at
   150%), and the window never gets taller than the screen.
 - Shorter status texts, so they fit on one line.

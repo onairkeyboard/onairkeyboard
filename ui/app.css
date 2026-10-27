@@ -75,6 +75,7 @@ label.check.top input { margin-top: 2px; }
    lines up with the tiles, the version ends under the "r" */
 .brand { display: inline-flex; flex-direction: column; gap: 6px; justify-self: start; margin-left: -9px; }
 .brand .logo { display: block; }
+.brand .home { display: block; line-height: 0; }
 /* 7 px closer to the logotype; the logo keeps its place (the author's pick from the mockups) */
 .ver { align-self: stretch; padding-right: 8.5px; text-align: right; white-space: nowrap; font-size: 12px; line-height: 17px; color: var(--muted);
   position: relative; top: -7px; }
