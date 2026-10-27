@@ -2,7 +2,7 @@
 ; so new settings take effect without restarting the program.
 class App {
     static Name := "OnAir keyboard"
-    static Version := "0.3.2"
+    static Version := "0.3.3"
     ; Product website (videos, tutorials, FAQ and feedback will live there)
     static WebsiteUrl := "https://onairkeyboard.com"
     static WebsiteName := "onairkeyboard.com"
