@@ -31,7 +31,8 @@ roadmap and current to-do. Never copy their contents into this public repository
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\run.ps1        # validation + all tests
-powershell -ExecutionPolicy Bypass -File build.ps1            # dist\OnAirKeyboard-<version>.exe
+powershell -ExecutionPolicy Bypass -File build.ps1            # next patch, commit, dist\OnAirKeyboard-<version>.exe
+powershell -ExecutionPolicy Bypass -File build.ps1 -Minor     # first build of a new minor (0.2.x -> 0.3.0)
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe   # tests incl. the compiled EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1   # demo instance (temp config, Caps Lock)
 AutoHotkey64.exe /ErrorStdOut tools\screenshot-window.ahk pl [folder]  # every view, light + dark
@@ -39,6 +40,12 @@ python -I assets\build_icons.py                               # icons/logos from
 ```
 
 Run the tests after every change; commit after each finished step.
+
+**Versions:** every EXE gets its own number. The patch number counts builds (the author installs
+and compares them), `build.ps1` raises it and commits "Build x.y.z" (it refuses uncommitted
+changes); a new feature version starts with `-Minor`. Never hand over two different EXEs with one
+number. A release publishes an existing build unchanged, so public versions may skip patches
+(0.2.0 → 0.3.4).
 
 ## Pitfalls learned the hard way
 

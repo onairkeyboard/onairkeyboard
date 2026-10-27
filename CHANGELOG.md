@@ -1,10 +1,11 @@
 # Changelog
 
 All notable changes to OnAir keyboard are documented here.
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
-[Semantic Versioning](https://semver.org/).
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versions: the middle number changes with new features; the last one counts builds, so a release
+may skip numbers (0.2.0, then 0.3.4).
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-10-27
 
 Install it and it works: the LED follows the microphone, no shortcuts to set up.
 
@@ -15,8 +16,7 @@ Install it and it works: the LED follows the microphone, no shortcuts to set up.
   default, messengers and browsers aren't. The LED turns on when the app really listens (about
   0.5 s after the start) and off 0.1–0.25 s after the end.
 - **Signal sources in the advanced settings:** Microphone, Keyboard shortcuts (as in 0.1) and Both
-  (a shortcut turns the LED on at once; when Wispr Flow's microphone stays closed for 6 s, it
-  goes off).
+  (a shortcut turns the LED on; when Wispr Flow's microphone stays closed for 6 s, it goes off).
 - **Self-protection while setting up Wispr Flow:** with the shortcut sources, an active Wispr Flow
   window puts OnAir keyboard's shortcuts on hold and leaves the Lock alone, so Wispr Flow can
   record its shortcuts.
