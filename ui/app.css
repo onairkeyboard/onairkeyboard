@@ -68,7 +68,7 @@ label.check.top input { margin-top: 2px; }
 .page { height: 100%; display: flex; flex-direction: column; gap: 20px; padding: 22px 28px 16px; overflow-y: auto; }
 /* The main view lies on the app list's three columns: the logo in the first, the status card
    across the other two; the sound and LED sections take the first two */
-.page.main { gap: 24px; padding: 24px 32px 16px; }
+.page.main { gap: 24px; padding: 24px 32px 12px; }  /* with 4 app rows open it ends at ~636 of 640 px */
 .header { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: center; margin-bottom: 16px; }
 .header .card { grid-column: span 2; }
 /* The logo file has empty margins (its drawing spans 4.63-95.66 % of the width): the keycap

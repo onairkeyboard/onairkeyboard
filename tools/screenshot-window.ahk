@@ -60,6 +60,8 @@ FakeMic.Set("C:#Program Files#obs-studio#bin#64bit#obs64.exe", 810, 815, true)
 FakeMic.Set("C:#Users#me#AppData#Local#slack#app-4.41#slack.exe", 800, 805, true)
 FakeMic.Set("C:#Program Files#Mozilla Firefox#firefox.exe", 790, 795, true)
 FakeMic.Set("Microsoft.WindowsSoundRecorder_8wekyb3d8bbwe", 780, 785)
+FakeMic.Set("Microsoft.WindowsCamera_8wekyb3d8bbwe", 770, 775)  ; 14 apps: the open list scrolls
+FakeMic.Set("Microsoft.XboxGamingOverlay_8wekyb3d8bbwe", 760, 765)
 
 Pid := 0
 Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk" --config "' Dir '\config.ini" --mic-key "' FakeMic.Key '" --audio-file "' Mixer '"', , , &Pid)
