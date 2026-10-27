@@ -44,7 +44,7 @@ class AppWindow {
         if owner.NoWebView2  ; test option: behave as if the runtime were missing
             return false
         try {
-            hr := DllCall(AppWindow._Files().Loader "\GetAvailableCoreWebView2BrowserVersionString"
+            hr := DllCall(AppWindow._Files(AppWindow.FilesDir(owner)).Loader "\GetAvailableCoreWebView2BrowserVersionString"
                 , "Ptr", 0, "Ptr*", &version := 0, "UInt")
             if hr = 0 && version {
                 Log.Write("WebView2 Runtime " StrGet(version))
@@ -59,6 +59,11 @@ class AppWindow {
     }
 
     static DataDir() => EnvGet("LOCALAPPDATA") "\OnAirKeyboard"
+
+    ; Where the EXE unpacks the window's files: next to the settings file of a test instance, so
+    ; tests never touch the installed program's files (and a test started from an MSIX app, whose
+    ; %LOCALAPPDATA% is virtualized, gets files WebView2 can read); otherwise %LOCALAPPDATA%
+    static FilesDir(owner) => owner.IsTestInstance ? owner.DataDir "\window" : AppWindow.DataDir()
 
     static IsDark() {
         if AppWindow.ForcedScheme
@@ -122,7 +127,7 @@ class AppWindow {
 
     _CreateWebView() {
         try {
-            files := AppWindow._Files()
+            files := AppWindow._Files(AppWindow.FilesDir(this.Owner))
             this.UiDir := files.Ui
             WebView2.CreateControllerAsync(this.Win.Hwnd, 0, AppWindow.DataDir() "\WebView2", "", files.Loader)
                 .then(ObjBindMethod(this, "_OnController"), ObjBindMethod(this, "_OnFailed"))
@@ -323,11 +328,10 @@ class AppWindow {
     ; --- Files ---
 
     ; The script uses ui\ and the loader DLL from the repository. The EXE carries them inside and
-    ; unpacks them to %LOCALAPPDATA%\OnAirKeyboard when this build hasn't done it yet.
-    static _Files() {
+    ; unpacks them to dir (FilesDir) when this build hasn't done it yet.
+    static _Files(dir) {
         if !A_IsCompiled
             return {Ui: TrayUI._FullPath(A_LineFile "\..\..\ui"), Loader: TrayUI._FullPath(A_LineFile "\..\..\lib\WebView2\64bit\WebView2Loader.dll")}
-        dir := AppWindow.DataDir()
         ui := dir "\ui"
         stamp := App.Version " " FileGetTime(A_ScriptFullPath)
         current := ""
