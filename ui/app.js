@@ -104,6 +104,13 @@ function logos() {
     h('img.logo.dark', { src: 'logo-dark.svg', alt: 'OnAir keyboard' })];
 }
 
+// The logo with the version under it (a link to About): main view and the advanced side menu
+function brand() {
+  return h('div.brand', logos(),
+    h('a.ver', { href: '#', title: t('section.about'), on: { click: (e) => { e.preventDefault(); go('advanced', 'about'); } } },
+      S.version ? 'v' + S.version : ''));
+}
+
 // hint: an explanation behind an "i" next to the label
 function checkbox(text, value, onchange, hint, attrs) {
   const box = h('label.check',
@@ -336,11 +343,7 @@ function ledBlock() {
 
 function viewMain() {
   return h('div.page.main',
-    h('div.header',
-      h('div.brand', logos(),
-        h('a.ver', { href: '#', title: t('section.about'), on: { click: (e) => { e.preventDefault(); go('advanced', 'about'); } } },
-          S.version ? 'v' + S.version : '')),
-      statusCard()),
+    h('div.header', brand(), statusCard()),
     appsSection(),
     h('div.two', soundBlock(), ledBlock()),
     h('footer',
@@ -354,7 +357,7 @@ function viewMain() {
 function viewAdvanced() {
   const sec = S.view === 'about' ? 'about' : S.section;
   const nav = h('nav.side', { 'aria-label': t('nav.sections') },
-    logos(),
+    brand(),
     SECTIONS.map((id) => {
       const soon = id === 'obs';
       return h('button' + (id === sec ? '.on' : ''), {

@@ -75,7 +75,9 @@ label.check.top input { margin-top: 2px; }
    lines up with the tiles, the version ends under the "r" */
 .brand { display: inline-flex; flex-direction: column; gap: 6px; justify-self: start; margin-left: -9px; }
 .brand .logo { display: block; }
-.ver { align-self: stretch; padding-right: 8.5px; text-align: right; white-space: nowrap; font-size: 12px; line-height: 17px; color: var(--muted); }
+/* 7 px closer to the logotype; the logo keeps its place (the author's pick from the mockups) */
+.ver { align-self: stretch; padding-right: 8.5px; text-align: right; white-space: nowrap; font-size: 12px; line-height: 17px; color: var(--muted);
+  position: relative; top: -7px; }
 a.ver:hover { color: var(--text); text-decoration: none; }
 .two { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 8px; row-gap: 32px; margin-top: 8px; }
 .two > * { grid-column: 1 / span 2; min-width: 0; }
@@ -169,7 +171,7 @@ footer .strong { font-weight: 600; }
 .split { height: 100%; display: flex; }
 nav.side { width: 230px; flex: none; display: flex; flex-direction: column; gap: 3px; padding: 16px 12px;
   background: var(--side); border-right: 1px solid var(--border); }
-nav.side .logo { height: 63px; margin: 0 0 14px; align-self: center; }
+nav.side .brand { margin: 0 0 14px; align-self: center; }  /* the same logo and version as the main view */
 nav.side button { display: flex; justify-content: space-between; align-items: center; height: 38px; padding: 0 12px;
   border: 0; border-radius: 6px; background: transparent; color: var(--text); text-align: left; }
 nav.side button:hover:not(:disabled) { background: var(--chip); }
