@@ -4,8 +4,19 @@
 ; Wispr Flow briefly blocks injected keys, so a single change can get lost.
 ; Resync flips the Lock back and forth, because Windows sends the Lock state to keyboards
 ; only when it changes (after boot, replug or wake the LED can show a stale state).
+; With WaitFn set (the microphone source), the Lock isn't pressed while the user holds a key of
+; a shortcut: Wispr Flow ends Push to talk when another key arrives while its keys are held.
 class Indicator {
     static Setters := Map("ScrollLock", SetScrollLockState, "NumLock", SetNumLockState, "CapsLock", SetCapsLockState)
+    ; Every Wispr Flow shortcut holds one of these (CapsLock alone for Push to talk / Hands-free)
+    static ShortcutKeys := ["LCtrl", "RCtrl", "LShift", "RShift", "LAlt", "RAlt", "LWin", "RWin", "CapsLock"]
+
+    static KeysHeld() {
+        for key in Indicator.ShortcutKeys
+            if GetKeyState(key)
+                return true
+        return false
+    }
 
     ; wantFn: returns true while recording
     __New(lockName, wantFn) {
@@ -14,6 +25,8 @@ class Indicator {
         this.Paused := false
         this.Testing := false
         this.Held := false  ; leave the Lock as it is (the Wispr Flow window is active)
+        this.WaitFn := ""   ; returns true while the Lock must not be pressed yet
+        this.Waiting := false
         this._sync := ObjBindMethod(this, "Sync")
         this._resync := ObjBindMethod(this, "Resync")
     }
@@ -54,10 +67,21 @@ class Indicator {
         if this.Testing || this.Held
             return
         want := this.Wanted
-        if this.IsOn != want {
-            this.Set(want)
-            Log.Write(this.LockName " -> " want)
-        }
+        if this.IsOn = want
+            return
+        if this.MustWait()
+            return
+        this.Set(want)
+        Log.Write(this.LockName " -> " want)
+    }
+
+    ; The sync timer retries, so a waiting change lands right after the keys are released
+    MustWait() {
+        wait := this.WaitFn && this.WaitFn.Call()
+        if wait && !this.Waiting
+            Log.Write(this.LockName " waits for the keys to be released")
+        this.Waiting := wait
+        return wait
     }
 
     ; Repeated calls within the delay collapse into one resync.
@@ -66,6 +90,10 @@ class Indicator {
     Resync() {
         if this.Testing || this.Held
             return
+        if this.MustWait() {
+            this.ScheduleResync(200)
+            return
+        }
         want := this.Wanted
         this.Set(!want)
         Sleep(50)

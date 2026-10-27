@@ -115,6 +115,10 @@ class App {
             this.Led.Stop()
         this.Led := Indicator(cfg.Lock, () => this.OnAir)
         this.Led.Paused := this.Paused
+        ; The microphone opens while Push to talk is held; with shortcuts the LED changes on the
+        ; key press itself, before Wispr Flow starts listening, so only this source waits
+        if cfg.Source = "Microphone"
+            this.Led.WaitFn := ObjBindMethod(Indicator, "KeysHeld")
 
         ; The microphone also runs for the Shortcuts source: the window shows who uses it
         if this.Mic
