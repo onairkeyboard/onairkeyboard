@@ -6,6 +6,7 @@
 ; With --exe the compiled program is tested instead of the script.
 
 #Include %A_LineFile%\..\TestLib.ahk
+#Include %A_LineFile%\..\FakeMic.ahk
 
 target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk"'
 exePath := ""
@@ -14,13 +15,19 @@ for i, arg in A_Args
         exePath := A_Args[i + 1], target := '"' exePath '"'
 Out("target: " target)
 
+; Every instance reads a fake microphone registry, so the user's dictation doesn't interfere
+micArg := ' --mic-key "' FakeMic.Key '"'
+FakeMic.Reset()
+
 ; Shortcuts only work while the Wispr helper runs, so a process that surely runs stands in
-; for it: AutoHotkey running this test.
-TestConfig(folder, helperProcess) {
+; for it: AutoHotkey running this test. signal: lines of the [Signal] and [Microphone] sections.
+TestConfig(folder, helperProcess, signal := "Source=Shortcuts`nPauseInWisprWindow=0") {
     try DirDelete(folder, true)
     DirCreate(folder)
     FileAppend(Format("
     (
+    [Signal]
+    {2}
     [Shortcuts]
     PushToTalk=Ctrl+Shift+F20
     HandsFree=Ctrl+Shift+F21
@@ -34,8 +41,9 @@ TestConfig(folder, helperProcess) {
     SyncIntervalMs=50
     ResyncDelayMs=0
     WisprHelperProcess={1}
+    WisprAppProcess={1}
     HookReinstallDelaysMs=
-    )", helperProcess), folder "\config.ini", "UTF-16")
+    )", helperProcess, signal), folder "\config.ini", "UTF-16")
 }
 
 SplitPath(A_AhkPath, &ahkExe)
@@ -43,7 +51,7 @@ dir := A_Temp "\onairkeyboard-integration"
 TestConfig(dir, ahkExe)
 
 SetCapsLockState(false)
-Run(target ' --config "' dir '\config.ini"', , , &pid)
+Run(target ' --config "' dir '\config.ini"' micArg, , , &pid)
 Sleep(1500)
 
 SendLevel(1)
@@ -218,7 +226,7 @@ if failures
 failuresBefore := failures
 wDir := A_Temp "\onairkeyboard-nowispr"
 TestConfig(wDir, "PING.EXE")
-Run(target ' --config "' wDir '\config.ini"', , , &pid3)
+Run(target ' --config "' wDir '\config.ini"' micArg, , , &pid3)
 Check("missing helper logged", WaitLog("Wispr helper not running", 6000, wDir), true)
 Tap("F21")
 Check("no wispr ignores keys", Caps(), 0)
@@ -238,12 +246,117 @@ SetCapsLockState(false)
 if failures > failuresBefore
     Out(FileRead(wDir "\onairkeyboard.log"))
 
+; Waits until the Caps Lock LED shows the wanted state (the microphone is polled), up to timeoutMs
+WaitCaps(want, timeoutMs := 1500) {
+    start := A_TickCount
+    while A_TickCount - start < timeoutMs {
+        if Caps() = want
+            return true
+        Sleep(25)
+    }
+    return false
+}
+
+; Microphone source (the default): a ticked app using the microphone lights the LED, no shortcut
+; is listened to. Store apps are used here, because a program counts only while its EXE runs.
+failuresBefore := failures
+micDir := A_Temp "\onairkeyboard-mic"
+TestConfig(micDir, ahkExe, "Source=Microphone`n[Microphone]`nApps=Claude|OpenAI.ChatGPT-Desktop`nPollMs=50")
+FakeMic.Reset()
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 100, 200)
+FakeMic.Set("Discord_abcdefghijklm", 100, 200)
+Run(target ' --config "' micDir '\config.ini"' micArg, , , &micPid)
+Check("mic source starts", WaitLog("signal source Microphone", 4000, micDir), true)
+Check("mic idle off", Caps(), 0)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 0)
+Check("mic in use lights", WaitCaps(1), true)
+Check("mic on air logged", WaitLog("on air (Claude)", 2000, micDir), true)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 400)
+Check("mic free turns off", WaitCaps(0), true)
+FakeMic.Set("Discord_abcdefghijklm", 500, 0)
+Sleep(400)
+Check("unticked app ignored", Caps(), 0)
+Tap("F21")
+Check("shortcuts not used", Caps(), 0)
+WinClose("ahk_class AutoHotkey ahk_pid " micPid)
+ProcessWaitClose(micPid, 3)
+SetCapsLockState(false)
+if failures > failuresBefore
+    Out(FileRead(micDir "\onairkeyboard.log"))
+
+; Both: a shortcut lights the LED at once; when Wispr Flow's microphone (stand-in: this
+; AutoHotkey, which runs) stays closed for HybridGraceMs, the LED goes off. A ticked app's
+; microphone alone lights it too.
+failuresBefore := failures
+bothDir := A_Temp "\onairkeyboard-both"
+TestConfig(bothDir, ahkExe, "Source=Both`nPauseInWisprWindow=0`n[Microphone]`nApps=Claude`nPollMs=50`nHybridGraceMs=1000")
+FakeMic.Reset()
+wisprKey := "C:#Apps#Wispr#" ahkExe
+FakeMic.Set(wisprKey, 100, 200, true)
+Run(target ' --config "' bothDir '\config.ini"' micArg, , , &bothPid)
+Check("both source starts", WaitLog("signal source Both", 4000, bothDir), true)
+WaitLog("Wispr helper running", 4000, bothDir)
+Tap("F21")
+Check("both: shortcut lights at once", Caps(), 1)
+Check("both: no microphone, goes off", WaitCaps(0, 2500), true)
+Check("both: reset logged", WaitLog("hybrid: Wispr Flow's microphone closed", 1000, bothDir), true)
+Tap("F21")
+Check("both: shortcut again", Caps(), 1)
+FakeMic.Set(wisprKey, 300, 0, true)
+Sleep(1600)
+Check("both: microphone open keeps it", Caps(), 1)
+FakeMic.Set(wisprKey, 300, 400, true)
+Check("both: microphone closed, goes off", WaitCaps(0, 2500), true)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 0)
+Check("both: ticked app alone lights", WaitCaps(1), true)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 600)
+Check("both: and goes off", WaitCaps(0), true)
+WinClose("ahk_class AutoHotkey ahk_pid " bothPid)
+ProcessWaitClose(bothPid, 3)
+SetCapsLockState(false)
+if failures > failuresBefore
+    Out(FileRead(bothDir "\onairkeyboard.log"))
+
+; Self-protection: while a Wispr Flow window is active (stand-in: a window of this AutoHotkey)
+; shortcuts are ignored and the Lock is left alone; Hands-free keeps its state.
+failuresBefore := failures
+guardDir := A_Temp "\onairkeyboard-guard"
+TestConfig(guardDir, ahkExe, "Source=Shortcuts`nPauseInWisprWindow=1")
+Run(target ' --config "' guardDir '\config.ini"' micArg, , , &guardPid)
+WaitLog("Wispr helper running", 4000, guardDir)
+fakeWispr := Gui("+AlwaysOnTop", "OnAir keyboard test: Wispr Flow stand-in")
+fakeWispr.Show("w240 h60")
+WinActivate(fakeWispr.Hwnd)
+Check("guard: window active", WaitLog("Wispr Flow window active", 3000, guardDir), true)
+Tap("F21")
+Check("guard: shortcut ignored", Caps(), 0)
+fakeWispr.Hide()
+Check("guard: window inactive", WaitLog("Wispr Flow window inactive", 3000, guardDir), true)
+Tap("F21")
+Check("guard: shortcuts work again", Caps(), 1)
+fakeWispr.Show()
+WinActivate(fakeWispr.Hwnd)
+Sleep(600)
+Tap("F21")
+Check("guard: hands-free kept, Lock left alone", Caps(), 1)
+fakeWispr.Destroy()
+Sleep(600)
+Check("guard: still on after the window", Caps(), 1)
+Tap("F21")
+Check("guard: off by shortcut", Caps(), 0)
+WinClose("ahk_class AutoHotkey ahk_pid " guardPid)
+ProcessWaitClose(guardPid, 3)
+SetCapsLockState(false)
+if failures > failuresBefore
+    Out(FileRead(guardDir "\onairkeyboard.log"))
+FakeMic.Delete()
+
 ; First run (no config yet): settings open by themselves on "How it works";
 ; opening them again later shows "Shortcuts".
 ; Note: a fresh config uses Scroll Lock, so the keyboard LED may blink once here.
 freshDir := A_Temp "\onairkeyboard-firstrun"
 try DirDelete(freshDir, true)
-Run(target ' --config "' freshDir '\config.ini"', , , &pid2)
+Run(target ' --config "' freshDir '\config.ini"' micArg, , , &pid2)
 firstWin := "ahk_class AutoHotkeyGUI ahk_pid " pid2
 Check("first run opens settings", WinWait(firstWin, , 5) != 0, true)
 Sleep(300)
@@ -289,7 +402,7 @@ if exePath != "" {
     SplitPath(exePath, &dlName)
     dlExe := dlDir "\" dlName
     FileCopy(exePath, dlExe)
-    downloaded := '"' dlExe '" --install-dir "' instDir '"'
+    downloaded := '"' dlExe '" --install-dir "' instDir '"' micArg
 
     instCfg := A_Temp "\onairkeyboard-inst-cfg\config.ini"
     Run(downloaded ' --config "' instCfg '" --install-answer yes', , , &dlPid)
@@ -309,7 +422,7 @@ if exePath != "" {
 
     ; "No": runs from Downloads, installs nothing and remembers Portable=1
     portableCfg := A_Temp "\onairkeyboard-portable-cfg\config.ini"
-    Run('"' dlExe '" --install-dir "' A_Temp '\onairkeyboard-install-no" --config "' portableCfg '" --install-answer no', , , &portablePid)
+    Run('"' dlExe '" --install-dir "' A_Temp '\onairkeyboard-install-no" --config "' portableCfg '" --install-answer no' micArg, , , &portablePid)
     Sleep(2000)
     Check("no keeps running here", ProcessExist(portablePid) != 0, true)
     Check("no installs nothing", FileExist(A_Temp "\onairkeyboard-install-no\OnAirKeyboard.exe"), "")

@@ -36,7 +36,10 @@ class HybridGate {
             this.Since := now
             return false
         }
-        return now - this.Since >= this.GraceMs
+        if now - this.Since < this.GraceMs
+            return false
+        this.Since := 0  ; counted afresh after the reset
+        return true
     }
 }
 

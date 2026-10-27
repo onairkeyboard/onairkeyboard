@@ -56,8 +56,8 @@ class TrayUI {
             this.PauseLabel := label
         }
 
-        recording := !owner.Paused && owner.State.IsRecording
-        if recording && owner.Cfg.TrayIconShowsState
+        onAir := !owner.Paused && owner.OnAir
+        if onAir && owner.Cfg.TrayIconShowsState
             icon := "tray-rec"
         else
             icon := TrayUI.LightTaskbar() ? "tray-idle-light" : "tray-idle-dark"
@@ -70,14 +70,23 @@ class TrayUI {
             Log.Write("tray icon " icon)
         }
 
+        A_IconTip := TrayUI.Tip(owner, onAir)
+    }
+
+    ; "OnAir keyboard: on air (Wispr Flow)" / "quiet" / "paused", or what's missing for the source
+    static Tip(owner, onAir) {
+        source := owner.Cfg.Source
         if owner.Paused
-            A_IconTip := T("tip.paused")
-        else if !owner.WisprRunning
-            A_IconTip := T("tip.no_wispr")
-        else if !owner.Hotkeys.HasShortcuts
-            A_IconTip := T("tip.no_shortcuts")
-        else
-            A_IconTip := T(recording ? "tip.recording" : "tip.idle")
+            return T("tip.paused")
+        if onAir
+            return T("tip.on_air", owner.OnAirWho())
+        if source != "Microphone" && !owner.WisprRunning
+            return T("tip.no_wispr")
+        if source = "Shortcuts" && !owner.Hotkeys.HasShortcuts
+            return T("tip.no_shortcuts")
+        if source != "Shortcuts" && !owner.Cfg.MicApps.Length
+            return T("tip.no_apps")
+        return T("tip.idle")
     }
 
     static _FullPath(path) {

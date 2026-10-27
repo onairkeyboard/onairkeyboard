@@ -13,6 +13,7 @@ class Indicator {
         this.WantFn := wantFn
         this.Paused := false
         this.Testing := false
+        this.Held := false  ; leave the Lock as it is (the Wispr Flow window is active)
         this._sync := ObjBindMethod(this, "Sync")
         this._resync := ObjBindMethod(this, "Resync")
     }
@@ -50,7 +51,7 @@ class Indicator {
     }
 
     Sync() {
-        if this.Testing
+        if this.Testing || this.Held
             return
         want := this.Wanted
         if this.IsOn != want {
@@ -63,7 +64,7 @@ class Indicator {
     ScheduleResync(delayMs) => SetTimer(this._resync, -Max(delayMs, 1))
 
     Resync() {
-        if this.Testing
+        if this.Testing || this.Held
             return
         want := this.Wanted
         this.Set(!want)

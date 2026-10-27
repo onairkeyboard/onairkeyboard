@@ -43,8 +43,9 @@ OnError((e, *) => Log.Write("ERROR " e.Message " (" e.Extra ") at " e.File ":" e
 A_MaxHotkeysPerInterval := 500
 
 ; Test options: --config <path> overrides the settings file; --install-dir <folder> and
-; --install-answer yes|no exercise the self-install of the EXE without touching the real one
-configPath := Config.DefaultPath(), installDir := "", installAnswer := ""
+; --install-answer yes|no exercise the self-install of the EXE without touching the real one;
+; --mic-key <key under HKCU> reads a fake microphone registry instead of Windows' one
+configPath := Config.DefaultPath(), installDir := "", installAnswer := "", micKey := ""
 for i, arg in A_Args {
     if i = A_Args.Length
         break
@@ -52,8 +53,9 @@ for i, arg in A_Args {
         case "--config": configPath := A_Args[i + 1]
         case "--install-dir": installDir := A_Args[i + 1]
         case "--install-answer": installAnswer := A_Args[i + 1]
+        case "--mic-key": micKey := A_Args[i + 1]
     }
 }
 
-OnAirKeyboardApp := App(configPath, installDir, installAnswer)
+OnAirKeyboardApp := App(configPath, installDir, installAnswer, micKey)
 OnAirKeyboardApp.Start()

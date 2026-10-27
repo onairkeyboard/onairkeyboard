@@ -7,6 +7,7 @@ class HotkeyEngine {
     __New(state) {
         this.State := state
         this.Paused := false
+        this.Ignored := false       ; events dropped, state kept (the Wispr Flow window is active)
         this.Registered := []
         this.MainKeys := Map()      ; key -> array of {Action, Mods}
         this.KeysDown := Map()      ; main keys currently down (to skip auto-repeat)
@@ -78,7 +79,7 @@ class HotkeyEngine {
     }
 
     OnKeyDown(key, *) {
-        if this.Paused || this.KeysDown.Has(key)
+        if this.Paused || this.Ignored || this.KeysDown.Has(key)
             return
         this.KeysDown[key] := true
         mods := Shortcut.CurrentMods()
@@ -94,21 +95,21 @@ class HotkeyEngine {
     OnKeyUp(key, *) {
         if this.KeysDown.Has(key)
             this.KeysDown.Delete(key)
-        if this.Paused || !this.ActiveByKey.Has(key)
+        if this.Paused || this.Ignored || !this.ActiveByKey.Has(key)
             return
         action := this.ActiveByKey.Delete(key)
         this._Dispatch(action, "up")
     }
 
     OnModifier(key, down, *) {
-        if this.Paused
+        if this.Paused || this.Ignored
             return
         for pair in this.Session.OnModsChanged(Shortcut.CurrentMods(key, down), A_TickCount)
             this._Dispatch(pair[1], pair[2])
     }
 
     OnAnyKey(ih, vk, sc) {
-        if this.Paused
+        if this.Paused || this.Ignored
             return
         name := GetKeyName(Format("vk{:x}sc{:x}", vk, sc))
         if Shortcut.ModifierKeys.Has(name)

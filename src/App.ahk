@@ -21,16 +21,23 @@ class App {
     static CMD_SAVE_SETTINGS := 5
     static CMD_REPORT_BUG := 6
 
-    ; installDir / installAnswer: test overrides for the self-install (see Installer)
-    __New(configPath, installDir := "", installAnswer := "") {
+    ; installDir / installAnswer: test overrides for the self-install (see Installer);
+    ; micKey: test override for the microphone registry key (under HKEY_CURRENT_USER)
+    __New(configPath, installDir := "", installAnswer := "", micKey := "") {
         this.ConfigPath := configPath
         this.InstallDir := installDir
         this.InstallAnswer := installAnswer
+        this.MicKey := micKey != "" ? micKey : MicWatch.DefaultKey
         this.Paused := false
         this.Cfg := ""
         this.State := RecState(ObjBindMethod(this, "OnRecordingChange"))
         this.Led := ""
         this.Hotkeys := HotkeyEngine(this.State)
+        this.Mic := ""
+        this.Gate := ""
+        this.Guard := ""
+        this.LastOnAir := false
+        this._hybrid := ObjBindMethod(this, "HybridTick")
         this.Wispr := ""
         this.WisprRunning := true  ; until the first check says otherwise
         this.Tray := TrayUI(this)
@@ -46,6 +53,8 @@ class App {
         if A_IsCompiled && (this.ConfigPath = Config.DefaultPath() || this.InstallDir != "") {
             dir := this.InstallDir != "" ? this.InstallDir : Installer.DefaultDir()
             args := this.InstallDir = "" ? "" : Format(' --config "{1}" --install-dir "{2}"', this.ConfigPath, this.InstallDir)
+            if args != "" && this.MicKey != MicWatch.DefaultKey
+                args .= Format(' --mic-key "{1}"', this.MicKey)
             install := Installer.Check(App.Version, this.ConfigPath, dir, this.InstallAnswer, args)
             if install = "exit"
                 ExitApp()
@@ -83,22 +92,54 @@ class App {
             Log.Write(warning)
         Lang.Set(Config.ResolveLanguage(cfg.Language))
 
+        Log.Write("signal source " cfg.Source)
         if this.Led
             this.Led.Stop()
-        this.Led := Indicator(cfg.Lock, () => this.State.IsRecording)
+        this.Led := Indicator(cfg.Lock, () => this.OnAir)
         this.Led.Paused := this.Paused
 
-        this.Hotkeys.Register(Shortcut.ValidShortcuts(cfg.Shortcuts, cfg.Lock, &issues))
-        for issue in issues
-            Log.Write(Format("shortcut {1} for {2}: {3} {4}", issue.Level, issue.Action, issue.Code, issue.Detail))
+        ; The microphone also runs for the Shortcuts source: the window shows who uses it
+        if this.Mic
+            this.Mic.Stop()
+        this.Mic := MicWatch(this.MicKey, cfg.MicApps, ObjBindMethod(this, "OnMicChange"))
+        this.Mic.Start(cfg.MicPollMs)
+
+        ; Shortcuts, the Wispr Flow helper watch and the window guard only matter for the
+        ; Shortcuts and Both sources. With the microphone alone OnAir keyboard listens to no key.
+        shortcuts := Signal.UsesShortcuts(cfg.Source)
+        if this.Wispr
+            this.Wispr.Stop()
+        this.Wispr := ""
+        this.WisprRunning := true
+        if this.Guard
+            this.Guard.Stop()
+        this.Guard := ""
+        if shortcuts {
+            this.Hotkeys.Register(Shortcut.ValidShortcuts(cfg.Shortcuts, cfg.Lock, &issues))
+            for issue in issues
+                Log.Write(Format("shortcut {1} for {2}: {3} {4}", issue.Level, issue.Action, issue.Code, issue.Detail))
+            if cfg.PauseInWisprWindow {
+                this.Guard := WindowGuard(cfg.WisprAppProcess, ObjBindMethod(this, "OnGuardChange"))
+                this.Guard.Start()
+            }
+        } else {
+            this.Hotkeys.Unregister()
+        }
         this.UpdateHotkeys()
+
+        SetTimer(this._hybrid, 0)
+        this.Gate := ""
+        if cfg.Source = "Both" {
+            this.Gate := HybridGate(cfg.HybridGraceMs)
+            SetTimer(this._hybrid, 250)
+        }
 
         this.Led.Start(cfg.SyncIntervalMs, cfg.ResyncDelayMs)
 
-        if this.Wispr
-            this.Wispr.Stop()
-        this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs, ObjBindMethod(this, "OnWisprChange"))
-        this.Wispr.Start()
+        if shortcuts {
+            this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs, ObjBindMethod(this, "OnWisprChange"))
+            this.Wispr.Start()
+        }
 
         ; Only the EXE on the real settings file manages autostart, so tests and
         ; development runs (--config, or the script) never touch the Startup folder.
@@ -131,11 +172,63 @@ class App {
         return target
     }
 
+    ; "Are we on air?" from the chosen source. Pause is applied by the indicator and the tray.
+    OnAir => Signal.OnAir(this.Cfg.Source, this.State.IsRecording, this.Mic && this.Mic.OnAir)
+
+    ; Who is on air, for the tray tip and the window: the apps using the microphone, or
+    ; Wispr Flow when its shortcuts turned recording on
+    OnAirWho() {
+        if this.Cfg.Source = "Shortcuts" || this.Cfg.Source = "Both" && this.State.IsRecording
+            return "Wispr Flow"
+        return this.Mic ? this.Mic.LiveNames() : ""
+    }
+
+    ; State from the shortcuts
     OnRecordingChange(recording) {
         Log.Write("recording " (recording ? "on" : "off"))
+        this.UpdateOnAir()
+    }
+
+    OnMicChange(liveIds) {
+        Log.Write(liveIds.Length ? "microphone in use: " this.Mic.LiveNames() : "microphone free")
+        this.UpdateOnAir()
+    }
+
+    UpdateOnAir() {
+        onAir := this.OnAir ? true : false
+        if onAir != this.LastOnAir {
+            this.LastOnAir := onAir
+            Log.Write(onAir ? "on air (" this.OnAirWho() ")" : "off air")
+        }
         if this.Led
             this.Led.Sync()
         this.Tray.Update()
+    }
+
+    ; Both: a shortcut state that Wispr Flow's microphone doesn't confirm ends after the grace time
+    HybridTick() {
+        if this.Paused || !this.Gate || !this.Mic
+            return
+        if this.Gate.Tick(A_TickCount, this.State.IsRecording, this.Mic.IsLive(this.Cfg.WisprAppProcess)) {
+            Log.Write("hybrid: Wispr Flow's microphone closed for " this.Cfg.HybridGraceMs " ms, shortcut state reset")
+            this.State.Reset()
+        }
+    }
+
+    ; Wispr Flow's window is active (the user may be setting its shortcuts there): shortcuts
+    ; are ignored and the Lock is left alone. Hands-free keeps its state, so a quick look at the
+    ; window doesn't turn the LED off; holds end, because their key-up would be missed.
+    OnGuardChange(active) {
+        this.Hotkeys.Ignored := active
+        if active {
+            this.State.HoldUp("PushToTalk")
+            this.State.HoldUp("CommandMode")
+        }
+        if this.Led {
+            this.Led.Held := active
+            if !active
+                this.Led.Sync()
+        }
     }
 
     ; Shortcuts are ignored while paused, while a shortcut is being recorded in settings and
@@ -207,6 +300,11 @@ class App {
 
     Shutdown(*) {
         this.Hotkeys.Unregister()
+        SetTimer(this._hybrid, 0)
+        if this.Mic
+            this.Mic.Stop()
+        if this.Guard
+            this.Guard.Stop()
         if this.Wispr
             this.Wispr.Stop()
         if this.Led
