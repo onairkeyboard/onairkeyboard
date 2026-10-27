@@ -130,7 +130,10 @@ class AudioMixer {
 
 ; A fake mixer for tests (--audio-file <ini>): every section is a session, with the keys Ident,
 ; Pid, Exe, Package, System and Volume. The program changes Volume there, the test reads it, so
-; tests never touch the sound of the user's apps.
+; tests never touch the sound of the user's apps. A write replaces the whole file at once (a
+; temporary file moved over it), so the test never reads half a file; the test may hold the file
+; for a moment, so it is retried, and it never throws (an error dialog in a fade step would stop
+; the program).
 class FileMixer {
     __New(path) {
         this.Path := path
@@ -138,9 +141,10 @@ class FileMixer {
 
     Sessions() {
         list := []
-        if !FileExist(this.Path)
-            return list
-        for key in StrSplit(IniRead(this.Path), "`n") {
+        sections := ""
+        if FileExist(this.Path)
+            try sections := IniRead(this.Path)
+        for key in StrSplit(sections, "`n") {
             if key = ""
                 continue
             list.Push({Key: key, Ident: this._Get(key, "Ident", key), Pid: Integer(this._Get(key, "Pid", 0))
@@ -158,13 +162,24 @@ class FileMixer {
     SetVolume(key, level) {
         if this._Get(key, "Volume", "") = ""
             return false
-        IniWrite(Format("{:.4f}", Max(0, Min(1, level))), this.Path, key, "Volume")
-        return true
+        tmp := this.Path ".tmp"
+        loop 10 {
+            try {
+                FileCopy(this.Path, tmp, true)
+                IniWrite(Format("{:.4f}", Max(0, Min(1, level))), tmp, key, "Volume")
+                FileMove(tmp, this.Path, true)
+                return true
+            }
+            Sleep(10)
+        }
+        try FileDelete(tmp)
+        return false
     }
 
     _Get(key, name, default) {
         if !FileExist(this.Path)
             return default
-        return Trim(IniRead(this.Path, key, name, default))
+        try return Trim(IniRead(this.Path, key, name, default))
+        return default
     }
 }

@@ -13,12 +13,13 @@ ReportError(e, *) {
 
 Check(name, actual, expected) {
     global failures, passed
-    if actual == expected
+    if actual == expected {
         passed++
-    else {
-        failures++
-        Out("FAIL " name ": expected [" expected "], got [" actual "]")
+        return true
     }
+    failures++
+    Out("FAIL " name ": expected [" expected "], got [" actual "]")
+    return false
 }
 
 Out(text) => FileAppend(text "`n", "*", "UTF-8")

@@ -464,7 +464,7 @@ audioFile := duckDir "\mixer.ini"
 FileAppend("[spotify]`nExe=Spotify.exe`nVolume=0.6`n[chatgpt]`nExe=ChatGPT.exe`nPackage=OpenAI.ChatGPT-Desktop`nVolume=1"
     . "`n[wispr]`nExe=" ahkExe "`nVolume=0.9`n[system]`nSystem=1`nVolume=1`n", audioFile, "UTF-16")
 duckArgs := ' --config "' duckDir '\config.ini"' micArg ' --audio-file "' audioFile '"'
-Vol(key) => Round(Number(IniRead(audioFile, key, "Volume", -1)), 2)
+Vol(key) => Round(Number(IniRead(audioFile, key, "Volume", -1)), 3)  ; a fade step near 0.12 isn't 0.12
 WaitVol(key, want, timeoutMs := 2000) {
     start := A_TickCount
     while A_TickCount - start < timeoutMs {
@@ -513,14 +513,26 @@ Check("duck: recovery logged", WaitLog("left lowered by the last run", 2000, duc
 ; Closing the program while on air gives the sound back
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 0)
 WaitVol("spotify", 0.12)
+answeredBefore := DuckAnswers(duckPid)
 WinClose("ahk_class AutoHotkey ahk_pid " duckPid)
-ProcessWaitClose(duckPid, 3)
-Check("duck: exit restores", Vol("spotify"), 0.6)
+duckGone := ProcessWaitClose(duckPid, 3) = 0
+if !Check("duck: exit restores", Vol("spotify"), 0.6)
+    Out(Format("duck: before exit spotify {1}, answered {2}; gone after WinClose {3}`n{4}", "?", answeredBefore, duckGone
+        , FileRead(audioFile, "UTF-16")))
+if !duckGone
+    try ProcessClose(duckPid)
 Check("duck: no runtime errors", InStr(FileRead(duckDir "\onairkeyboard.log"), "ERROR"), 0)
 FakeMic.Reset()
 SetCapsLockState(false)
 if failures > failuresBefore
     Out(FileRead(duckDir "\onairkeyboard.log"))
+
+; Whether the instance still handles messages (a hung one doesn't within half a second)
+DuckAnswers(p) {
+    DetectHiddenWindows(true)
+    hwnd := WinExist("ahk_class AutoHotkey ahk_pid " p)
+    return hwnd && DllCall("SendMessageTimeoutW", "Ptr", hwnd, "UInt", 0, "Ptr", 0, "Ptr", 0, "UInt", 2, "UInt", 500, "Ptr*", &r := 0, "Ptr") ? "yes" : "NO"
+}
 
 WaitFileGone(path, timeoutMs := 1000) {
     start := A_TickCount
