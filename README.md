@@ -34,7 +34,7 @@ OnAir keyboard turns on an "on air" light: your keyboard LED (a small macro pad,
 red tray icon. It glows exactly while a chosen app uses the microphone. Install it and it works,
 no shortcuts to set up.
 
-<p align="center"><img src="docs/img/window-main-en.png" alt="OnAir keyboard window: on air, Wispr Flow is using the microphone" width="560"></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-en-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-en-light.png"><img src="docs/img/window-main-en-light.png" alt="OnAir keyboard window: on air, Wispr Flow is using the microphone" width="560"></picture></p>
 
 ## Features
 
@@ -61,7 +61,7 @@ no shortcuts to set up.
 Three programs, one order: **SayoDevice → Wispr Flow → OnAir keyboard**. OnAir keyboard comes last
 and needs no setting up.
 
-<p align="center"><img src="docs/img/window-howto-en.png" alt="How it works: three steps" width="720"></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-howto-en-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-howto-en-light.png"><img src="docs/img/window-howto-en-light.png" alt="How it works: three steps" width="720"></picture></p>
 
 **1. Macro pad.** Have a SayoDevice 2x2? Download
 [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), open [sayodevice.com](https://sayodevice.com)

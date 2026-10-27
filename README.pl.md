@@ -34,7 +34,7 @@ OnAir keyboard zapala lampkę „na antenie”: diodę na klawiaturze (np. małe
 i czerwoną ikonę w zasobniku. Świeci dokładnie wtedy, gdy wybrana aplikacja używa mikrofonu.
 Instalujesz i działa, bez ustawiania skrótów.
 
-<p align="center"><img src="docs/img/window-main-pl.png" alt="Okno OnAir keyboard: na antenie, Wispr Flow używa mikrofonu" width="560"></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-main-pl-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-main-pl-light.png"><img src="docs/img/window-main-pl-light.png" alt="Okno OnAir keyboard: na antenie, Wispr Flow używa mikrofonu" width="560"></picture></p>
 
 ## Co potrafi
 
@@ -61,7 +61,7 @@ Instalujesz i działa, bez ustawiania skrótów.
 Trzy programy, jedna kolejność: **SayoDevice → Wispr Flow → OnAir keyboard**. OnAir keyboard jest
 na końcu i niczego nie trzeba w nim ustawiać.
 
-<p align="center"><img src="docs/img/window-howto-pl.png" alt="Jak to działa: trzy kroki" width="720"></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/img/window-howto-pl-dark.png"><source media="(prefers-color-scheme: light)" srcset="docs/img/window-howto-pl-light.png"><img src="docs/img/window-howto-pl-light.png" alt="Jak to działa: trzy kroki" width="720"></picture></p>
 
 **1. Klawiatura makro.** Masz SayoDevice 2x2? Pobierz
 [WisprFlow_2x2.sayobak](presets/WisprFlow_2x2.sayobak), otwórz [sayodevice.com](https://sayodevice.com)

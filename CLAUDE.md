@@ -21,9 +21,11 @@ roadmap and current to-do. Never copy their contents into this public repository
 - Brand colours from the logo: red `#E63A3A`, dark text `#2A2A2A`, light text `#FBFBFB`.
 - Icons and logos come from `assets\src` (keycap in several colours, logos for light and dark
   backgrounds); `build_icons.py` copies both logos to `ui\` for the window. The README picks
-  the logo with `<picture>` + `prefers-color-scheme`: GitHub's `themed-picture` rewrites the
-  sources on page load to its own theme setting (it follows the OS only when GitHub's theme is
-  "Sync with system" or nobody is signed in), so test it with a single GitHub theme and a reload.
+  the logo and the window screenshots (`docs\img\*-light.png` / `*-dark.png`, from
+  `tools\screenshot-window.ahk`) with `<picture>` + `prefers-color-scheme`. In the author's
+  test this follows the system theme (GitHub's default "Sync with system"), not a theme forced in
+  GitHub's settings; GitHub's `themed-picture` only reacts when its `data-color-mode` is
+  `light` / `dark`, never `auto`.
 
 ## Commands
 
