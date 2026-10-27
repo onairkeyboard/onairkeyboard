@@ -86,7 +86,7 @@ number. A release publishes an existing build unchanged, so public versions may 
   the real installation, Start menu and Startup folder are never touched.
 - Ducking (lowering other apps' sound) sets real per-app volumes. Tests and screenshots use a fake
   mixer (`--audio-file <ini>`, `FileMixer`) and must give one to every instance that turns ducking
-  on, so the author's music is never touched; `toolsudio-probe.ahk` lists the real sessions
+  on, so the author's music is never touched; `tools\audio-probe.ahk` lists the real sessions
   read-only.
 - `Ducker` entry points run Critical through `_Atomic`, which restores the caller's state: a fade
   step cut in half by another thread looks like a volume the user changed, and a start-up thread
