@@ -13,10 +13,7 @@ Install it and it works: the LED follows the microphone, no shortcuts to set up.
   microphone, read from the registry Windows keeps for its microphone icon. Works with any app;
   dictation apps and AI assistants (Wispr Flow, Claude, ChatGPT, Aqua Voice) are ticked by
   default, messengers and browsers aren't. The LED turns on when the app really listens (about
-  0.5 s after the start) and off 0.1–0.25 s after the end. While a shortcut is held (Wispr
-  Flow's Push to talk) the LED waits for the keys to be released, because pressing the Lock
-  then would end the recording (and stays off when the recording ends with the release); the tray
-  icon turns red at once.
+  0.5 s after the start) and off 0.1–0.25 s after the end.
 - **Signal sources in the advanced settings:** Microphone, Keyboard shortcuts (as in 0.1) and Both
   (a shortcut turns the LED on at once; when Wispr Flow's microphone stays closed for 6 s, it
   goes off).
@@ -33,6 +30,12 @@ Install it and it works: the LED follows the microphone, no shortcuts to set up.
 - The tray tooltip says who is on air ("on air (Wispr Flow)").
 
 ### Changed
+- **The LED no longer changes while a shortcut is held.** Pressing the Lock in the middle of
+  Wispr Flow's Push to talk delayed its start from about 0.6 s to 1–5 s, or ended the recording.
+  So with Push to talk only the tray icon turns red; with Hands-free the LED turns on as you
+  release the key.
+- Shortcut taps from a macro pad are no longer lost when OnAir keyboard is busy (for example with
+  its window open): the modifiers count as they were at the key press.
 - Settings from 0.1 move over by themselves: the source becomes Microphone with the default apps;
   your shortcuts are kept for the shortcut sources.
 - "Record" is now "Assign"; an assigned shortcut is saved at once, or refused with the reason when

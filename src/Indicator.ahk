@@ -4,13 +4,13 @@
 ; Wispr Flow briefly blocks injected keys, so a single change can get lost.
 ; Resync flips the Lock back and forth, because Windows sends the Lock state to keyboards
 ; only when it changes (after boot, replug or wake the LED can show a stale state).
-; With WaitFn set (the microphone source), the Lock isn't pressed while the user holds a key of
-; a shortcut: Wispr Flow ends Push to talk when another key arrives while its keys are held.
+; With WaitFn set, the Lock isn't pressed while the user holds a key of a shortcut: a key that
+; arrives while Wispr Flow's keys are held ends Push to talk (microphone source) or delays its
+; start from ~0.6 s to 1-5 s (Lock pressed right after the key, shortcut sources).
 class Indicator {
     static Setters := Map("ScrollLock", SetScrollLockState, "NumLock", SetNumLockState, "CapsLock", SetCapsLockState)
     ; Every Wispr Flow shortcut holds one of these (CapsLock alone for Push to talk / Hands-free)
     static ShortcutKeys := ["LCtrl", "RCtrl", "LShift", "RShift", "LAlt", "RAlt", "LWin", "RWin", "CapsLock"]
-    static ReleaseHoldMs := 400
 
     static KeysHeld() {
         for key in Indicator.ShortcutKeys
@@ -28,7 +28,8 @@ class Indicator {
         this.Held := false  ; leave the Lock as it is (the Wispr Flow window is active)
         this.WaitFn := ""   ; returns true while the Lock must not be pressed yet
         this.Waiting := false
-        this.ReleasedAt := -Indicator.ReleaseHoldMs
+        this.ReleaseHoldMs := 0  ; after the wait, an "on" waits this long more
+        this.ReleasedAt := 0
         this._sync := ObjBindMethod(this, "Sync")
         this._resync := ObjBindMethod(this, "Resync")
     }
@@ -77,7 +78,7 @@ class Indicator {
             return
         ; Push to talk closes the microphone 0.1-0.25 s after the keys are released: don't
         ; light the LED for that moment
-        if want && A_TickCount - this.ReleasedAt < Indicator.ReleaseHoldMs
+        if want && this.ReleasedAt && A_TickCount - this.ReleasedAt < this.ReleaseHoldMs
             return
         this.Set(want)
         Log.Write(this.LockName " -> " want)

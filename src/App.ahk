@@ -115,10 +115,12 @@ class App {
             this.Led.Stop()
         this.Led := Indicator(cfg.Lock, () => this.OnAir)
         this.Led.Paused := this.Paused
-        ; The microphone opens while Push to talk is held; with shortcuts the LED changes on the
-        ; key press itself, before Wispr Flow starts listening, so only this source waits
-        if cfg.Source = "Microphone"
-            this.Led.WaitFn := ObjBindMethod(Indicator, "KeysHeld")
+        ; No Lock press while a shortcut is held (it disturbs Wispr Flow's Push to talk), so Push
+        ; to talk shows in the tray icon only. With the microphone, Wispr Flow closes it
+        ; 0.1-0.25 s after the release: the LED doesn't light for that moment.
+        this.Led.WaitFn := ObjBindMethod(Indicator, "KeysHeld")
+        if cfg.Source != "Shortcuts"
+            this.Led.ReleaseHoldMs := 400
 
         ; The microphone also runs for the Shortcuts source: the window shows who uses it
         if this.Mic

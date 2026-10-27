@@ -66,9 +66,12 @@ Tap(key) {
 
 Check("idle off", Caps(), 0)
 
+; Push to talk: no Lock press while the shortcut is held (it would delay Wispr Flow's start)
 Send("{Ctrl down}{Shift down}{F20 down}")
 Sleep(250)
-Check("ptt held on", Caps(), 1)
+Check("ptt held: recording", WaitLog("PushToTalk down"), true)
+Check("ptt held: LED waits", Caps(), 0)
+Check("ptt held: wait logged", WaitLog("CapsLock waits for the keys to be released"), true)
 Send("{F20 up}{Shift up}{Ctrl up}")
 Sleep(250)
 Check("ptt released off", Caps(), 0)
@@ -143,6 +146,15 @@ Check("no runtime errors", InStr(logText, "ERROR"), 0)
 
 ; Settings window: record shortcuts with simulated keys, save, use them without a restart
 ; Waits until the app's log contains text (instead of guessing delays), up to timeoutMs
+; How many times text is in the log
+LogCount(text, logDir := "") {
+    loop 20 {  ; the app may be writing the log right now
+        try return StrSplit(FileRead((logDir = "" ? dir : logDir) "\onairkeyboard.log"), text).Length - 1
+        Sleep(50)
+    }
+    return -1
+}
+
 WaitLog(text, timeoutMs := 4000, logDir := "") {
     file := (logDir = "" ? dir : logDir) "\onairkeyboard.log"
     start := A_TickCount
@@ -246,9 +258,10 @@ loop 100 {
 }
 Check("no WebView2 processes left", WebViewProcesses() <= webViewBefore, true)
 
+pttBefore := LogCount("PushToTalk down")
 Send("{Ctrl down}{Shift down}{F23 down}")
 Sleep(250)
-Check("new ptt works", Caps(), 1)
+Check("new ptt works", LogCount("PushToTalk down"), pttBefore + 1)
 Send("{F23 up}{Shift up}{Ctrl up}")
 Sleep(250)
 Check("new ptt released", Caps(), 0)
@@ -333,14 +346,7 @@ Check("mic: lights after release", WaitCaps(1), true)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 600)
 Check("mic: and goes off", WaitCaps(0), true)
 ; The microphone closes right after the keys are released: no blink of the LED
-LightCount() {
-    loop 20 {  ; the app may be writing the log right now
-        try return StrSplit(FileRead(micDir "\onairkeyboard.log"), "CapsLock -> 1").Length
-        Sleep(50)
-    }
-    return -1
-}
-lightsBefore := LightCount()
+lightsBefore := LogCount("CapsLock -> 1", micDir)
 Send("{Blind}{RShift down}")
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 0)
 Sleep(400)
@@ -348,7 +354,7 @@ Send("{Blind}{RShift up}")
 Sleep(100)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 800)
 Sleep(800)
-Check("mic: no blink after release", LightCount(), lightsBefore)
+Check("mic: no blink after release", LogCount("CapsLock -> 1", micDir), lightsBefore)
 Check("mic: off after the quick release", Caps(), 0)
 FakeMic.Set("Discord_abcdefghijklm", 500, 0)
 Sleep(400)
@@ -373,11 +379,11 @@ FakeMic.Set(wisprKey, 100, 200, true)
 Run(target ' --config "' bothDir '\config.ini"' micArg, , , &bothPid)
 Check("both source starts", WaitLog("started, config", 4000, bothDir) && InStr(FileRead(bothDir "\onairkeyboard.log"), "signal source Both") > 0, true)
 Tap("F21")
-Check("both: shortcut lights at once", Caps(), 1)
+Check("both: shortcut lights after the release", WaitCaps(1), true)
 Check("both: no microphone, goes off", WaitCaps(0, 2500), true)
 Check("both: reset logged", WaitLog("hybrid: Wispr Flow's microphone closed", 1000, bothDir), true)
 Tap("F21")
-Check("both: shortcut again", Caps(), 1)
+Check("both: shortcut again", WaitCaps(1), true)
 FakeMic.Set(wisprKey, 300, 0, true)
 Sleep(1600)
 Check("both: microphone open keeps it", Caps(), 1)
