@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/logo-banner.svg" alt="OnAir keyboard" width="480">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/src/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/src/logo-bright.svg">
+    <img src="assets/src/logo-bright.svg" alt="OnAir keyboard" width="430">
+  </picture>
 </p>
 
 <h3 align="center">Jeden klawisz. Zero zgadywania.</h3>

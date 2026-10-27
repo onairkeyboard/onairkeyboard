@@ -5,9 +5,6 @@ Requires Inkscape on PATH. Produces:
   assets/tray-idle-light.ico   tray icon, idle, light taskbar (black keycap)
   assets/tray-idle-dark.ico    tray icon, idle, dark taskbar (white keycap)
   assets/tray-rec.ico          tray icon, recording (red keycap)
-  assets/logo-banner.svg       README logo: the dark-mode logo on a dark plate, so it reads
-                               the same in every GitHub theme (theme-dependent images follow
-                               the OS, not GitHub's own theme setting)
   ui/logo-bright.svg           logos of the window (light and dark theme), copied from assets/src
   ui/logo-dark.svg
   assets/png/*.png             bitmaps for the website and the GitHub social preview
@@ -35,8 +32,6 @@ ICON_COLORS = ["black", "blue", "green", "red", "white", "white-contrast", "yell
 LOGOS = ["logo-bright", "logo-dark", "logo-mono-bright", "logo-mono-dark"]
 
 SOCIAL_SIZE = (1280, 640)
-BANNER_SIZE = (1200, 420)
-BANNER_PLATE = "#2A2A2A"  # brand dark
 
 
 def inkscape(source: Path, *args: str) -> None:
@@ -96,8 +91,6 @@ def main() -> None:
                  f"--export-filename={PNG / f'{logo}.svg'}")
         inkscape(SRC / f"{logo}.svg", "--export-type=png", "--export-area-drawing",
                  f"--export-filename={PNG / f'{logo}.png'}", "-h", "300")
-    framed_logo(PNG / "logo-dark.svg", ASSETS / "logo-banner.svg", BANNER_SIZE, BANNER_PLATE,
-                radius=36, margin=(0.09, 0.16))
 
     # Logos of the window: the page picks one by the theme and scales the vector itself
     for name in ("logo-bright.svg", "logo-dark.svg"):
