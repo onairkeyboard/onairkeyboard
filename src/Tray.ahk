@@ -31,19 +31,19 @@ class TrayUI {
         for link in Support.Links(Lang.Current)
             supportMenu.Add(link.Name, ((l, *) => Support.Open(l)).Bind(link))
 
-        tray.Add(T("tray.settings"), (*) => owner.OpenSettings())
+        tray.Add(T("tray.open"), (*) => owner.OpenWindow())
         tray.Add(T("tray.support"), supportMenu)
         tray.Add()
         tray.Add(T("tray.test_led"), (*) => owner.TestLed())
         this.PauseLabel := T(owner.Paused ? "tray.resume" : "tray.pause")
         tray.Add(this.PauseLabel, (*) => owner.TogglePause())
         tray.Add(T("tray.open_log"), (*) => owner.OpenLog())
-        tray.Add(T("tray.report_bug"), (*) => owner.ReportBug())
         tray.Add()
         tray.Add(T("tray.website"), (*) => Run(App.WebsiteUrl))
+        tray.Add(T("tray.report_bug"), (*) => owner.ReportBug())
         tray.Add(T("tray.about"), (*) => owner.ShowAbout())
         tray.Add(T("tray.exit"), (*) => ExitApp())
-        tray.Default := T("tray.settings")
+        tray.Default := T("tray.open")
         tray.ClickCount := 2
         this.Update()
     }

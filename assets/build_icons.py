@@ -8,13 +8,13 @@ Requires Inkscape on PATH. Produces:
   assets/logo-banner.svg       README logo: the dark-mode logo on a dark plate, so it reads
                                the same in every GitHub theme (theme-dependent images follow
                                the OS, not GitHub's own theme setting)
-  assets/logo-ui.png           logo for the settings window header (100% display scale)
-  assets/logo-ui-2x.png        the same for scaled displays
-  assets/bug-ui.png            bug icon of the "Report a bug" link (Ionicons, MIT)
+  ui/logo-bright.svg           logos of the window (light and dark theme), copied from assets/src
+  ui/logo-dark.svg
   assets/png/*.png             bitmaps for the website and the GitHub social preview
 """
 
 import re
+import shutil
 import struct
 import subprocess
 from pathlib import Path
@@ -34,8 +34,6 @@ TRAY_ICONS = {"tray-idle-light": "icon-black", "tray-idle-dark": "icon-white-con
 ICON_COLORS = ["black", "blue", "green", "red", "white", "white-contrast", "yellow"]
 LOGOS = ["logo-bright", "logo-dark", "logo-mono-bright", "logo-mono-dark"]
 
-# Height of the logo in the settings window header (h40 in SettingsGui.ahk)
-LOGO_UI_HEIGHT = 40
 SOCIAL_SIZE = (1280, 640)
 BANNER_SIZE = (1200, 420)
 BANNER_PLATE = "#2A2A2A"  # brand dark
@@ -101,21 +99,15 @@ def main() -> None:
     framed_logo(PNG / "logo-dark.svg", ASSETS / "logo-banner.svg", BANNER_SIZE, BANNER_PLATE,
                 radius=36, margin=(0.09, 0.16))
 
-    # Logo shown in the settings window header (light window background), at its exact size
-    # on 100% displays and at double size for scaled ones (Windows shrinks bitmaps roughly)
-    for name, height in (("logo-ui.png", LOGO_UI_HEIGHT), ("logo-ui-2x.png", 2 * LOGO_UI_HEIGHT)):
-        inkscape(SRC / "logo-bright.svg", "--export-type=png", "--export-area-drawing",
-                 f"--export-filename={ASSETS / name}", "-h", str(height))
+    # Logos of the window: the page picks one by the theme and scales the vector itself
+    for name in ("logo-bright.svg", "logo-dark.svg"):
+        shutil.copyfile(SRC / name, ASSETS.parent / "ui" / name)
 
     # GitHub social preview: the logo on white, inside the safe area
     social = PNG / "social-preview.svg"
     framed_logo(PNG / "logo-bright.svg", social, SOCIAL_SIZE, "#ffffff", radius=0, margin=(0.12, 0.2))
     inkscape(social, "--export-type=png", f"--export-filename={PNG / 'social-preview.png'}")
     social.unlink()
-
-    # Bug icon next to "Report a bug" in the header; 2x size, shown at 16 px
-    inkscape(SRC / "icon-bug.svg", "--export-type=png",
-             f"--export-filename={ASSETS / 'bug-ui.png'}", "-w", "32", "-h", "32")
 
 
 if __name__ == "__main__":

@@ -31,10 +31,12 @@ Persistent
 #Include %A_LineFile%\..\KeyRecorder.ahk
 #Include %A_LineFile%\..\Autostart.ahk
 #Include %A_LineFile%\..\Installer.ahk
-#Include %A_LineFile%\..\ScrollPane.ahk
-#Include %A_LineFile%\..\SettingsGui.ahk
-#Include %A_LineFile%\..\BugReport.ahk
+#Include %A_LineFile%\..\Json.ahk
+#Include %A_LineFile%\..\Window.ahk
 #Include %A_LineFile%\..\App.ahk
+; WebView2 for the window (lib\README.md). Its own includes are relative to its folder.
+#Include %A_LineFile%\..\..\lib\WebView2
+#Include WebView2.ahk
 
 ; Unexpected errors go to the diagnostic log (the standard error dialog still appears)
 OnError((e, *) => Log.Write("ERROR " e.Message " (" e.Extra ") at " e.File ":" e.Line))
@@ -56,6 +58,10 @@ for i, arg in A_Args {
         case "--mic-key": micKey := A_Args[i + 1]
     }
 }
+; --no-webview2 behaves as if the WebView2 Runtime were missing
+noWebView2 := false
+for arg in A_Args
+    noWebView2 := noWebView2 || arg = "--no-webview2"
 
-OnAirKeyboardApp := App(configPath, installDir, installAnswer, micKey)
+OnAirKeyboardApp := App(configPath, installDir, installAnswer, micKey, noWebView2)
 OnAirKeyboardApp.Start()

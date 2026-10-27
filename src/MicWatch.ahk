@@ -62,6 +62,7 @@ class MicWatch {
         this._event := 0
         this._lastRead := 0
         this.SafetyMs := 2000
+        this.CheckProcess := true  ; a fake registry (tests, screenshots) has no real programs
         this.Reads := 0         ; full reads so far (diagnostics, tests)
     }
 
@@ -86,7 +87,7 @@ class MicWatch {
     Poll() {
         if this._event
             this._Arm()
-        this.Entries := MicWatch.Read(this.KeyPath)
+        this.Entries := MicWatch.Read(this.KeyPath, this.CheckProcess)
         this.Reads++
         this._lastRead := A_TickCount
         this._Evaluate()
@@ -172,7 +173,7 @@ class MicWatch {
 
     ; Reads every app with a usage record: id -> {Id, Start, Live}. Versions of one app merge:
     ; the latest start counts, and it's live when any of them is.
-    static Read(keyPath) {
+    static Read(keyPath, checkProcess := true) {
         entries := MicWatch._Caseless(Map())
         add(sub, id, exe) {
             stop := MicWatch._Qword(sub, "LastUsedTimeStop")
@@ -180,7 +181,7 @@ class MicWatch {
             if stop = "" || start = ""
                 return
             ; A program that was killed may leave its key "in use" for good: it must still run
-            live := stop = 0 && (exe = "" || ProcessExist(exe) != 0)
+            live := stop = 0 && (exe = "" || !checkProcess || ProcessExist(exe) != 0)
             if entries.Has(id) {
                 e := entries[id]
                 e.Start := Max(e.Start, start)

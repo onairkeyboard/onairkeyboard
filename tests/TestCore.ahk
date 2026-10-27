@@ -9,6 +9,7 @@
 #Include %A_LineFile%\..\..\src\Lang.ahk
 #Include %A_LineFile%\..\..\src\Support.ahk
 #Include %A_LineFile%\..\..\src\Installer.ahk
+#Include %A_LineFile%\..\..\src\Json.ahk
 #Include %A_LineFile%\..\TestLib.ahk
 
 TempConfig() {
@@ -159,5 +160,40 @@ try {
     Check("bad hold throws", false, true)
 } catch ValueError
     Check("bad hold throws", true, true)
+
+; --- JSON for the window messages ---
+msg := Json.Parse('{"cmd":"set","key":"app","value":{"id":"Wispr Flow.exe","checked":true},"list":[1,2.5,null,false],"s":"a\"b\\c\nd\u0105"}')
+Check("json cmd", msg["cmd"], "set")
+Check("json nested", msg["value"]["id"] " " msg["value"]["checked"], "Wispr Flow.exe 1")
+Check("json array", msg["list"].Length " " msg["list"][2] " " msg["list"][3] " " msg["list"][4], "4 2.5  0")
+Check("json escapes", msg["s"], 'a"b\c' "`n" "dą")
+Check("json stringify", Json.Stringify(Map("a", [1, "x"], "b", 'q"' "`n")), '{"a":[1,"x"],"b":"q\"\n"}')
+Check("json round trip", Json.Stringify(Json.Parse(Json.Stringify(Map("t", "zażółć\t\\")))), Json.Stringify(Map("t", "zażółć\t\\")))
+try {
+    Json.Parse('{"a":1,}')
+    Check("json bad throws", false, true)
+} catch ValueError
+    Check("json bad throws", true, true)
+
+; --- Every text the window's page uses exists in both languages ---
+pageJs := FileRead(A_LineFile "\..\..\ui\app.js", "UTF-8")
+pageKeys := Map()
+pos := 1
+while pos := RegExMatch(pageJs, "\bt\('([\w.]+)'[,)]", &m, pos) {  ; t('key') and t('key', ...)
+    pageKeys[m[1]] := true
+    pos += m.Len
+}
+; Keys the page builds from a prefix
+for prefix, suffixes in Map("action.", ["PushToTalk", "HandsFree", "Cancel", "CommandMode"], "type.", ["hold", "toggle", "reset"]
+        , "lock.", ["ScrollLock", "NumLock", "CapsLock", "ScrollLock_rec"], "lang.name.", ["pl", "en"]
+        , "section.", ["source", "shortcuts", "indicator", "general", "diag", "about", "obs"]
+        , "source.", ["Microphone", "Shortcuts", "Both", "Microphone_text", "Shortcuts_text", "Both_text"]
+        , "bug.copied_", ["address", "subject", "text"])
+    for name in suffixes
+        pageKeys[prefix name] := true
+Check("page keys found", pageKeys.Count > 100, true)
+for language in ["en", "pl"]
+    for key in pageKeys
+        Check(language " has page text " key, Lang.Strings[language].Has("ui." key) || Lang.Strings[language].Has(key), true)
 
 Finish()

@@ -16,18 +16,23 @@ class App {
     static WM_COMMAND := 0x8001
     static CMD_TOGGLE_PAUSE := 1
     static CMD_TEST_LED := 2
-    static CMD_OPEN_SETTINGS := 3
-    static CMD_RECORD := 4        ; lParam = action index in Config.Actions
-    static CMD_SAVE_SETTINGS := 5
     static CMD_REPORT_BUG := 6
+    static CMD_OPEN_WINDOW := 7   ; lParam = view index in AppWindow.Views (0: main)
+    static CMD_CLOSE_WINDOW := 8
+    ; WM_COPYDATA commands for tests (dwData = command, the data a string)
+    static COPY_EVAL := 1         ; run JavaScript in the window, log the result
+    static COPY_THEME := 2        ; "light", "dark" or "auto"
+    static COPY_CAPTURE := 3      ; save a PNG of the page
 
     ; installDir / installAnswer: test overrides for the self-install (see Installer);
-    ; micKey: test override for the microphone registry key (under HKEY_CURRENT_USER)
-    __New(configPath, installDir := "", installAnswer := "", micKey := "") {
+    ; micKey: test override for the microphone registry key (under HKEY_CURRENT_USER);
+    ; noWebView2: behave as if the WebView2 Runtime were missing
+    __New(configPath, installDir := "", installAnswer := "", micKey := "", noWebView2 := false) {
         this.ConfigPath := configPath
         this.InstallDir := installDir
         this.InstallAnswer := installAnswer
         this.MicKey := micKey != "" ? micKey : MicWatch.DefaultKey
+        this.NoWebView2 := noWebView2
         this.Paused := false
         this.Cfg := ""
         this.State := RecState(ObjBindMethod(this, "OnRecordingChange"))
@@ -37,13 +42,12 @@ class App {
         this.Gate := ""
         this.Guard := ""
         this.LastOnAir := false
+        this.Assigning := ""  ; action whose shortcut is being assigned in the window
+        this.Recorder := KeyRecorder()
         this._hybrid := ObjBindMethod(this, "HybridTick")
         this.Wispr := ""
         this.WisprRunning := true  ; until the first check says otherwise
         this.Tray := TrayUI(this)
-        this.LogoFile := ""
-        this.BugIconFile := ""
-        this.SettingsShown := false
     }
 
     Start() {
@@ -66,8 +70,6 @@ class App {
         }
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
-        this.LogoFile := App._UiImage(dir, A_ScreenDPI > 120 ? "logo-ui-2x.png" : "logo-ui.png")
-        this.BugIconFile := App._UiImage(dir, "bug-ui.png")
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
         if this.Cfg.Migrated
@@ -75,13 +77,29 @@ class App {
 
         OnMessage(0x0219, (*) => this.Led.ScheduleResync(1000))  ; WM_DEVICECHANGE
         OnMessage(0x0218, (*) => this.Led.ScheduleResync(1000))  ; WM_POWERBROADCAST
-        OnMessage(0x001A, (*) => this.Tray.Update())  ; WM_SETTINGCHANGE: the taskbar may turn light / dark
+        OnMessage(0x001A, ObjBindMethod(this, "OnSettingChange"))
         OnMessage(App.WM_COMMAND, ObjBindMethod(this, "OnCommand"))
+        if this.IsTestInstance
+            OnMessage(0x004A, ObjBindMethod(this, "OnCopyData"))  ; WM_COPYDATA
         OnExit(ObjBindMethod(this, "Shutdown"))
 
-        ; First run: no welcome screen, the settings window opens on "How it works"
+        ; First run: no welcome screen, the window opens on "How it works"
         if this.Cfg.IsFirstRun
-            SetTimer(() => this.OpenSettings(), -500)
+            SetTimer(() => this.OpenWindow("howto"), -500)
+    }
+
+    ; Instances on a custom settings file (tests, demo) accept test commands
+    IsTestInstance => this.ConfigPath != Config.DefaultPath()
+
+    ; Only the EXE on the real settings file manages autostart, so tests and development runs
+    ; (--config, or the script) never touch the Startup folder
+    ManagesAutostart => A_IsCompiled && !this.IsTestInstance
+
+    ; WM_SETTINGCHANGE: the taskbar and the apps may have turned light / dark
+    OnSettingChange(*) {
+        this.Tray.Update()
+        if AppWindow.Instance
+            AppWindow.Instance.ApplyTheme()
     }
 
     ; (Re)applies the current settings to every module.
@@ -102,6 +120,7 @@ class App {
         if this.Mic
             this.Mic.Stop()
         this.Mic := MicWatch(this.MicKey, cfg.MicApps, ObjBindMethod(this, "OnMicChange"))
+        this.Mic.CheckProcess := this.MicKey = MicWatch.DefaultKey
         this.Mic.Start(cfg.MicPollMs)
 
         ; Shortcuts, the Wispr Flow helper watch and the window guard only matter for the
@@ -141,35 +160,22 @@ class App {
             this.Wispr.Start()
         }
 
-        ; Only the EXE on the real settings file manages autostart, so tests and
-        ; development runs (--config, or the script) never touch the Startup folder.
-        if A_IsCompiled && this.ConfigPath = Config.DefaultPath() {
-            try Autostart.Sync(cfg.StartWithWindows)
-            catch as e
-                Log.Write("autostart failed: " e.Message)
-        } else {
-            Log.Write("autostart not managed (script or custom config)")
-        }
-
+        this._SyncAutostart()
         this.Tray.Build()
+        if AppWindow.Instance {
+            AppWindow.Instance.SendSettings()
+            AppWindow.Instance.SendState()
+        }
     }
 
-    ; Images of the settings window. The script uses the assets directly; the EXE carries them
-    ; inside and unpacks them once.
-    static _UiImage(dataDir, name) {
-        if !A_IsCompiled
-            return TrayUI._FullPath(A_LineFile "\..\..\assets\" name)
-        target := dataDir "\" name
-        ; FileInstall needs a literal source and must start its own line, or Ahk2Exe won't embed the file
-        try {
-            if name = "logo-ui.png"
-                FileInstall("..\assets\logo-ui.png", target, 1)
-            else if name = "logo-ui-2x.png"
-                FileInstall("..\assets\logo-ui-2x.png", target, 1)
-            else if name = "bug-ui.png"
-                FileInstall("..\assets\bug-ui.png", target, 1)
+    _SyncAutostart() {
+        if !this.ManagesAutostart {
+            Log.Write("autostart not managed (script or custom config)")
+            return
         }
-        return target
+        try Autostart.Sync(this.Cfg.StartWithWindows)
+        catch as e
+            Log.Write("autostart failed: " e.Message)
     }
 
     ; "Are we on air?" from the chosen source. Pause is applied by the indicator and the tray.
@@ -203,6 +209,8 @@ class App {
         if this.Led
             this.Led.Sync()
         this.Tray.Update()
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
     }
 
     ; Both: a shortcut state that Wispr Flow's microphone doesn't confirm ends after the grace time
@@ -231,17 +239,18 @@ class App {
         }
     }
 
-    ; Shortcuts are ignored while paused, while a shortcut is being recorded in settings and
+    ; Shortcuts are ignored while paused, while a shortcut is being assigned in the window and
     ; while Wispr Flow isn't running (it wouldn't record, so the LED would be wrong).
     UpdateHotkeys() {
-        recording := SettingsWindow.Instance && SettingsWindow.Instance.Recording != ""
-        this.Hotkeys.SetPaused(this.Paused || recording || !this.WisprRunning)
+        this.Hotkeys.SetPaused(this.Paused || this.Assigning != "" || !this.WisprRunning)
     }
 
     OnWisprChange(running) {
         this.WisprRunning := running
         this.UpdateHotkeys()
         this.Tray.Update()
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
     }
 
     TogglePause() {
@@ -251,34 +260,135 @@ class App {
         this.Led.Paused := this.Paused
         this.Led.Sync()
         this.Tray.Update()
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
     }
 
     TestLed() => this.Led.Blink()
 
-    OpenSettings() => SettingsWindow.Open(this)
+    OpenWindow(view := "") => AppWindow.Open(this, view)
 
     OpenLog() {
-        file := this.DataDir "\onairkeyboard.log"
+        file := this.LogFile
         if this.Cfg.Debug && FileExist(file)
             Run('notepad.exe "' file '"')
         else
             MsgBox(T("log.disabled"), App.Name, "Iconi")
     }
 
-    ShowAbout() => SettingsWindow.Open(this, SettingsWindow.TAB_ABOUT)
+    LogFile => this.DataDir "\onairkeyboard.log"
 
-    ; Opens the window with the address and a prefilled e-mail text to copy
+    ShowAbout() => this.OpenWindow("about")
+
+    ; Report a bug. Once the form on the website exists (App.BugReportUrl), it opens there with
+    ; technical details in the address only, together with Explorer showing the log file. Until
+    ; then the window shows a ready e-mail template to copy.
+    static BugReportUrl := ""
+
     ReportBug() {
+        Log.Write("bug report opened")
+        if App.BugReportUrl != "" {
+            Run(Format("{1}?v={2}&win={3}&lang={4}&mode={5}", App.BugReportUrl, App.Version, A_OSVersion
+                , Lang.Current, StrLower(this.Cfg.Source)))
+            if FileExist(this.LogFile)
+                Run('explorer.exe /select,"' this.LogFile '"')
+            return
+        }
+        if win := this.OpenWindow("bug")
+            win.Send(Map("type", "bug", "bug", this.BugPayload()))
+    }
+
+    BugPayload() {
         cfg := this.Cfg
         shortcuts := ""
         for action in Config.Actions
             shortcuts .= (shortcuts = "" ? "" : ", ") action "=" cfg.Shortcuts[action]
-        diag := Format("OnAir keyboard {1} ({2})`nWindows {3}`nWispr Flow: {4}`nIndicator: {5}`nShortcuts: {6}`nLanguage: {7}`nDiagnostic log: {8}"
-            , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion
-            , this.WisprRunning ? "detected" : "not running", cfg.Lock, shortcuts, Lang.Current
-            , cfg.Debug ? this.DataDir "\onairkeyboard.log" : "off")
-        Log.Write("bug report opened")
-        BugReportWindow.Open(diag, cfg.Debug ? this.DataDir "\onairkeyboard.log" : "")
+        diag := Format("OnAir keyboard {1} ({2})`nWindows {3}`nSignal: {4}`nApps: {5}`nWispr Flow: {6}`nIndicator: {7}"
+            . "`nShortcuts: {8}`nLanguage: {9}`nDiagnostic log: {10}"
+            , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion, cfg.Source, MicWatch.JoinApps(cfg.MicApps)
+            , ProcessExist(cfg.WisprAppProcess) ? "running" : "not running", cfg.Lock, shortcuts, Lang.Current
+            , cfg.Debug ? this.LogFile : "off")
+        return Map("email", Support.BugEmail, "subject", T("bug.subject", App.Version), "body", Support.BugBody(diag)
+            , "logExists", cfg.Debug && FileExist(this.LogFile) ? 1 : 0)
+    }
+
+    ; --- Assigning a shortcut in the window: the keys pressed next become the shortcut ---
+
+    StartAssign(action) {
+        if !App._In(action, Config.Actions)
+            return
+        this.EndAssign()
+        this.Assigning := action
+        this.UpdateHotkeys()
+        this.Recorder.Start(ObjBindMethod(this, "_OnAssigned"), ObjBindMethod(this, "EndAssign"))
+        Log.Write("assigning shortcut for " action)
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
+    }
+
+    EndAssign() {
+        if this.Assigning = ""
+            return
+        this.Recorder.Stop()
+        this.Assigning := ""
+        this.UpdateHotkeys()
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
+    }
+
+    ; Saved at once, unless Wispr Flow wouldn't accept it (then the old shortcut stays and the
+    ; window says why); warnings are shown but don't block
+    _OnAssigned(text) {
+        action := this.Assigning
+        this.EndAssign()
+        draft := this.Cfg.Shortcuts.Clone()
+        draft[action] := text
+        found := ""
+        for issue in Shortcut.ValidateSet(draft, this.Cfg.Lock) {
+            mine := issue.Action = action || issue.Code = "duplicate" && issue.Detail = action
+            if mine && (found = "" || issue.Level = "error")
+                found := issue
+        }
+        if found != "" && found.Level = "error" {
+            Log.Write("assigned " action " rejected: " text " (" found.Code ")")
+            other := found.Action != action ? T("issue.duplicate", T("action." found.Action)) : App.IssueText(found)
+            this._SendAssign(action, "error", text ": " other)
+            return
+        }
+        parsed := Shortcut.Parse(text)
+        this.Cfg.Shortcuts[action] := parsed.Text
+        this.Cfg.Save()
+        Log.Write("assigned " action ": " parsed.Text)
+        this._ApplyShortcuts()
+        this._SendAssign(action, found = "" ? "" : "warning", found = "" ? "" : App.IssueText(found))
+    }
+
+    ClearShortcut(action) {
+        if !App._In(action, Config.Actions)
+            return
+        if this.Assigning = action
+            this.EndAssign()
+        this.Cfg.Shortcuts[action] := ""
+        this.Cfg.Save()
+        Log.Write("cleared " action)
+        this._ApplyShortcuts()
+        this._SendAssign(action, "", "")
+    }
+
+    _ApplyShortcuts() {
+        cfg := this.Cfg
+        if Signal.UsesShortcuts(cfg.Source) {
+            this.Hotkeys.Register(Shortcut.ValidShortcuts(cfg.Shortcuts, cfg.Lock, &issues))
+            this.UpdateHotkeys()
+        }
+        this.Tray.Update()
+        if AppWindow.Instance
+            AppWindow.Instance.SendSettings()
+    }
+
+    _SendAssign(action, level, text) {
+        if AppWindow.Instance
+            AppWindow.Instance.Send(Map("type", "assign", "action", action, "level", level, "text", text))
     }
 
     ; Commands run on a timer so the sender's PostMessage returns immediately.
@@ -286,16 +396,197 @@ class App {
         switch wParam {
             case App.CMD_TOGGLE_PAUSE: SetTimer(() => this.TogglePause(), -1)
             case App.CMD_TEST_LED: SetTimer(() => this.TestLed(), -1)
-            case App.CMD_OPEN_SETTINGS: SetTimer(() => this.OpenSettings(), -1)
-            case App.CMD_RECORD:
-                if lParam >= 1 && lParam <= Config.Actions.Length
-                    SetTimer(() => SettingsWindow.Open(this).StartRecording(Config.Actions[lParam]), -1)
-            case App.CMD_SAVE_SETTINGS:
-                if SettingsWindow.Instance
-                    SetTimer(() => SettingsWindow.Instance.Save(), -1)
             case App.CMD_REPORT_BUG: SetTimer(() => this.ReportBug(), -1)
+            case App.CMD_OPEN_WINDOW:
+                view := lParam >= 1 && lParam <= AppWindow.Views.Length ? AppWindow.Views[lParam] : ""
+                SetTimer(() => this.OpenWindow(view), -1)
+            case App.CMD_CLOSE_WINDOW:
+                SetTimer(() => AppWindow.Instance && AppWindow.Instance.Close(), -1)
         }
         return 1
+    }
+
+    ; Test commands with text (tests, screenshots); only test instances listen
+    OnCopyData(wParam, lParam, *) {
+        cmd := NumGet(lParam, 0, "UPtr")
+        text := StrGet(NumGet(lParam, 2 * A_PtrSize, "Ptr"), NumGet(lParam, A_PtrSize, "UInt") // 2, "UTF-16")
+        switch cmd {
+            case App.COPY_EVAL:
+                SetTimer(() => AppWindow.Instance ? AppWindow.Instance.Eval(text) : Log.Write("page eval: no window"), -1)
+            case App.COPY_THEME:
+                AppWindow.ForcedScheme := text = "light" ? 1 : text = "dark" ? 2 : 0
+                SetTimer(() => AppWindow.Instance && AppWindow.Instance.ApplyTheme(), -1)
+            case App.COPY_CAPTURE:
+                SetTimer(() => AppWindow.Instance && AppWindow.Instance.Capture(text), -1)
+            default:
+                return 0
+        }
+        return 1
+    }
+
+    ; --- The window: what the page shows, and what it asks for ---
+
+    StatePayload() => Map("onAir", !this.Paused && this.OnAir ? 1 : 0, "who", this.OnAirWho()
+        , "paused", this.Paused ? 1 : 0, "wispr", this.WisprRunning ? 1 : 0
+        , "hasShortcuts", this.Hotkeys.HasShortcuts ? 1 : 0, "assigning", this.Assigning)
+
+    SettingsPayload() {
+        cfg := this.Cfg
+        issues := []
+        for issue in Shortcut.ValidateSet(cfg.Shortcuts, cfg.Lock)
+            issues.Push(Map("action", issue.Action, "level", issue.Level, "text", App.IssueText(issue)))
+        return Map("lock", cfg.Lock, "source", cfg.Source, "apps", cfg.MicApps
+            , "autostart", cfg.StartWithWindows ? 1 : 0, "autostartManaged", this.ManagesAutostart ? 1 : 0
+            , "trayState", cfg.TrayIconShowsState ? 1 : 0, "language", cfg.Language
+            , "autoLanguage", Config.ResolveLanguage("auto"), "debug", cfg.Debug ? 1 : 0
+            , "pauseInWispr", cfg.PauseInWisprWindow ? 1 : 0, "graceS", Round(cfg.HybridGraceMs / 1000)
+            , "shortcuts", cfg.Shortcuts, "issues", issues, "configPath", cfg.Path
+            , "logPath", this.LogFile, "logExists", FileExist(this.LogFile) != "" ? 1 : 0)
+    }
+
+    AppsPayload() {
+        list := []
+        if this.Mic
+            for item in this.Mic.List()
+                list.Push(Map("id", item.Id, "name", item.Name, "live", item.Live ? 1 : 0, "checked", item.Checked ? 1 : 0))
+        return list
+    }
+
+    LinksPayload() {
+        donations := []  ; not "support": names are case-insensitive, it would hide the Support class
+        for link in Support.Links(Lang.Current)
+            donations.Push(Map("name", link.Name, "url", link.Url))
+        return Map("website", App.WebsiteUrl, "websiteName", App.WebsiteName, "repo", App.RepoUrl
+            , "sayoPreset", App.SayoPresetUrl, "sayoApp", App.SayoAppUrl, "support", donations
+            , "bugEmail", Support.BugEmail)
+    }
+
+    static IssueText(issue) {
+        if issue.Code = "duplicate"
+            return T("issue.duplicate", T("action." issue.Detail))
+        return T("issue." issue.Code, issue.Detail)
+    }
+
+    ; msg: {cmd, ...} from the page
+    OnWindowCommand(msg) {
+        win := AppWindow.Instance
+        get(key, default := "") => msg.Has(key) ? msg[key] : default
+        switch msg["cmd"] {
+            case "set": this.SetOption(get("key"), get("value"))
+            case "testLed": this.TestLed()
+            case "pause": this.TogglePause()
+            case "open": AppWindow.OpenExternal(get("url"))
+            case "openLog": this.OpenLog()
+            case "showLog":
+                if FileExist(this.LogFile)
+                    Run('explorer.exe /select,"' this.LogFile '"')
+                else
+                    Run('explorer.exe "' this.DataDir '"')
+            case "openConfig": Run('notepad.exe "' this.Cfg.Path '"')
+            case "copy": A_Clipboard := get("text")
+            case "bug": this.ReportBug()
+            case "assign": this.StartAssign(get("action"))
+            case "cancelAssign": this.EndAssign()
+            case "clear": this.ClearShortcut(get("action"))
+            case "view":
+                if win
+                    win.View := get("view")
+            case "layout":
+                if win
+                    win.SetLayout(get("layout"))
+            case "close":
+                if win
+                    win.Close()
+            default: Log.Write("unknown window command " msg["cmd"])
+        }
+    }
+
+    OnWindowClosing() {
+        this.EndAssign()
+        this.UpdateHotkeys()
+    }
+
+    ; A change from the window takes effect at once and is saved
+    SetOption(key, value) {
+        cfg := this.Cfg
+        Log.Write("window set " key)
+        switch key {
+            case "lock":
+                if !App._In(value, Config.Locks)
+                    return
+                cfg.Lock := value
+                this._SaveAndApply()
+            case "source":
+                if !App._In(value, Config.Sources)
+                    return
+                cfg.Source := value
+                this._SaveAndApply()
+            case "app":  ; {id, checked}: one app of the list ticked or unticked
+                id := value["id"], apps := []
+                for known in cfg.MicApps
+                    if known != id
+                        apps.Push(known)
+                if value["checked"]
+                    apps.Push(id)
+                cfg.MicApps := apps
+                cfg.Save()
+                this.Mic.SetApps(apps)
+                this.UpdateOnAir()
+                if AppWindow.Instance
+                    AppWindow.Instance.SendApps(true)
+            case "autostart":
+                cfg.StartWithWindows := value ? true : false
+                cfg.Save()
+                this._SyncAutostart()
+            case "trayState":
+                cfg.TrayIconShowsState := value ? true : false
+                cfg.Save()
+                this.Tray.Update()
+            case "debug":
+                cfg.Debug := value ? true : false
+                cfg.Save()
+                Log.Init(this.LogFile, cfg.Debug)
+                Log.Write("diagnostic log turned on")
+            case "pauseInWispr":
+                cfg.PauseInWisprWindow := value ? true : false
+                this._SaveAndApply()
+            case "graceS":
+                if !Config.ParseInt(String(value), 1, 60, &seconds)
+                    return
+                cfg.HybridGraceMs := seconds * 1000
+                cfg.Save()
+                if this.Gate
+                    this.Gate.GraceMs := cfg.HybridGraceMs
+            case "language":
+                if !App._In(value, Config.Languages)
+                    return
+                cfg.Language := value
+                cfg.Save()
+                Lang.Set(Config.ResolveLanguage(value))
+                this.Tray.Build()
+                if AppWindow.Instance {
+                    AppWindow.Instance.Win.Title := T("ui.window_title", App.Version)
+                    AppWindow.Instance.SendInit()
+                }
+                return
+            default:
+                return
+        }
+        if AppWindow.Instance
+            AppWindow.Instance.SendSettings()
+    }
+
+    _SaveAndApply() {
+        this.Cfg.Warnings := []
+        this.Cfg.Save()
+        this.Apply()
+    }
+
+    static _In(value, list) {
+        for item in list
+            if value == item
+                return true
+        return false
     }
 
     Shutdown(*) {

@@ -5,11 +5,13 @@ Code, comments and commit messages are in English.
 ## What this is
 
 Windows tray program (AutoHotkey v2) that lights a keyboard LED (via Scroll / Num / Caps Lock)
-and turns the tray icon red while Wispr Flow is recording. Built for the author's SayoDevice 2x2
-macro pad, shared as free, open-source software (onairkeyboard.com).
+and turns the tray icon red while you dictate: by default while a ticked app (Wispr Flow, Claude,
+ChatGPT...) uses the microphone, optionally from the Wispr Flow shortcuts. Built for the author's
+SayoDevice 2x2 macro pad, shared as free, open-source software (onairkeyboard.com). The window is
+an HTML page (`ui\`) in WebView2 (`lib\`).
 
 On the author's PC, first read the private notes in `C:\dev\2026\OnAirKeyboard-notes` (its
-`CLAUDE.md`, then `PLAN.md`, `SPEC-v0.1.md`, `NEXT.md`). They hold the author's preferences,
+`CLAUDE.md`, then `PLAN.md`, `SPEC-v0.1.md`, `SPEC-v0.2.md`, `NEXT.md`). They hold the author's preferences,
 roadmap and current to-do. Never copy their contents into this public repository.
 
 ## Name and brand
@@ -18,7 +20,7 @@ roadmap and current to-do. Never copy their contents into this public repository
   fit: `OnAirKeyboard` (EXE, folders, script) and `onairkeyboard` (domain, GitHub, log, e-mail).
 - Brand colours from the logo: red `#E63A3A`, dark text `#2A2A2A`, light text `#FBFBFB`.
 - Icons and logos come from `assets\src` (keycap in several colours, logos for light and dark
-  backgrounds). The app uses the colour logo for light backgrounds. The README shows
+  backgrounds); `build_icons.py` copies both logos to `ui\` for the window. The README shows
   `logo-banner.svg` (dark-mode logo on a dark plate): theme-dependent README images follow the
   OS, not GitHub's theme setting (`<picture>` and `#gh-*-mode-only` both failed).
 
@@ -29,7 +31,7 @@ powershell -ExecutionPolicy Bypass -File tests\run.ps1        # validation + all
 powershell -ExecutionPolicy Bypass -File build.ps1            # dist\OnAirKeyboard-<version>.exe
 powershell -ExecutionPolicy Bypass -File tests\run.ps1 -Exe   # tests incl. the compiled EXE
 powershell -ExecutionPolicy Bypass -File tools\run-demo.ps1   # demo instance (temp config, Caps Lock)
-powershell -ExecutionPolicy Bypass -File tools\screenshot-settings.ps1 -Language pl [-Showcase]  # + Report a bug window
+AutoHotkey64.exe /ErrorStdOut tools\screenshot-window.ahk pl [folder]  # every view, light + dark
 python -I assets\build_icons.py                               # icons/logos from assets\src (Inkscape)
 ```
 
@@ -57,13 +59,18 @@ Run the tests after every change; commit after each finished step.
 - A static method passed as a callback (`OnMessage`, a stored function) needs
   `ObjBindMethod(Class, "Name")`; a plain `Class.Name` reference misses its hidden `this`.
 - AutoHotkey limits the length of one declaration: the translation tables are one `Map` per
-  language (`Lang.En`, `Lang.Pl`).
+  language (`Lang.En`, `Lang.Pl`), plus one per language for the window (`Lang.UiEn`, `Lang.UiPl`).
 - Building a window takes longer than the 15 ms after which another thread may interrupt, so
   windows are created inside `Critical` (otherwise a queued command opened a second one).
-- Tab3 shows its controls in a dialog window that paints over sibling windows: a child window
-  on a tab page (`ScrollPane`) must live inside that dialog, shown / hidden with the tab.
-- Link controls: `&` must be written `&&`, and emoji don't render (no font fallback); read-only
-  edits are grey unless given `BackgroundWhite`.
+- The window's WebView2 is created on open and closed with the window (about 126 MB only while
+  open), always with its own data folder (`%LOCALAPPDATA%\OnAirKeyboard\WebView2`). Page and
+  program talk in JSON (`App.OnWindowCommand`, `ui\app.js`); changes apply at once, no Save.
+  Texts reach the page from `Lang` (`ui.` keys override shared ones); TestCore checks that every
+  text the page uses exists in both languages. Tests drive the page with JavaScript through a
+  WM_COPYDATA command (`tests\WindowLib.ahk`), accepted only by instances on a custom config.
+- The microphone source reads `HKCU\...\CapabilityAccessManager\ConsentStore\microphone` only when
+  Windows signals a change (a full read costs about 10 ms). Tests use a fake key
+  (`tests\FakeMic.ahk`, `--mic-key`), so the author's dictation never interferes.
 - The self-install runs only in the EXE on the default settings file. Tests use
   `--install-dir <folder>` and `--install-answer yes|no` (see `tests\TestIntegration.ahk`), so
   the real installation, Start menu and Startup folder are never touched.

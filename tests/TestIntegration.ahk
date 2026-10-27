@@ -7,6 +7,7 @@
 
 #Include %A_LineFile%\..\TestLib.ahk
 #Include %A_LineFile%\..\FakeMic.ahk
+#Include %A_LineFile%\..\WindowLib.ahk
 
 target := '"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk"'
 exePath := ""
@@ -145,58 +146,92 @@ WaitLog(text, timeoutMs := 4000, logDir := "") {
     return false
 }
 
-settingsWin := "ahk_class AutoHotkeyGUI ahk_pid " pid
+; The window (WebView2): checks run JavaScript in the page through a test command
+appWin := "OnAir keyboard ahk_class AutoHotkeyGUI ahk_pid " pid
+logFile := dir "\onairkeyboard.log"
+Eval(js) => PageEval(pid, logFile, js)
 
-; Report a bug: a window with the address and a prefilled text, no mail app involved
+; Report a bug: the window shows the address and a prefilled text, no mail app involved
 Command(6)
-Check("bug report window opens", WinWait(settingsWin, , 5) != 0, true)
-Check("bug report address", ControlGetText("Edit1", settingsWin), "hello@onairkeyboard.com")
-Check("bug report details", InStr(ControlGetText("Edit3", settingsWin), "Cancel=Ctrl+Shift+F22") > 0, true)
-WinClose(settingsWin)
-Check("bug report closes", WinWaitClose(settingsWin, , 3) != 0, true)
-
-Command(3)
-Check("settings window opens", WinWait(settingsWin, , 5) != 0, true)
-
-; How it works is a scrolling pane: page down moves its text up
-ControlChooseIndex(1, "SysTabControl321", settingsWin)
+Check("bug report window opens", WinWait(appWin, , 5) != 0, true)
+Check("window ready", WaitLog("window ready", 8000), true)
 Sleep(300)
-howtoTitle := ControlGetHwnd("One key. No guessing.", settingsWin)
-ControlGetPos(, &titleY, , , howtoTitle)
-PostMessage(0x115, 3, 0, DllCall("GetParent", "Ptr", howtoTitle, "Ptr"))  ; WM_VSCROLL, SB_PAGEDOWN
-Sleep(300)
-ControlGetPos(, &scrolledY, , , howtoTitle)
-Check("how it works scrolls", scrolledY < titleY, true)
+Check("bug report view", Eval("S.view"), '"bug"')
+Check("bug report address", Eval("document.querySelector('.field .value').textContent"), '"hello@onairkeyboard.com"')
+Check("bug report details", Eval("document.getElementById('body').value.includes('Cancel=Ctrl+Shift+F22')"), "true")
+Check("page has no missing texts", Eval("[...document.body.querySelectorAll('*')].some(e => e.children.length === 0 && /^[a-z]+\.[a-z_.]+$/i.test(e.textContent.trim()))"), "false")
+Command(7, 2)  ; the same window switches to the advanced view
+Sleep(400)
+Check("one window", WinGetList(appWin).Length, 1)
+Check("advanced view", Eval("S.view"), '"advanced"')
+Check("advanced has no missing texts", Eval("[...document.body.querySelectorAll('*')].some(e => e.children.length === 0 && /^[a-z]+\.[a-z_.]+$/i.test(e.textContent.trim()))"), "false")
 
-Command(4, 1)  ; record push to talk
-Check("recording ptt starts", WaitLog("recording shortcut for PushToTalk"), true)
+; Assign shortcuts by pressing them; each one is saved and used at once
+Eval("go('advanced', 'shortcuts'); send('assign', {action: 'PushToTalk'}); 1")
+Check("assigning ptt starts", WaitLog("assigning shortcut for PushToTalk"), true)
+Check("page shows the prompt", Eval("document.querySelector('.combo.wait') !== null"), "true")
 Send("{Ctrl down}{Shift down}{F23}{Shift up}{Ctrl up}")
-Check("ptt recorded", WaitLog("recorded PushToTalk: Ctrl+Shift+F23"), true)
-Check("one settings window", WinGetList(settingsWin).Length, 1)  ; open + record must not open two
-Command(4, 3)  ; record cancel: Escape must be recorded, not close anything
-Check("recording cancel starts", WaitLog("recording shortcut for Cancel"), true)
+Check("ptt assigned", WaitLog("assigned PushToTalk: Ctrl+Shift+F23"), true)
+Eval("send('assign', {action: 'Cancel'}); 1")  ; Escape must be assigned, not close anything
+Check("assigning cancel starts", WaitLog("assigning shortcut for Cancel"), true)
 Send("{Escape}")
-Check("escape recorded", WaitLog("recorded Cancel: Escape"), true)
-Command(4, 2)  ; record hands-free as a modifier-only shortcut
-Check("recording hands-free starts", WaitLog("recording shortcut for HandsFree"), true)
+Check("escape assigned", WaitLog("assigned Cancel: Escape"), true)
+Sleep(200)
+Check("escape warning shown", Eval("document.querySelector('.msg.warning') !== null"), "true")
+Eval("send('assign', {action: 'HandsFree'}); 1")  ; modifier-only
+Check("assigning hands-free starts", WaitLog("assigning shortcut for HandsFree"), true)
 Send("{Ctrl down}{Alt down}")
 Sleep(60)
 Send("{Alt up}{Ctrl up}")
-Check("modifier-only recorded", WaitLog("recorded HandsFree: Ctrl+Alt"), true)
-Command(4, 4)  ; record command mode, press nothing: times out after 5 s
-Check("recording command mode starts", WaitLog("recording shortcut for CommandMode"), true)
-Sleep(5600)
-Check("window still open after Escape", WinExist(settingsWin) != 0, true)
-Command(5)     ; save
-Check("settings saved", WaitLog("settings saved"), true)
+Check("modifier-only assigned", WaitLog("assigned HandsFree: Ctrl+Alt"), true)
+Eval("send('assign', {action: 'CommandMode'}); 1")  ; the same as Push to talk: refused
+Check("assigning command mode starts", WaitLog("assigning shortcut for CommandMode"), true)
+Send("{Ctrl down}{Shift down}{F23}{Shift up}{Ctrl up}")
+Check("duplicate refused", WaitLog("assigned CommandMode rejected: Ctrl+Shift+F23 (duplicate)"), true)
+Sleep(200)
+Check("duplicate error shown", Eval("document.querySelector('.msg.error') !== null"), "true")
+Eval("send('assign', {action: 'CommandMode'}); 1")  ; press nothing: times out after 5 s
 Sleep(300)
-Check("save closes window", WinExist(settingsWin) = 0, true)
+Check("assigning again", Eval("S.state.assigning"), '"CommandMode"')
+Sleep(5600)
+Check("window still open after Escape", WinExist(appWin) != 0, true)
+Check("prompt gone after the time limit", Eval("document.querySelector('.combo.wait') === null"), "true")
 
 cfgText := FileRead(dir "\config.ini", "UTF-16")
 Check("saved push to talk", InStr(cfgText, "PushToTalk=Ctrl+Shift+F23`n") > 0, true)
 Check("saved escape cancel", InStr(cfgText, "Cancel=Escape`n") > 0, true)
 Check("saved modifier-only", InStr(cfgText, "HandsFree=Ctrl+Alt`n") > 0, true)
-Check("timeout leaves empty", InStr(cfgText, "CommandMode=`n") > 0, true)
+Check("refused and timed out leave empty", InStr(cfgText, "CommandMode=`n") > 0, true)
+
+; A setting changed in the window is saved and applied at once
+Eval("set('trayState', 0); 1")
+Check("setting applied", WaitLog("window set trayState"), true)
+Sleep(200)
+Check("setting saved", InStr(FileRead(dir "\config.ini", "UTF-16"), "TrayIconShowsState=0`n") > 0, true)
+Eval("set('trayState', 1); 1")
+Eval("set('language', 'pl'); 1")
+Sleep(500)
+Check("language switches the page", Eval("S.lang"), '"pl"')
+Eval("set('language', 'en'); 1")
+Sleep(300)
+
+Command(8)  ; close: WebView2 goes away with the window
+Check("window closes", WinWaitClose(appWin, , 3) != 0, true)
+Check("window closed logged", WaitLog("window closed"), true)
+; WebView2 processes of our data folder end shortly after the window
+WebViewProcesses() {
+    count := 0
+    for proc in ComObjGet("winmgmts:").ExecQuery("SELECT CommandLine FROM Win32_Process WHERE Name = 'msedgewebview2.exe'")
+        if InStr(proc.CommandLine, "OnAirKeyboard\WebView2")
+            count++
+    return count
+}
+loop 50 {
+    if !WebViewProcesses()
+        break
+    Sleep(100)
+}
+Check("no WebView2 processes left", WebViewProcesses(), 0)
 
 Send("{Ctrl down}{Shift down}{F23 down}")
 Sleep(250)
@@ -266,7 +301,7 @@ FakeMic.Reset()
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 100, 200)
 FakeMic.Set("Discord_abcdefghijklm", 100, 200)
 Run(target ' --config "' micDir '\config.ini"' micArg, , , &micPid)
-Check("mic source starts", WaitLog("signal source Microphone", 4000, micDir), true)
+Check("mic source starts", WaitLog("started, config", 4000, micDir) && InStr(FileRead(micDir "\onairkeyboard.log"), "signal source Microphone") > 0, true)
 Check("mic idle off", Caps(), 0)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 0)
 Check("mic in use lights", WaitCaps(1), true)
@@ -294,8 +329,7 @@ FakeMic.Reset()
 wisprKey := "C:#Apps#Wispr#" ahkExe
 FakeMic.Set(wisprKey, 100, 200, true)
 Run(target ' --config "' bothDir '\config.ini"' micArg, , , &bothPid)
-Check("both source starts", WaitLog("signal source Both", 4000, bothDir), true)
-WaitLog("Wispr helper running", 4000, bothDir)
+Check("both source starts", WaitLog("started, config", 4000, bothDir) && InStr(FileRead(bothDir "\onairkeyboard.log"), "signal source Both") > 0, true)
 Tap("F21")
 Check("both: shortcut lights at once", Caps(), 1)
 Check("both: no microphone, goes off", WaitCaps(0, 2500), true)
@@ -323,7 +357,7 @@ failuresBefore := failures
 guardDir := A_Temp "\onairkeyboard-guard"
 TestConfig(guardDir, ahkExe, "Source=Shortcuts`nPauseInWisprWindow=1")
 Run(target ' --config "' guardDir '\config.ini"' micArg, , , &guardPid)
-WaitLog("Wispr helper running", 4000, guardDir)
+WaitLog("started, config", 4000, guardDir)
 fakeWispr := Gui("+AlwaysOnTop", "OnAir keyboard test: Wispr Flow stand-in")
 fakeWispr.Show("w240 h60")
 WinActivate(fakeWispr.Hwnd)
@@ -351,25 +385,41 @@ if failures > failuresBefore
     Out(FileRead(guardDir "\onairkeyboard.log"))
 FakeMic.Delete()
 
-; First run (no config yet): settings open by themselves on "How it works";
-; opening them again later shows "Shortcuts".
+; First run (no config yet): the window opens by itself on "How it works" (the wide layout);
+; opening it again later shows the main view (narrow). No log yet, so the size tells the view.
 ; Note: a fresh config uses Scroll Lock, so the keyboard LED may blink once here.
 freshDir := A_Temp "\onairkeyboard-firstrun"
 try DirDelete(freshDir, true)
 Run(target ' --config "' freshDir '\config.ini"' micArg, , , &pid2)
-firstWin := "ahk_class AutoHotkeyGUI ahk_pid " pid2
-Check("first run opens settings", WinWait(firstWin, , 5) != 0, true)
-Sleep(300)
-Check("first run shows how it works", ControlGetIndex("SysTabControl321", firstWin), 1)
+firstWin := "OnAir keyboard ahk_class AutoHotkeyGUI ahk_pid " pid2
+Check("first run opens the window", WinWait(firstWin, , 8) != 0, true)
+Sleep(500)
+WinGetClientPos(, , &firstW, , firstWin)
+Check("first run shows how it works", firstW > 800 * A_ScreenDPI / 96, true)
 Check("first run creates config", FileExist(freshDir "\config.ini") != "", true)
 WinClose(firstWin)
-Sleep(300)
-PostMessage(0x8001, 3, 0, , "ahk_class AutoHotkey ahk_pid " pid2)
-Check("settings reopen", WinWait(firstWin, , 5) != 0, true)
-Sleep(300)
-Check("later opens shortcuts", ControlGetIndex("SysTabControl321", firstWin), 2)
+WinWaitClose(firstWin, , 3)
+PostMessage(0x8001, 7, 0, , "ahk_class AutoHotkey ahk_pid " pid2)
+Check("window reopens", WinWait(firstWin, , 8) != 0, true)
+Sleep(500)
+WinGetClientPos(, , &laterW, , firstWin)
+Check("later opens the main view", laterW < 700 * A_ScreenDPI / 96, true)
 WinClose("ahk_class AutoHotkey ahk_pid " pid2)
 ProcessWaitClose(pid2, 3)
+
+; Without the WebView2 Runtime the program keeps running and explains where to get it
+noDir := A_Temp "\onairkeyboard-noruntime"
+TestConfig(noDir, ahkExe)
+Run(target ' --config "' noDir '\config.ini"' micArg ' --no-webview2', , , &pid4)
+WaitLog("started, config", 4000, noDir)
+PostMessage(0x8001, 7, 0, , "ahk_class AutoHotkey ahk_pid " pid4)
+noWin := "ahk_class AutoHotkeyGUI ahk_pid " pid4
+Check("runtime message opens", WinWait(noWin, , 5) != 0, true)
+Check("runtime message text", InStr(WinGetText(noWin), "WebView2") > 0, true)
+Check("still running", ProcessExist(pid4) != 0, true)
+WinClose(noWin)
+WinClose("ahk_class AutoHotkey ahk_pid " pid4)
+ProcessWaitClose(pid4, 3)
 
 ; Process id of the OnAirKeyboard.exe running from the test install folder, 0 if none
 InstalledPid() {
