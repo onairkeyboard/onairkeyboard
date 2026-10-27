@@ -22,6 +22,12 @@ class Config {
         this.MicApps := MicWatch.DefaultApps()
         this.MicPollMs := 100
         this.HybridGraceMs := 6000
+        this.DuckEnabled := false
+        this.DuckLevel := 20
+        this.DuckSystemSounds := true
+        this.DuckFadeDownMs := 250
+        this.DuckFadeUpMs := 750
+        this.DuckRestoreDelayMs := 1000
         this.Lock := "ScrollLock"
         this.TrayIconShowsState := true
         this.Language := "auto"
@@ -125,6 +131,12 @@ class Config {
         this.MicApps := MicWatch.ParseApps(this._Get("Microphone", "Apps", MicWatch.JoinApps(this.MicApps)))
         this.MicPollMs := this._Int("Microphone", "PollMs", 20, 2000, this.MicPollMs)
         this.HybridGraceMs := this._Int("Microphone", "HybridGraceMs", 500, 60000, this.HybridGraceMs)
+        this.DuckEnabled := this._Bool("Ducking", "Enabled", this.DuckEnabled)
+        this.DuckLevel := this._Int("Ducking", "Level", 0, 100, this.DuckLevel)
+        this.DuckSystemSounds := this._Bool("Ducking", "SystemSounds", this.DuckSystemSounds)
+        this.DuckFadeDownMs := this._Int("Ducking", "FadeDownMs", 0, 2000, this.DuckFadeDownMs)
+        this.DuckFadeUpMs := this._Int("Ducking", "FadeUpMs", 0, 5000, this.DuckFadeUpMs)
+        this.DuckRestoreDelayMs := this._Int("Ducking", "RestoreDelayMs", 0, 10000, this.DuckRestoreDelayMs)
         this.Lock := this._Enum("Indicator", "Lock", Config.Locks, this.Lock)
         this.TrayIconShowsState := this._Bool("Indicator", "TrayIconShowsState", this.TrayIconShowsState)
         this.Language := this._Enum("General", "Language", Config.Languages, this.Language)
@@ -212,6 +224,19 @@ PollMs={18}
 ; Both: turn the LED off when Wispr Flow's microphone stays closed this long after a shortcut
 HybridGraceMs={19}
 
+[Ducking]
+; 1: lower other apps' sound while on air (not the app using the microphone, not Wispr Flow)
+Enabled={21}
+; Level the other apps go down to, in percent of their own volume (0-100)
+Level={22}
+; 1: also lower Windows' system sounds (notifications)
+SystemSounds={23}
+; Fade down 0-2000 ms, fade up 0-5000 ms
+FadeDownMs={24}
+FadeUpMs={25}
+; Wait this long after going off air before the sound comes back (0-10000 ms)
+RestoreDelayMs={26}
+
 [Shortcuts]
 ; Used by the Shortcuts and Both sources.
 ; Format: Ctrl / Alt / Shift / Win + key, for example Ctrl+Shift+F13.
@@ -248,6 +273,7 @@ HookReinstallDelaysMs={13}
         , b(this.StartWithWindows), b(this.Debug), this.SyncIntervalMs, this.ResyncDelayMs
         , this.WisprHelperProcess, Config._JoinInts(this.HookReinstallDelaysMs), b(this.Portable)
         , this.Source, b(this.PauseInWisprWindow), MicWatch.JoinApps(this.MicApps), this.MicPollMs
-        , this.HybridGraceMs, this.WisprAppProcess) "`n"
+        , this.HybridGraceMs, this.WisprAppProcess, b(this.DuckEnabled), this.DuckLevel
+        , b(this.DuckSystemSounds), this.DuckFadeDownMs, this.DuckFadeUpMs, this.DuckRestoreDelayMs) "`n"
     }
 }

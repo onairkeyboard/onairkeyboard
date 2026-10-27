@@ -76,6 +76,29 @@ Check("bad bool default", cfg3.Debug, false)
 Check("empty process default", cfg3.WisprHelperProcess, "Wispr Flow Helper.exe")
 Check("warnings count", cfg3.Warnings.Length, 3)
 
+; --- Config: ducking (other apps' sound), off by default; a v0.2 file gets the defaults ---
+duckPath := TempConfig()
+duckCfg := Config.Load(duckPath)
+Check("duck off by default", duckCfg.DuckEnabled, false)
+Check("duck defaults", duckCfg.DuckLevel " " duckCfg.DuckSystemSounds " " duckCfg.DuckFadeDownMs " " duckCfg.DuckFadeUpMs " " duckCfg.DuckRestoreDelayMs, "20 1 250 750 1000")
+duckCfg.DuckEnabled := true, duckCfg.DuckLevel := 35, duckCfg.DuckSystemSounds := false, duckCfg.DuckRestoreDelayMs := 2500
+duckCfg.Save()
+duckCfg2 := Config.Load(duckPath)
+Check("duck round trip", duckCfg2.DuckEnabled " " duckCfg2.DuckLevel " " duckCfg2.DuckSystemSounds " " duckCfg2.DuckRestoreDelayMs, "1 35 0 2500")
+IniWrite("150", duckPath, "Ducking", "Level")
+IniWrite("9000", duckPath, "Ducking", "FadeUpMs")
+duckCfg3 := Config.Load(duckPath)
+Check("duck level out of range", duckCfg3.DuckLevel, 20)
+Check("duck fade out of range", duckCfg3.DuckFadeUpMs, 750)
+Check("duck warnings", duckCfg3.Warnings.Length, 2)
+oldPath := TempConfig()
+FileAppend("[Signal]`nSource=Microphone`n[Indicator]`nLock=NumLock`n", oldPath, "UTF-16")
+oldCfg := Config.Load(oldPath)
+Check("v0.2 file: ducking off", oldCfg.DuckEnabled, false)
+Check("v0.2 file: no warnings", oldCfg.Warnings.Length, 0)
+oldCfg.Save()
+Check("v0.2 file gets [Ducking]", InStr(FileRead(oldPath, "UTF-16"), "[Ducking]") > 0, true)
+
 ; --- Lang: every key exists in both languages ---
 for key in Lang.Strings["en"]
     Check("pl has " key, Lang.Strings["pl"].Has(key), true)

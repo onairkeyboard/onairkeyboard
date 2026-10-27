@@ -26,13 +26,16 @@ class App {
 
     ; installDir / installAnswer: test overrides for the self-install (see Installer);
     ; micKey: test override for the microphone registry key (under HKEY_CURRENT_USER);
-    ; noWebView2: behave as if the WebView2 Runtime were missing
-    __New(configPath, installDir := "", installAnswer := "", micKey := "", noWebView2 := false) {
+    ; noWebView2: behave as if the WebView2 Runtime were missing;
+    ; audioFile: test override, a fake mixer (FileMixer) instead of the apps' real volumes
+    __New(configPath, installDir := "", installAnswer := "", micKey := "", noWebView2 := false, audioFile := "") {
         this.ConfigPath := configPath
         this.InstallDir := installDir
         this.InstallAnswer := installAnswer
         this.MicKey := micKey != "" ? micKey : MicWatch.DefaultKey
         this.NoWebView2 := noWebView2
+        this.AudioFile := audioFile
+        this.Ducker := ""
         this.Paused := false
         this.Cfg := ""
         this.State := RecState(ObjBindMethod(this, "OnRecordingChange"))
@@ -59,6 +62,8 @@ class App {
             args := this.InstallDir = "" ? "" : Format(' --config "{1}" --install-dir "{2}"', this.ConfigPath, this.InstallDir)
             if args != "" && this.MicKey != MicWatch.DefaultKey
                 args .= Format(' --mic-key "{1}"', this.MicKey)
+            if args != "" && this.AudioFile != ""
+                args .= Format(' --audio-file "{1}"', this.AudioFile)
             install := Installer.Check(App.Version, this.ConfigPath, dir, this.InstallAnswer, args)
             if install = "exit"
                 ExitApp()
@@ -70,13 +75,17 @@ class App {
         }
         SplitPath(this.Cfg.Path, , &dir)
         this.DataDir := dir
+        this.Ducker := Ducker(this._Mixer(), dir "\ducking.ini", ObjBindMethod(this, "DuckExcluded")
+            , ObjBindMethod(this, "OnDuckChange"))
+        Log.Init(dir "\onairkeyboard.log", this.Cfg.Debug)
+        this.Ducker.Recover()  ; before anything is lowered again
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
         if this.Cfg.Migrated
             Log.Write("settings from v0.1 migrated: source Microphone, apps " MicWatch.JoinApps(this.Cfg.MicApps) ", shortcuts kept")
 
         OnMessage(0x0219, (*) => this.Led.ScheduleResync(1000))  ; WM_DEVICECHANGE
-        OnMessage(0x0218, (*) => this.Led.ScheduleResync(1000))  ; WM_POWERBROADCAST
+        OnMessage(0x0218, ObjBindMethod(this, "OnPower"))  ; WM_POWERBROADCAST
         OnMessage(0x001A, ObjBindMethod(this, "OnSettingChange"))
         OnMessage(App.WM_COMMAND, ObjBindMethod(this, "OnCommand"))
         if this.IsTestInstance
@@ -86,6 +95,41 @@ class App {
         ; First run: no welcome screen, the window opens on "How it works"
         if this.Cfg.IsFirstRun
             SetTimer(() => this.OpenWindow("howto"), -500)
+    }
+
+    ; Other apps' volumes: the real mixer, or the fake one of a test (--audio-file)
+    _Mixer() {
+        if this.AudioFile != ""
+            return FileMixer(this.AudioFile)
+        try return AudioMixer()
+        catch as e {
+            Log.Write("audio sessions unavailable: " e.Message)
+            return FileMixer("")  ; no sessions: nothing is ever lowered
+        }
+    }
+
+    ; Sleep: the sound comes back first (the computer may wake up much later, off air)
+    OnPower(wParam, *) {
+        if wParam = 4 && this.Ducker  ; PBT_APMSUSPEND
+            this.Ducker.RestoreNow("sleep")
+        this.Led.ScheduleResync(1000)
+    }
+
+    ; Not lowered: every app using the microphone now (a voice chat), and Wispr Flow (its sounds)
+    DuckExcluded() {
+        ids := this.Mic ? this.Mic.LiveAll() : []
+        ids.Push(this.Cfg.WisprAppProcess, this.Cfg.WisprHelperProcess)
+        return ids
+    }
+
+    OnDuckChange() {
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
+    }
+
+    _SyncDuck() {
+        if this.Ducker
+            this.Ducker.SetOnAir(!this.Paused && this.OnAir, this.Paused)
     }
 
     ; Instances on a custom settings file (tests, demo) accept test commands
@@ -160,6 +204,10 @@ class App {
         }
 
         this.Led.Start(cfg.SyncIntervalMs, cfg.ResyncDelayMs)
+        if this.Ducker {
+            this.Ducker.Configure(cfg)
+            this._SyncDuck()
+        }
 
         if shortcuts {
             this.Wispr := WisprWatch(cfg.WisprHelperProcess, cfg.HookReinstallDelaysMs, ObjBindMethod(this, "OnWisprChange"))
@@ -204,6 +252,8 @@ class App {
     OnMicChange(liveIds) {
         Log.Write(liveIds.Length ? "microphone in use: " this.Mic.LiveNames() : "microphone free")
         this.UpdateOnAir()
+        if this.Ducker
+            this.Ducker.Refresh()  ; an app that now uses the microphone keeps its sound
     }
 
     UpdateOnAir() {
@@ -214,6 +264,7 @@ class App {
         }
         if this.Led
             this.Led.Sync()
+        this._SyncDuck()
         this.Tray.Update()
         if AppWindow.Instance
             AppWindow.Instance.SendState()
@@ -265,12 +316,15 @@ class App {
         this.UpdateHotkeys()
         this.Led.Paused := this.Paused
         this.Led.Sync()
+        this._SyncDuck()
         this.Tray.Update()
         if AppWindow.Instance
             AppWindow.Instance.SendState()
     }
 
     TestLed() => this.Led.Blink()
+
+    TestDuck() => this.Ducker && this.Ducker.Test()
 
     OpenWindow(view := "") => AppWindow.Open(this, view)
 
@@ -310,10 +364,11 @@ class App {
         for action in Config.Actions
             shortcuts .= (shortcuts = "" ? "" : ", ") action "=" cfg.Shortcuts[action]
         diag := Format("OnAir keyboard {1} ({2})`nWindows {3}`nSignal: {4}`nApps: {5}`nWispr Flow: {6}`nIndicator: {7}"
-            . "`nShortcuts: {8}`nLanguage: {9}`nDiagnostic log: {10}"
+            . "`nShortcuts: {8}`nLanguage: {9}`nDiagnostic log: {10}`nDucking: {11}"
             , App.Version, A_IsCompiled ? "EXE" : "script", A_OSVersion, cfg.Source, MicWatch.JoinApps(cfg.MicApps)
             , ProcessExist(cfg.WisprAppProcess) ? "running" : "not running", cfg.Lock, shortcuts, Lang.Current
-            , cfg.Debug ? this.LogFile : "off")
+            , cfg.Debug ? this.LogFile : "off"
+            , cfg.DuckEnabled ? Format("on, {1}%, system sounds {2}", cfg.DuckLevel, cfg.DuckSystemSounds ? "on" : "off") : "off")
         return Map("email", Support.BugEmail, "subject", T("bug.subject", App.Version), "body", Support.BugBody(diag)
             , "logExists", cfg.Debug && FileExist(this.LogFile) ? 1 : 0)
     }
@@ -434,7 +489,9 @@ class App {
 
     StatePayload() => Map("onAir", !this.Paused && this.OnAir ? 1 : 0, "who", this.OnAirWho()
         , "paused", this.Paused ? 1 : 0, "wispr", this.WisprRunning ? 1 : 0
-        , "hasShortcuts", this.Hotkeys.HasShortcuts ? 1 : 0, "assigning", this.Assigning)
+        , "hasShortcuts", this.Hotkeys.HasShortcuts ? 1 : 0, "assigning", this.Assigning
+        , "ducked", this.Ducker && this.Ducker.Active ? 1 : 0, "duckTesting", this.Ducker && this.Ducker.Testing ? 1 : 0
+        , "duckedApps", this.Ducker ? this.Ducker.Names() : [])
 
     SettingsPayload() {
         cfg := this.Cfg
@@ -447,7 +504,9 @@ class App {
             , "autoLanguage", Config.ResolveLanguage("auto"), "debug", cfg.Debug ? 1 : 0
             , "pauseInWispr", cfg.PauseInWisprWindow ? 1 : 0, "graceS", Round(cfg.HybridGraceMs / 1000)
             , "shortcuts", cfg.Shortcuts, "issues", issues, "configPath", cfg.Path
-            , "logPath", this.LogFile, "logExists", FileExist(this.LogFile) != "" ? 1 : 0)
+            , "logPath", this.LogFile, "logExists", FileExist(this.LogFile) != "" ? 1 : 0
+            , "duck", cfg.DuckEnabled ? 1 : 0, "duckLevel", cfg.DuckLevel, "duckSystem", cfg.DuckSystemSounds ? 1 : 0
+            , "duckDown", cfg.DuckFadeDownMs, "duckUp", cfg.DuckFadeUpMs, "duckDelay", cfg.DuckRestoreDelayMs)
     }
 
     AppsPayload() {
@@ -480,6 +539,7 @@ class App {
         switch msg["cmd"] {
             case "set": this.SetOption(get("key"), get("value"))
             case "testLed": this.TestLed()
+            case "testDuck": this.TestDuck()
             case "pause": this.TogglePause()
             case "open": AppWindow.OpenExternal(get("url"))
             case "openLog": this.OpenLog()
@@ -556,6 +616,25 @@ class App {
             case "pauseInWispr":
                 cfg.PauseInWisprWindow := value ? true : false
                 this._SaveAndApply()
+            case "duck", "duckSystem":
+                if key = "duck"
+                    cfg.DuckEnabled := value ? true : false
+                else
+                    cfg.DuckSystemSounds := value ? true : false
+                this._SaveDuck()
+            case "duckLevel", "duckDown", "duckUp", "duckDelay":
+                ; the slider moves in steps of 5 %, the times arrive in ms
+                limits := Map("duckLevel", 100, "duckDown", 2000, "duckUp", 5000, "duckDelay", 10000)
+                if !IsNumber(value) || value < 0 || value > limits[key]
+                    return
+                value := Round(value)
+                switch key {
+                    case "duckLevel": cfg.DuckLevel := value
+                    case "duckDown": cfg.DuckFadeDownMs := value
+                    case "duckUp": cfg.DuckFadeUpMs := value
+                    default: cfg.DuckRestoreDelayMs := value
+                }
+                this._SaveDuck()
             case "graceS":
                 if !Config.ParseInt(String(value), 1, 60, &seconds)
                     return
@@ -582,6 +661,14 @@ class App {
             AppWindow.Instance.SendSettings()
     }
 
+    _SaveDuck() {
+        this.Cfg.Save()
+        this.Ducker.Configure(this.Cfg)
+        this._SyncDuck()
+        if AppWindow.Instance
+            AppWindow.Instance.SendState()
+    }
+
     _SaveAndApply() {
         this.Cfg.Warnings := []
         this.Cfg.Save()
@@ -596,6 +683,10 @@ class App {
     }
 
     Shutdown(*) {
+        if this.Ducker {
+            this.Ducker.RestoreNow("exit")
+            this.Ducker.Stop()
+        }
         this.Hotkeys.Unregister()
         SetTimer(this._hybrid, 0)
         if this.Mic

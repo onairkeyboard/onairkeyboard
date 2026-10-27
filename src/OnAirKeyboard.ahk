@@ -18,6 +18,8 @@ Persistent
 #Include %A_LineFile%\..\Log.ahk
 #Include %A_LineFile%\..\Lang.ahk
 #Include %A_LineFile%\..\MicWatch.ahk
+#Include %A_LineFile%\..\AudioMixer.ahk
+#Include %A_LineFile%\..\Ducker.ahk
 #Include %A_LineFile%\..\Signal.ahk
 #Include %A_LineFile%\..\Config.ahk
 #Include %A_LineFile%\..\State.ahk
@@ -46,8 +48,9 @@ A_MaxHotkeysPerInterval := 500
 
 ; Test options: --config <path> overrides the settings file; --install-dir <folder> and
 ; --install-answer yes|no exercise the self-install of the EXE without touching the real one;
-; --mic-key <key under HKCU> reads a fake microphone registry instead of Windows' one
-configPath := Config.DefaultPath(), installDir := "", installAnswer := "", micKey := ""
+; --mic-key <key under HKCU> reads a fake microphone registry instead of Windows' one;
+; --audio-file <ini> lowers the volumes of a fake mixer instead of the real apps' ones
+configPath := Config.DefaultPath(), installDir := "", installAnswer := "", micKey := "", audioFile := ""
 for i, arg in A_Args {
     if i = A_Args.Length
         break
@@ -56,6 +59,7 @@ for i, arg in A_Args {
         case "--install-dir": installDir := A_Args[i + 1]
         case "--install-answer": installAnswer := A_Args[i + 1]
         case "--mic-key": micKey := A_Args[i + 1]
+        case "--audio-file": audioFile := A_Args[i + 1]
     }
 }
 ; --no-webview2 behaves as if the WebView2 Runtime were missing
@@ -63,5 +67,5 @@ noWebView2 := false
 for arg in A_Args
     noWebView2 := noWebView2 || arg = "--no-webview2"
 
-OnAirKeyboardApp := App(configPath, installDir, installAnswer, micKey, noWebView2)
+OnAirKeyboardApp := App(configPath, installDir, installAnswer, micKey, noWebView2, audioFile)
 OnAirKeyboardApp.Start()

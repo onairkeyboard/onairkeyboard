@@ -399,6 +399,85 @@ SetCapsLockState(false)
 if failures > failuresBefore
     Out(FileRead(bothDir "\onairkeyboard.log"))
 
+; Lowering other apps' sound (ducking) on a fake mixer (--audio-file): the test reads the
+; volumes the program sets, so the user's own apps are never touched. ChatGPT uses the
+; microphone (not ticked), so it keeps its sound; Wispr Flow (stand-in: this AutoHotkey) too.
+failuresBefore := failures
+duckDir := A_Temp "\onairkeyboard-duck"
+TestConfig(duckDir, ahkExe, "Source=Microphone`n[Microphone]`nApps=Claude`nPollMs=50"
+    . "`n[Ducking]`nEnabled=1`nLevel=20`nFadeDownMs=100`nFadeUpMs=100`nRestoreDelayMs=300")
+audioFile := duckDir "\mixer.ini"
+FileAppend("[spotify]`nExe=Spotify.exe`nVolume=0.6`n[chatgpt]`nExe=ChatGPT.exe`nPackage=OpenAI.ChatGPT-Desktop`nVolume=1"
+    . "`n[wispr]`nExe=" ahkExe "`nVolume=0.9`n[system]`nSystem=1`nVolume=1`n", audioFile, "UTF-16")
+duckArgs := ' --config "' duckDir '\config.ini"' micArg ' --audio-file "' audioFile '"'
+Vol(key) => Round(Number(IniRead(audioFile, key, "Volume", -1)), 2)
+WaitVol(key, want, timeoutMs := 2000) {
+    start := A_TickCount
+    while A_TickCount - start < timeoutMs {
+        try {
+            if Vol(key) = want
+                return true
+        }
+        Sleep(25)
+    }
+    return false
+}
+FakeMic.Reset()
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 100, 200)
+FakeMic.Set("OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0", 100, 0)
+Run(target duckArgs, , , &duckPid)
+Check("duck: starts", WaitLog("started, config", 4000, duckDir), true)
+Check("duck: nothing lowered off air", Vol("spotify"), 0.6)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 0)
+Check("duck: spotify lowered on air", WaitVol("spotify", 0.12), true)
+Check("duck: system sounds lowered", Vol("system"), 0.2)
+Check("duck: microphone app keeps its sound", Vol("chatgpt"), 1)
+Check("duck: wispr flow keeps its sound", Vol("wispr"), 0.9)
+Check("duck: lowered logged", WaitLog("lowered to 20%", 1000, duckDir), true)
+Check("duck: state file", FileExist(duckDir "\ducking.ini") != "", true)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 400)
+Sleep(150)
+Check("duck: waits after going off air", Vol("spotify"), 0.12)
+Check("duck: back after the delay", WaitVol("spotify", 0.6), true)
+Check("duck: state file removed", WaitFileGone(duckDir "\ducking.ini"), true)
+; Pause gives the sound back at once
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 0)
+WaitVol("spotify", 0.12)
+DetectHiddenWindows(true)
+PostMessage(0x8001, 1, 0, , "ahk_class AutoHotkey ahk_pid " duckPid)  ; pause
+Check("duck: pause restores at once", WaitVol("spotify", 0.6, 300), true)
+PostMessage(0x8001, 1, 0, , "ahk_class AutoHotkey ahk_pid " duckPid)  ; resume
+Check("duck: resumed lowers again", WaitVol("spotify", 0.12), true)
+; A crash leaves the sound lowered; the next start brings it back
+ProcessClose(duckPid)
+ProcessWaitClose(duckPid, 3)
+Check("duck: still lowered after the crash", Vol("spotify"), 0.12)
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 600)
+Run(target duckArgs, , , &duckPid)
+Check("duck: restored at the next start", WaitVol("spotify", 0.6, 4000), true)
+Check("duck: recovery logged", WaitLog("left lowered by the last run", 2000, duckDir), true)
+; Closing the program while on air gives the sound back
+FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 0)
+WaitVol("spotify", 0.12)
+WinClose("ahk_class AutoHotkey ahk_pid " duckPid)
+ProcessWaitClose(duckPid, 3)
+Check("duck: exit restores", Vol("spotify"), 0.6)
+Check("duck: no runtime errors", InStr(FileRead(duckDir "\onairkeyboard.log"), "ERROR"), 0)
+FakeMic.Reset()
+SetCapsLockState(false)
+if failures > failuresBefore
+    Out(FileRead(duckDir "\onairkeyboard.log"))
+
+WaitFileGone(path, timeoutMs := 1000) {
+    start := A_TickCount
+    while A_TickCount - start < timeoutMs {
+        if !FileExist(path)
+            return true
+        Sleep(25)
+    }
+    return false
+}
+
 ; Self-protection: while a Wispr Flow window is active (stand-in: a window of this AutoHotkey)
 ; shortcuts are ignored and the Lock is left alone; Hands-free keeps its state.
 failuresBefore := failures

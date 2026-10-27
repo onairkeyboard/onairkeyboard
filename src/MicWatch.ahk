@@ -126,6 +126,15 @@ class MicWatch {
     }
 
     IsSelected(id) => this.Selected.Has(id)
+
+    ; Every app using the microphone now, ticked or not (their sound is never lowered)
+    LiveAll() {
+        ids := []
+        for id, e in this.Entries
+            if e.Live
+                ids.Push(id)
+        return ids
+    }
     IsLive(id) => this.Entries.Has(id) && this.Entries[id].Live
 
     ; Display names of the ticked apps using the microphone now ("Wispr Flow, Claude")

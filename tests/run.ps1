@@ -14,6 +14,7 @@ $runs = @(
     @{ Name = 'TestCore'; Args = @() },
     @{ Name = 'TestShortcuts'; Args = @() },
     @{ Name = 'TestMic'; Args = @() },
+    @{ Name = 'TestDuck'; Args = @() },
     @{ Name = 'TestIntegration'; Args = @() }
 )
 if ($Exe) {
