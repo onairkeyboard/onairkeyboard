@@ -13,6 +13,7 @@ if ($LASTEXITCODE -ne 0) { Write-Host 'validate FAILED'; $failed++ } else { Writ
 $runs = @(
     @{ Name = 'TestCore'; Args = @() },
     @{ Name = 'TestShortcuts'; Args = @() },
+    @{ Name = 'TestMic'; Args = @() },
     @{ Name = 'TestIntegration'; Args = @() }
 )
 if ($Exe) {

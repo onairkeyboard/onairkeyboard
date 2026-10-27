@@ -5,6 +5,9 @@ class Lang {
 
     ; One declaration per language: AutoHotkey limits the length of a single declaration
     static En := Map(
+            "mic.app.recorder", "Sound Recorder",
+            "mic.app.camera", "Camera",
+            "mic.app.settings", "Windows Settings",
             "tray.settings", "Settings",
             "tray.support", "Support OnAir keyboard",
             "tray.test_led", "Test LED",
@@ -137,6 +140,9 @@ class Lang {
         )
 
     static Pl := Map(
+            "mic.app.recorder", "Dyktafon",
+            "mic.app.camera", "Kamera",
+            "mic.app.settings", "Ustawienia Windows",
             "tray.settings", "Ustawienia",
             "tray.support", "Wesprzyj OnAir keyboard",
             "tray.test_led", "Test diody",

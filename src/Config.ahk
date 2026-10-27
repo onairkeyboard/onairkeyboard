@@ -4,6 +4,7 @@ class Config {
     static Actions := ["PushToTalk", "HandsFree", "Cancel", "CommandMode"]
     static Locks := ["ScrollLock", "NumLock", "CapsLock"]
     static Languages := ["auto", "pl", "en"]
+    static Sources := ["Microphone", "Shortcuts", "Both"]
 
     static DataDir() => A_AppData "\OnAirKeyboard"
     static DefaultPath() => Config.DataDir() "\config.ini"
@@ -11,10 +12,16 @@ class Config {
     __New() {
         this.Path := ""
         this.IsFirstRun := false
+        this.Migrated := false   ; a v0.1 file got the new sections
         this.Warnings := []
         this.Shortcuts := Map()
         for action in Config.Actions
             this.Shortcuts[action] := ""
+        this.Source := "Microphone"
+        this.PauseInWisprWindow := true
+        this.MicApps := MicWatch.DefaultApps()
+        this.MicPollMs := 100
+        this.HybridGraceMs := 6000
         this.Lock := "ScrollLock"
         this.TrayIconShowsState := true
         this.Language := "auto"
@@ -24,6 +31,7 @@ class Config {
         this.SyncIntervalMs := 150
         this.ResyncDelayMs := 2000
         this.WisprHelperProcess := "Wispr Flow Helper.exe"
+        this.WisprAppProcess := "Wispr Flow.exe"
         this.HookReinstallDelaysMs := [3000, 15000]
     }
 
@@ -34,7 +42,12 @@ class Config {
         cfg.IsFirstRun := !FileExist(path)
         if cfg.IsFirstRun
             cfg.Save()
+        ; A file without [Signal] comes from v0.1: it gets the microphone source and the default
+        ; apps, its shortcuts stay for when the source changes
+        cfg.Migrated := !cfg.IsFirstRun && IniRead(path, "Signal", , "") = ""
         cfg._Read()
+        if cfg.Migrated
+            cfg.Save()
         return cfg
     }
 
@@ -106,6 +119,12 @@ class Config {
     _Read() {
         for action in Config.Actions
             this.Shortcuts[action] := this._Get("Shortcuts", action, "")
+        this.Source := this._Enum("Signal", "Source", Config.Sources, this.Source)
+        this.PauseInWisprWindow := this._Bool("Signal", "PauseInWisprWindow", this.PauseInWisprWindow)
+        ; An empty list is a valid choice: no app lights the LED
+        this.MicApps := MicWatch.ParseApps(this._Get("Microphone", "Apps", MicWatch.JoinApps(this.MicApps)))
+        this.MicPollMs := this._Int("Microphone", "PollMs", 20, 2000, this.MicPollMs)
+        this.HybridGraceMs := this._Int("Microphone", "HybridGraceMs", 500, 60000, this.HybridGraceMs)
         this.Lock := this._Enum("Indicator", "Lock", Config.Locks, this.Lock)
         this.TrayIconShowsState := this._Bool("Indicator", "TrayIconShowsState", this.TrayIconShowsState)
         this.Language := this._Enum("General", "Language", Config.Languages, this.Language)
@@ -119,6 +138,11 @@ class Config {
             this._Warn("Advanced", "WisprHelperProcess", process, this.WisprHelperProcess)
         else
             this.WisprHelperProcess := process
+        process := this._Get("Advanced", "WisprAppProcess", this.WisprAppProcess)
+        if process = ""
+            this._Warn("Advanced", "WisprAppProcess", process, this.WisprAppProcess)
+        else
+            this.WisprAppProcess := process
         raw := this._Get("Advanced", "HookReinstallDelaysMs", Config._JoinInts(this.HookReinstallDelaysMs))
         if Config.ParseIntList(raw, 0, 120000, 5, &delays)
             this.HookReinstallDelaysMs := delays
@@ -172,10 +196,24 @@ class Config {
         b(v) => v ? "1" : "0"
         return Format("
         (
-; OnAir keyboard settings. The easiest way to change them: tray icon > Settings.
+; OnAir keyboard settings. The easiest way to change them: tray icon > Open OnAir keyboard.
 ; Edits made in this file take effect after OnAir keyboard restarts.
 
+[Signal]
+; What turns the LED on: Microphone, Shortcuts or Both
+Source={15}
+; 1: ignore shortcuts while the Wispr Flow window is active (Shortcuts and Both)
+PauseInWisprWindow={16}
+
+[Microphone]
+; Apps that light the LED while they use the microphone: EXE or package names, separated by |
+Apps={17}
+PollMs={18}
+; Both: turn the LED off when Wispr Flow's microphone stays closed this long after a shortcut
+HybridGraceMs={19}
+
 [Shortcuts]
+; Used by the Shortcuts and Both sources.
 ; Format: Ctrl / Alt / Shift / Win + key, for example Ctrl+Shift+F13.
 ; Empty means the action is disabled. Use the same shortcuts as in Wispr Flow.
 PushToTalk={1}
@@ -202,11 +240,14 @@ Portable={14}
 SyncIntervalMs={10}
 ResyncDelayMs={11}
 WisprHelperProcess={12}
+WisprAppProcess={20}
 HookReinstallDelaysMs={13}
         )"
         , this.Shortcuts["PushToTalk"], this.Shortcuts["HandsFree"], this.Shortcuts["Cancel"]
         , this.Shortcuts["CommandMode"], this.Lock, b(this.TrayIconShowsState), this.Language
         , b(this.StartWithWindows), b(this.Debug), this.SyncIntervalMs, this.ResyncDelayMs
-        , this.WisprHelperProcess, Config._JoinInts(this.HookReinstallDelaysMs), b(this.Portable)) "`n"
+        , this.WisprHelperProcess, Config._JoinInts(this.HookReinstallDelaysMs), b(this.Portable)
+        , this.Source, b(this.PauseInWisprWindow), MicWatch.JoinApps(this.MicApps), this.MicPollMs
+        , this.HybridGraceMs, this.WisprAppProcess) "`n"
     }
 }

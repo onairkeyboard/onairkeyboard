@@ -61,6 +61,8 @@ class App {
         this.BugIconFile := App._UiImage(dir, "bug-ui.png")
         this.Apply()
         Log.Write(App.Name " " App.Version " started, config " this.Cfg.Path (this.Cfg.IsFirstRun ? " (created)" : ""))
+        if this.Cfg.Migrated
+            Log.Write("settings from v0.1 migrated: source Microphone, apps " MicWatch.JoinApps(this.Cfg.MicApps) ", shortcuts kept")
 
         OnMessage(0x0219, (*) => this.Led.ScheduleResync(1000))  ; WM_DEVICECHANGE
         OnMessage(0x0218, (*) => this.Led.ScheduleResync(1000))  ; WM_POWERBROADCAST

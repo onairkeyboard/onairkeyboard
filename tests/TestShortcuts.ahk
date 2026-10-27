@@ -3,6 +3,8 @@
 ; Run: AutoHotkey64.exe /ErrorStdOut tests\TestShortcuts.ahk   (exit code = number of failures)
 
 #Include %A_LineFile%\..\..\src\Log.ahk
+#Include %A_LineFile%\..\..\src\Lang.ahk
+#Include %A_LineFile%\..\..\src\MicWatch.ahk
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\Shortcut.ahk
 #Include %A_LineFile%\..\..\src\ModSession.ahk

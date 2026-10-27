@@ -3,6 +3,7 @@
 ; Run: AutoHotkey64.exe /ErrorStdOut tests\TestCore.ahk   (exit code = number of failures)
 
 #Include %A_LineFile%\..\..\src\Log.ahk
+#Include %A_LineFile%\..\..\src\MicWatch.ahk
 #Include %A_LineFile%\..\..\src\Config.ahk
 #Include %A_LineFile%\..\..\src\State.ahk
 #Include %A_LineFile%\..\..\src\Lang.ahk

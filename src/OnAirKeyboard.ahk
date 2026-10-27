@@ -17,6 +17,8 @@ Persistent
 
 #Include %A_LineFile%\..\Log.ahk
 #Include %A_LineFile%\..\Lang.ahk
+#Include %A_LineFile%\..\MicWatch.ahk
+#Include %A_LineFile%\..\Signal.ahk
 #Include %A_LineFile%\..\Config.ahk
 #Include %A_LineFile%\..\State.ahk
 #Include %A_LineFile%\..\Indicator.ahk
