@@ -73,7 +73,9 @@ number. A release publishes an existing build unchanged, so public versions may 
 - Building a window takes longer than the 15 ms after which another thread may interrupt, so
   windows are created inside `Critical` (otherwise a queued command opened a second one).
 - The window's WebView2 is created on open and closed with the window (about 126 MB only while
-  open), always with its own data folder (`%LOCALAPPDATA%\OnAirKeyboard\WebView2`). Page and
+  open), always with its own data folder (`%LOCALAPPDATA%\OnAirKeyboard\WebView2`). Close it
+  before the script exits (`App.Shutdown`): left to AutoHotkey's own clean-up it crashed
+  (0xC000041D, 0.2-0.3.4) and Windows held the EXE ~6 s, so an update couldn't replace it. Page and
   program talk in JSON (`App.OnWindowCommand`, `ui\app.js`); changes apply at once, no Save.
   Texts reach the page from `Lang` (`ui.` keys override shared ones); TestCore checks that every
   text the page uses exists in both languages. Tests drive the page with JavaScript through a

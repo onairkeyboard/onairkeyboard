@@ -161,6 +161,17 @@ LogCount(text, logDir := "") {
     return -1
 }
 
+; Asks an instance to exit and returns its exit code ("0x0": clean, "0x103": still running)
+ExitCode(p, timeoutMs := 5000) {
+    h := DllCall("OpenProcess", "UInt", 0x101000, "Int", false, "UInt", p, "Ptr")  ; SYNCHRONIZE | QUERY_LIMITED_INFORMATION
+    DetectHiddenWindows(true)
+    WinClose("ahk_class AutoHotkey ahk_pid " p)
+    DllCall("WaitForSingleObject", "Ptr", h, "UInt", timeoutMs)
+    DllCall("GetExitCodeProcess", "Ptr", h, "UInt*", &code := 0)
+    DllCall("CloseHandle", "Ptr", h)
+    return Format("0x{:X}", code)
+}
+
 WaitLog(text, timeoutMs := 4000, logDir := "") {
     file := (logDir = "" ? dir : logDir) "\onairkeyboard.log"
     start := A_TickCount
@@ -269,12 +280,22 @@ Sleep(300)
 Check("level saved", InStr(FileRead(dir "\config.ini", "UTF-16"), "Level=35`n") > 0, true)
 Eval("document.querySelector('button.test').click(); 1")
 Check("test lowering", WaitLog("ducking test"), true)
-Sleep(400)
-Check("test lowers the fake player", Round(Number(IniRead(mainMixer, "player", "Volume")), 3), 0.175)
+; the default times: down 420 ms, back 2900 ms
+WaitPlayer(want, timeoutMs) {
+    start := A_TickCount
+    while A_TickCount - start < timeoutMs {
+        try {
+            if Round(Number(IniRead(mainMixer, "player", "Volume")), 3) = want
+                return true
+        }
+        Sleep(25)
+    }
+    return false
+}
+Check("test lowers the fake player", WaitPlayer(0.175, 2000), true)
 Check("button says it is lowered", Eval("document.querySelector('button.test').disabled"), "true")
 Check("test over", WaitLog("ducking test over", 4000), true)
-Sleep(1200)
-Check("test restores the fake player", Round(Number(IniRead(mainMixer, "player", "Volume")), 3), 0.5)
+Check("test restores the fake player", WaitPlayer(0.5, 5000), true)
 
 ; Advanced view, Sound: times in ms, out-of-range values come back into range
 Eval("go('advanced', 'sound'); 1")
@@ -282,7 +303,7 @@ Sleep(400)
 WinGetClientPos(, , &wideW, &wideH, appWin)
 Check("advanced view height", Abs(wideH - 640 * A_ScreenDPI / 96) <= 2 || wideH < 640 * A_ScreenDPI / 96, true)
 Check("sound section", Eval("document.querySelectorAll('.times input').length"), "3")
-Check("fade down in ms", Eval("document.getElementById('duck-down').value"), '"250"')
+Check("fade down in ms", Eval("document.getElementById('duck-down').value"), '"420"')
 Eval("const i = document.getElementById('duck-down'); i.value = '99999'; i.dispatchEvent(new Event('change')); i.value")
 Check("fade down set", WaitLog("window set duckDown"), true)
 Sleep(300)
@@ -333,8 +354,15 @@ Send("{Alt up}{Ctrl up}")
 Sleep(250)
 Check("modifier-only hands-free off", Caps(), 0)
 
-WinClose("ahk_class AutoHotkey ahk_pid " pid)
-Check("exits cleanly", ProcessWaitClose(pid, 3), 0)
+; Exiting with the window open: 0.2-0.3.4 crashed there (0xC000041D) and Windows held the EXE
+; for ~6 s, so an update couldn't replace it
+readyBefore := LogCount("window ready")
+Command(7)
+start := A_TickCount
+while LogCount("window ready") = readyBefore && A_TickCount - start < 8000
+    Sleep(100)
+Check("window open again", LogCount("window ready"), readyBefore + 1)
+Check("exits cleanly with the window open", ExitCode(pid), "0x0")
 SetCapsLockState(false)
 if failures
     Out(FileRead(dir "\onairkeyboard.log"))

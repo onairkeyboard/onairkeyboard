@@ -25,9 +25,9 @@ class Config {
         this.DuckEnabled := false
         this.DuckLevel := 20
         this.DuckSystemSounds := true
-        this.DuckFadeDownMs := 250
-        this.DuckFadeUpMs := 750
-        this.DuckRestoreDelayMs := 1000
+        this.DuckFadeDownMs := 420
+        this.DuckFadeUpMs := 2900
+        this.DuckRestoreDelayMs := 2137
         this.Lock := "ScrollLock"
         this.TrayIconShowsState := true
         this.Language := "auto"

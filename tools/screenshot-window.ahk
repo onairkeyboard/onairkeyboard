@@ -165,7 +165,7 @@ for theme in ["light", "dark"] {
     Shot(theme "-main-show-all", "S.showAll = true; refresh('apps')")
     Eval("S.showAll = false; 1")
     FakeMic.Set("C:#Users#me#AppData#Local#WisprFlow#app-1.6.1264#Wispr Flow.exe", 900, 950, true)
-    Sleep(2500)  ; the sound comes back after the delay
+    Sleep(5500)  ; the sound comes back after the delay and the fade (2137 + 2900 ms)
     Shot(theme "-main-quiet")
     PostMessage(0x8001, 1, 0, , "ahk_class AutoHotkey ahk_pid " Pid)  ; pause
     Sleep(500)

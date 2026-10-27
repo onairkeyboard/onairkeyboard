@@ -33,9 +33,9 @@ class Ducker {
         this.Enabled := false
         this.Level := 20
         this.SystemSounds := true
-        this.FadeDownMs := 250
-        this.FadeUpMs := 750
-        this.RestoreDelayMs := 1000
+        this.FadeDownMs := 420
+        this.FadeUpMs := 2900
+        this.RestoreDelayMs := 2137
         this.Managed := Map()    ; Key -> {Key, Ident, Name, Original, Target, Last, From}
         this.Pending := Map()    ; Ident -> {Ident, Original, Target}: apps that are gone
         this.Phase := "idle"

@@ -60,7 +60,7 @@ class Installer {
         Installer._CloseRunning(target)
         try DirCreate(installDir)
         copied := false
-        loop 10 {  ; the closed copy may hold its file for a moment
+        loop 17 {  ; the closed copy may hold its file for a moment (up to 5 s)
             try {
                 FileCopy(A_ScriptFullPath, target, true)
                 copied := true
@@ -77,7 +77,9 @@ class Installer {
         return true
     }
 
-    ; A running installed copy holds its file: ask it to exit (it turns its LED off), then wait
+    ; A running installed copy holds its file: ask it to close its window (0.2-0.3.4 crashed when
+    ; they exited with the window open, and Windows then held the file for ~6 s), then to exit (it
+    ; turns its LED off); end it if it doesn't go
     static _CloseRunning(target) {
         prev := DetectHiddenWindows(true)
         for hwnd in WinGetList("ahk_class AutoHotkey ahk_exe " Installer.ExeName) {
@@ -87,9 +89,18 @@ class Installer {
             if !Installer._SamePath(path, target)
                 continue
             pid := WinGetPID(hwnd)
+            DetectHiddenWindows(false)
+            open := WinExist("ahk_class AutoHotkeyGUI ahk_pid " pid)
+            DetectHiddenWindows(true)
+            if open {
+                PostMessage(0x8001, 8, 0, hwnd)  ; App.WM_COMMAND, App.CMD_CLOSE_WINDOW
+                WinWaitClose(open, , 3)
+            }
             WinClose(hwnd)
-            if ProcessWaitClose(pid, 3)
+            if ProcessWaitClose(pid, 10) {
                 ProcessClose(pid)
+                ProcessWaitClose(pid, 5)
+            }
         }
         DetectHiddenWindows(prev)
     }

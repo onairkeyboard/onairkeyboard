@@ -689,6 +689,10 @@ class App {
             this.Ducker.RestoreNow("exit")
             this.Ducker.Stop()
         }
+        ; WebView2 is closed here, not in AutoHotkey's own clean-up: exiting with the window open
+        ; crashed (0xC000041D) and Windows held the EXE for seconds, so an update couldn't replace it
+        if AppWindow.Instance
+            try AppWindow.Instance.Close()
         this.Hotkeys.Unregister()
         SetTimer(this._hybrid, 0)
         if this.Mic

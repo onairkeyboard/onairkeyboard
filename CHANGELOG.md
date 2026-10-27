@@ -12,9 +12,9 @@ Music and videos go quiet while you dictate.
 ### Added
 - **Lowering other sounds while on air** (off by default; *Lower other sounds to:* in the main
   view). Other apps go down to the level you choose, 0–50% of their own volume in steps of 1%
-  (20% by default), on every output device, and come back with a fade a second after you go off
-  air. The fades follow the ear: going down the sound drops quickly at first and gently at the
-  end. The
+  (20% by default), on every output device, and come back with a slow fade about two seconds
+  after you go off air. The fades follow the ear: going down the sound drops quickly at first and
+  gently at the end. The
   app using the microphone (a voice chat) and Wispr Flow keep their sound; a volume you change
   meanwhile is left as is. Pause, sleep and closing OnAir keyboard bring the sound back at once,
   and after a crash the next start does, also for an app that was closed while lowered.
