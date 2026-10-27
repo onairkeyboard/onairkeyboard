@@ -118,7 +118,12 @@ a.ver:hover { color: var(--text); text-decoration: none; }
 .app .name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .badge { font-size: 11px; font-weight: 700; color: #FFFFFF; background: var(--rec); padding: 1px 7px; border-radius: 10px; flex: none; }
 .more { align-self: flex-start; font-size: 13px; }
-.apps.scroll { max-height: 136px; overflow-y: auto; padding-right: 6px; }  /* 3 rows: the window keeps its height */
+/* 4 rows, then the list scrolls; its scrollbar (always reserved) sits right of the grid, so the
+   tiles stay on the header's columns */
+.apps.scroll { max-height: 184px; overflow-y: auto; scrollbar-gutter: stable; margin-right: -14px; padding-right: 6px; }
+.apps.scroll::-webkit-scrollbar { width: 8px; }
+.apps.scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.apps.scroll::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px;
   padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }

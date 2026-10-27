@@ -45,6 +45,7 @@ Check("default lock", cfg.Lock, "ScrollLock")
 Check("default shortcut empty", cfg.Shortcuts["PushToTalk"], "")
 Check("default sync", cfg.SyncIntervalMs, 150)
 Check("default delays", cfg.HookReinstallDelaysMs.Length, 2)
+Check("default starts with Windows", cfg.StartWithWindows, true)
 Check("no warnings", cfg.Warnings.Length, 0)
 Check("second load not first run", Config.Load(path).IsFirstRun, false)
 
@@ -85,7 +86,7 @@ duckCfg.DuckEnabled := true, duckCfg.DuckLevel := 35, duckCfg.DuckSystemSounds :
 duckCfg.Save()
 duckCfg2 := Config.Load(duckPath)
 Check("duck round trip", duckCfg2.DuckEnabled " " duckCfg2.DuckLevel " " duckCfg2.DuckSystemSounds " " duckCfg2.DuckRestoreDelayMs, "1 35 0 2500")
-IniWrite("150", duckPath, "Ducking", "Level")
+IniWrite("60", duckPath, "Ducking", "Level")  ; 0-50
 IniWrite("9000", duckPath, "Ducking", "FadeUpMs")
 duckCfg3 := Config.Load(duckPath)
 Check("duck level out of range", duckCfg3.DuckLevel, 20)
@@ -96,6 +97,7 @@ FileAppend("[Signal]`nSource=Microphone`n[Indicator]`nLock=NumLock`n", oldPath, 
 oldCfg := Config.Load(oldPath)
 Check("v0.2 file: ducking off", oldCfg.DuckEnabled, false)
 Check("v0.2 file: no warnings", oldCfg.Warnings.Length, 0)
+Check("v0.2 file: starts with Windows", oldCfg.StartWithWindows, true)
 oldCfg.Save()
 Check("v0.2 file gets [Ducking]", InStr(FileRead(oldPath, "UTF-16"), "[Ducking]") > 0, true)
 

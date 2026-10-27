@@ -132,7 +132,7 @@ class Config {
         this.MicPollMs := this._Int("Microphone", "PollMs", 20, 2000, this.MicPollMs)
         this.HybridGraceMs := this._Int("Microphone", "HybridGraceMs", 500, 60000, this.HybridGraceMs)
         this.DuckEnabled := this._Bool("Ducking", "Enabled", this.DuckEnabled)
-        this.DuckLevel := this._Int("Ducking", "Level", 0, 100, this.DuckLevel)
+        this.DuckLevel := this._Int("Ducking", "Level", 0, 50, this.DuckLevel)
         this.DuckSystemSounds := this._Bool("Ducking", "SystemSounds", this.DuckSystemSounds)
         this.DuckFadeDownMs := this._Int("Ducking", "FadeDownMs", 0, 2000, this.DuckFadeDownMs)
         this.DuckFadeUpMs := this._Int("Ducking", "FadeUpMs", 0, 5000, this.DuckFadeUpMs)
@@ -227,7 +227,7 @@ HybridGraceMs={19}
 [Ducking]
 ; 1: lower other apps' sound while on air (not the app using the microphone, not Wispr Flow)
 Enabled={21}
-; Level the other apps go down to, in percent of their own volume (0-100)
+; Level the other apps go down to, in percent of their own volume (0-50)
 Level={22}
 ; 1: also lower Windows' system sounds (notifications)
 SystemSounds={23}

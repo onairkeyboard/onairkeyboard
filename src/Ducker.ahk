@@ -21,6 +21,7 @@ class Ducker {
     static PendingMs := 2000     ; looking for apps closed while lowered
     static TestMs := 3000        ; "Test": lowered this long
     static Tolerance := 0.01     ; volume difference that counts as a change
+    static SilenceLevel := 0.001 ; -60 dB: where a fade from or to silence starts or ends
 
     ; mixer: AudioMixer or FileMixer; excluded(): ids (EXE or package names, as MicWatch names
     ; apps) not to lower; onChange(): the lowered set or the phase changed (the window shows it)
@@ -173,11 +174,13 @@ class Ducker {
 
     static TargetOf(original, level) => Round(original * level / 100, 4)
 
-    ; Linear fade from -> to, progress in ms of durationMs
+    ; Fade from -> to, progress in ms of durationMs, in even steps to the ear (decibels): going
+    ; down the volume drops fast at first and gently at the end. Silence counts as SilenceLevel.
     static FadeLevel(from, to, elapsed, durationMs) {
-        if durationMs <= 0 || elapsed >= durationMs
+        if durationMs <= 0 || elapsed >= durationMs || from = to
             return to
-        return Round(from + (to - from) * Max(0, elapsed) / durationMs, 4)
+        a := Max(from, Ducker.SilenceLevel), b := Max(to, Ducker.SilenceLevel)
+        return Round(a * (b / a) ** (Max(0, elapsed) / durationMs), 4)
     }
 
     ; Whether a session must keep its sound. excluded: Map of ids (case-insensitive).

@@ -625,8 +625,8 @@ class App {
                     cfg.DuckSystemSounds := value ? true : false
                 this._SaveDuck()
             case "duckLevel", "duckDown", "duckUp", "duckDelay":
-                ; the slider moves in steps of 5 %, the times arrive in ms
-                limits := Map("duckLevel", 100, "duckDown", 2000, "duckUp", 5000, "duckDelay", 10000)
+                ; the slider moves in steps of 1 % up to 50 %, the times arrive in ms
+                limits := Map("duckLevel", 50, "duckDown", 2000, "duckUp", 5000, "duckDelay", 10000)
                 if !IsNumber(value) || value < 0 || value > limits[key]
                     return
                 value := Round(value)

@@ -295,7 +295,7 @@ function appsSection() {
 function levelSlider(id) {
   const s = S.settings;
   const value = h('span.pct' + (s.duck ? '' : '.off'), { 'aria-hidden': 'true' }, s.duckLevel + '%');
-  const input = h('input', { type: 'range', id, min: 0, max: 100, step: 5, value: String(s.duckLevel), disabled: !s.duck,
+  const input = h('input', { type: 'range', id, min: 0, max: 50, step: 1, value: String(s.duckLevel), disabled: !s.duck,
     'aria-labelledby': 'duck-label', 'aria-valuetext': t('sound.level_value', s.duckLevel), 'data-focus': id,
     on: {
       input: (e) => { value.textContent = e.target.value + '%'; e.target.setAttribute('aria-valuetext', t('sound.level_value', e.target.value)); },
@@ -309,7 +309,7 @@ function duckButton() {
   const s = S.settings, st = S.state;
   const label = st.duckTesting ? t('btn.duck_testing') : st.ducked ? t('btn.duck_now') : t('btn.test_duck');
   return h('button.test', { 'data-region': 'ducktest', 'data-focus': 'duck-test',
-    disabled: !s.duck || st.ducked || st.duckTesting || s.duckLevel >= 100, on: { click: () => send('testDuck') } }, label);
+    disabled: !s.duck || st.ducked || st.duckTesting, on: { click: () => send('testDuck') } }, label);
 }
 
 function duckCheckbox() {
@@ -472,17 +472,11 @@ function secDiag() {
   ];
 }
 
-// Seconds in the window ("0,25" in Polish), milliseconds in the settings
-function seconds(ms) {
-  const text = String(Math.round(ms / 10) / 100);
-  return S.lang === 'pl' ? text.replace('.', ',') : text;
-}
-
-// Back to the nearest allowed value (steps of 0.05 s); text that isn't a number keeps the old one
-function parseSeconds(text, maxMs, oldMs) {
+// Whole milliseconds, back to the nearest allowed value; text that isn't a number keeps the old one
+function parseMs(text, maxMs, oldMs) {
   const v = parseFloat(String(text).replace(',', '.'));
   if (isNaN(v)) return oldMs;
-  return Math.min(maxMs, Math.max(0, Math.round(v * 20) * 50));
+  return Math.min(maxMs, Math.max(0, Math.round(v)));
 }
 
 function timeField(key, id, label, tipText, maxMs) {
@@ -490,15 +484,14 @@ function timeField(key, id, label, tipText, maxMs) {
   return h('div.stack',
     h('div.line', h('label.small.strong', { for: id }, label), tip(tipText, t('tip.more', label), 'tip:' + id)),
     h('div.line',
-      h('input.sec', { id, type: 'text', inputmode: 'decimal', value: seconds(s[key]), disabled: !s.duck, 'data-focus': id,
-        on: { change: (e) => { const ms = parseSeconds(e.target.value, maxMs, s[key]); e.target.value = seconds(ms); set(key, ms); } } }),
-      h('span.muted', t('sound.unit'), ' ', h('span.small', t('sound.range', maxMs / 1000)))));
+      h('input.sec', { id, type: 'text', inputmode: 'numeric', value: String(s[key]), disabled: !s.duck, 'data-focus': id,
+        on: { change: (e) => { const ms = parseMs(e.target.value, maxMs, s[key]); e.target.value = String(ms); set(key, ms); } } }),
+      h('span.muted', t('sound.unit'), ' ', h('span.small', t('sound.range', maxMs)))));
 }
 
 function duckExample() {
   const level = S.settings.duckLevel;
   if (level <= 0) return t('sound.example_0');
-  if (level >= 100) return t('sound.example_100');
   return t('sound.example', Math.round(60 * level / 100));
 }
 
