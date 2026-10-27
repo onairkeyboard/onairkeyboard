@@ -231,6 +231,7 @@ class App {
     ; are ignored and the Lock is left alone. Hands-free keeps its state, so a quick look at the
     ; window doesn't turn the LED off; holds end, because their key-up would be missed.
     OnGuardChange(active) {
+        Log.Write(active ? "Wispr Flow window active: shortcuts on hold" : "Wispr Flow window left: shortcuts back")
         this.Hotkeys.Ignored := active
         if active {
             this.State.HoldUp("PushToTalk")

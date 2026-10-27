@@ -15,7 +15,8 @@ Install it and it works: the LED follows the microphone, no shortcuts to set up.
   default, messengers and browsers aren't. The LED turns on when the app really listens (about
   0.5 s after the start) and off 0.1–0.25 s after the end. While a shortcut is held (Wispr
   Flow's Push to talk) the LED waits for the keys to be released, because pressing the Lock
-  then would end the recording; the tray icon turns red at once.
+  then would end the recording (and stays off when the recording ends with the release); the tray
+  icon turns red at once.
 - **Signal sources in the advanced settings:** Microphone, Keyboard shortcuts (as in 0.1) and Both
   (a shortcut turns the LED on at once; when Wispr Flow's microphone stays closed for 6 s, it
   goes off).

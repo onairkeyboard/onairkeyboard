@@ -10,6 +10,7 @@ class Indicator {
     static Setters := Map("ScrollLock", SetScrollLockState, "NumLock", SetNumLockState, "CapsLock", SetCapsLockState)
     ; Every Wispr Flow shortcut holds one of these (CapsLock alone for Push to talk / Hands-free)
     static ShortcutKeys := ["LCtrl", "RCtrl", "LShift", "RShift", "LAlt", "RAlt", "LWin", "RWin", "CapsLock"]
+    static ReleaseHoldMs := 400
 
     static KeysHeld() {
         for key in Indicator.ShortcutKeys
@@ -27,6 +28,7 @@ class Indicator {
         this.Held := false  ; leave the Lock as it is (the Wispr Flow window is active)
         this.WaitFn := ""   ; returns true while the Lock must not be pressed yet
         this.Waiting := false
+        this.ReleasedAt := -Indicator.ReleaseHoldMs
         this._sync := ObjBindMethod(this, "Sync")
         this._resync := ObjBindMethod(this, "Resync")
     }
@@ -67,9 +69,15 @@ class Indicator {
         if this.Testing || this.Held
             return
         want := this.Wanted
-        if this.IsOn = want
+        if this.IsOn = want {
+            this.Waiting := false
             return
+        }
         if this.MustWait()
+            return
+        ; Push to talk closes the microphone 0.1-0.25 s after the keys are released: don't
+        ; light the LED for that moment
+        if want && A_TickCount - this.ReleasedAt < Indicator.ReleaseHoldMs
             return
         this.Set(want)
         Log.Write(this.LockName " -> " want)
@@ -80,6 +88,8 @@ class Indicator {
         wait := this.WaitFn && this.WaitFn.Call()
         if wait && !this.Waiting
             Log.Write(this.LockName " waits for the keys to be released")
+        else if !wait && this.Waiting
+            this.ReleasedAt := A_TickCount
         this.Waiting := wait
         return wait
     }

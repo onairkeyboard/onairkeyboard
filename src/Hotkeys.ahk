@@ -79,9 +79,13 @@ class HotkeyEngine {
     }
 
     OnKeyDown(key, *) {
-        if this.Paused || this.Ignored || this.KeysDown.Has(key)
+        if this.KeysDown.Has(key)  ; auto-repeat
             return
         this.KeysDown[key] := true
+        if this.Paused || this.Ignored {
+            Log.Write(key " ignored (" (this.Ignored ? "Wispr Flow window active" : "shortcuts paused") ")")
+            return
+        }
         mods := Shortcut.CurrentMods()
         for entry in this.MainKeys[key] {
             if entry.Mods = mods {
