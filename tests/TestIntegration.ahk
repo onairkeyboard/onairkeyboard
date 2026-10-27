@@ -88,6 +88,16 @@ Check("wrong modifiers ignored", Caps(), 0)
 Send("{F20 up}{Ctrl up}")
 Sleep(150)
 
+; A macro pad's tap: the modifiers are released right after the key. They count as they were
+; at the press. (Here the program handles the press in time anyway; live, a busy thread got to
+; it after the release and the tap was lost.)
+Loop 3 {
+    Send("{Ctrl down}{Shift down}{F21 down}{Shift up}{Ctrl up}{F21 up}")
+    Sleep(250)
+    Check("instant tap " A_Index " toggles", Caps(), Mod(A_Index, 2))
+}
+Tap("F22")
+
 ; Auto-repeat while holding the hands-free shortcut must toggle only once
 Send("{Ctrl down}{Shift down}{F21 down}")
 Loop 5 {
@@ -323,7 +333,14 @@ Check("mic: lights after release", WaitCaps(1), true)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 500, 600)
 Check("mic: and goes off", WaitCaps(0), true)
 ; The microphone closes right after the keys are released: no blink of the LED
-lightsBefore := StrSplit(FileRead(micDir "\onairkeyboard.log"), "CapsLock -> 1").Length
+LightCount() {
+    loop 20 {  ; the app may be writing the log right now
+        try return StrSplit(FileRead(micDir "\onairkeyboard.log"), "CapsLock -> 1").Length
+        Sleep(50)
+    }
+    return -1
+}
+lightsBefore := LightCount()
 Send("{Blind}{RShift down}")
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 0)
 Sleep(400)
@@ -331,7 +348,7 @@ Send("{Blind}{RShift up}")
 Sleep(100)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 700, 800)
 Sleep(800)
-Check("mic: no blink after release", StrSplit(FileRead(micDir "\onairkeyboard.log"), "CapsLock -> 1").Length, lightsBefore)
+Check("mic: no blink after release", LightCount(), lightsBefore)
 Check("mic: off after the quick release", Caps(), 0)
 FakeMic.Set("Discord_abcdefghijklm", 500, 0)
 Sleep(400)

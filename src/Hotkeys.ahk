@@ -1,6 +1,8 @@
 ; Listens for the Wispr shortcuts and feeds the recording state.
-; Every hotkey uses ~ (the key still reaches Wispr) and * (fires regardless of modifiers;
-; the exact modifiers are checked in code, so the release order of a macro pad doesn't matter).
+; Every hotkey uses ~ (the key still reaches Wispr). A key press is a hotkey with the exact
+; modifiers ("~^+F14"): the hook checks them at the moment of the press. Reading them later in
+; the handler missed taps, because a macro pad releases them ~50 ms after the key, before a busy
+; thread got to the handler. Key releases use * (the release order of a macro pad doesn't matter).
 class HotkeyEngine {
     static HoldActions := Map("PushToTalk", true, "CommandMode", true)
 
@@ -27,10 +29,10 @@ class HotkeyEngine {
             }
             if !this.MainKeys.Has(sc.Key) {
                 this.MainKeys[sc.Key] := []
-                this._Hotkey("~*" sc.Key, ObjBindMethod(this, "OnKeyDown", sc.Key))
                 this._Hotkey("~*" sc.Key " up", ObjBindMethod(this, "OnKeyUp", sc.Key))
             }
             this.MainKeys[sc.Key].Push({Action: action, Mods: sc.Mods})
+            this._Hotkey("~" Shortcut.HotkeyPrefix(sc.Mods) sc.Key, ObjBindMethod(this, "OnKeyDown", sc.Key, action))
         }
         if modEntries.Length {
             this.Session := ModSession(modEntries)
@@ -78,22 +80,16 @@ class HotkeyEngine {
         this.Registered.Push(name)
     }
 
-    OnKeyDown(key, *) {
+    OnKeyDown(key, action, *) {
         if this.KeysDown.Has(key)  ; auto-repeat
             return
         this.KeysDown[key] := true
         if this.Paused || this.Ignored {
-            Log.Write(key " ignored (" (this.Ignored ? "Wispr Flow window active" : "shortcuts paused") ")")
+            Log.Write(action " ignored (" (this.Ignored ? "Wispr Flow window active" : "shortcuts paused") ")")
             return
         }
-        mods := Shortcut.CurrentMods()
-        for entry in this.MainKeys[key] {
-            if entry.Mods = mods {
-                this.ActiveByKey[key] := entry.Action
-                this._Dispatch(entry.Action, "down")
-                return
-            }
-        }
+        this.ActiveByKey[key] := action
+        this._Dispatch(action, "down")
     }
 
     OnKeyUp(key, *) {

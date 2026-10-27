@@ -68,6 +68,10 @@ class Shortcut {
 
     static DisplayKey(key) => StrLen(key) = 1 ? StrUpper(key) : key
 
+    ; Hotkey prefix for exactly these modifiers: Ctrl|Shift -> "^+"
+    static HotkeyPrefix(mods) => (mods & Shortcut.CTRL ? "^" : "") (mods & Shortcut.ALT ? "!" : "")
+        . (mods & Shortcut.SHIFT ? "+" : "") (mods & Shortcut.WIN ? "#" : "")
+
     static CountBits(n) {
         count := 0
         while n {
