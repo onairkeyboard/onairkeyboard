@@ -11,7 +11,7 @@ const S = {
 const ACTIONS = ['PushToTalk', 'HandsFree', 'Cancel', 'CommandMode'];
 const TYPES = { PushToTalk: 'hold', CommandMode: 'hold', HandsFree: 'toggle', Cancel: 'reset' };
 const LOCKS = ['ScrollLock', 'NumLock', 'CapsLock'];
-const SECTIONS = ['source', 'shortcuts', 'indicator', 'general', 'diag', 'about', 'obs'];
+const SECTIONS = ['source', 'shortcuts', 'indicator', 'sound', 'general', 'diag', 'about', 'obs'];
 const VISIBLE_APPS = 9;
 
 // --- Helpers ---
@@ -58,7 +58,8 @@ function icon(name, size) {
   const paths = {
     mic: ['rect:9,3,6,11,3', 'M5 11a7 7 0 0 0 14 0', 'M12 18v3'],
     pause: ['M9 5v14', 'M15 5v14'],
-    info: ['circle:12,12,9', 'M12 8v5', 'M12 16h.01'],
+    info: ['circle:12,12,10', 'M12 16v-4', 'M12 8h.01'],
+    warn: ['M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', 'M12 9v4', 'M12 17h.01'],
     check: ['M20 6L9 17l-5-5'],
     arrow: ['M5 12h14', 'M13 6l6 6-6 6'],
     close: ['M6 6l12 12', 'M18 6L6 18']
@@ -103,16 +104,83 @@ function logos() {
     h('img.logo.dark', { src: 'logo-dark.svg', alt: 'OnAir keyboard' })];
 }
 
-function checkbox(text, value, onchange, hint) {
-  return h('label.check' + (hint ? '.top' : ''),
-    h('input', { type: 'checkbox', checked: !!value, on: { change: (e) => onchange(e.target.checked) } }),
-    hint ? h('span.stack', h('span', text), h('span.small.muted', hint)) : h('span', text));
+// hint: an explanation behind an "i" next to the label
+function checkbox(text, value, onchange, hint, attrs) {
+  const box = h('label.check',
+    h('input', Object.assign({ type: 'checkbox', checked: !!value, on: { change: (e) => onchange(e.target.checked) } }, attrs || {})),
+    h('span', text));
+  return hint ? h('div.line', box, tip(hint, t('tip.more', text))) : box;
 }
 
 function note(text, kind) {
   return h('div.note' + (kind === 'ok' ? '.ok' : ''), { role: kind === 'ok' ? null : 'note' },
-    icon(kind === 'ok' ? 'check' : 'info', 20), h('span', text));
+    icon(kind === 'ok' ? 'check' : 'warn', 20), h('span', text));
 }
+
+// --- Explanations: an "i" whose bubble shows on hover, on keyboard focus or pinned by a click
+// (touch); Esc and a click elsewhere close it. Placed above the icon, below when there is no
+// room, and kept 16 px inside the window. ---
+
+let tipSeq = 0;
+
+function tip(text, label, focusKey) {
+  const id = 'tip' + (++tipSeq);
+  const wrap = h('span.tip',
+    h('button', { type: 'button', 'aria-label': label, 'aria-describedby': id, 'aria-expanded': 'false',
+      'data-focus': focusKey || null, on: { click: (e) => { e.preventDefault(); e.stopPropagation(); pinTip(wrap); } } },
+      icon('info', 18)),
+    h('span.bubble', { id, role: 'tooltip' }, text));
+  wrap.addEventListener('mouseenter', () => placeTip(wrap));
+  wrap.addEventListener('focusin', () => placeTip(wrap));
+  wrap.addEventListener('mouseleave', () => wrap.classList.remove('hush'));
+  wrap.addEventListener('focusout', () => { wrap.classList.remove('hush'); closeTip(wrap); });
+  return wrap;
+}
+
+function pinTip(wrap) {
+  const open = !wrap.classList.contains('open');
+  document.querySelectorAll('.tip.open').forEach(closeTip);
+  if (!open) return;
+  wrap.classList.remove('hush');
+  wrap.classList.add('open');
+  wrap.firstChild.setAttribute('aria-expanded', 'true');
+  placeTip(wrap);
+}
+
+function closeTip(wrap) {
+  wrap.classList.remove('open');
+  wrap.firstChild.setAttribute('aria-expanded', 'false');
+}
+
+function placeTip(wrap) {
+  const b = wrap.querySelector('.bubble');
+  wrap.classList.remove('below');
+  b.style.transform = '';
+  b.style.removeProperty('--ax');
+  requestAnimationFrame(() => {
+    let r = b.getBoundingClientRect();
+    if (!r.width) return;
+    if (r.top < 8) {
+      wrap.classList.add('below');
+      r = b.getBoundingClientRect();
+    }
+    let dx = 0;
+    if (r.right > window.innerWidth - 16) dx = window.innerWidth - 16 - r.right;
+    if (r.left + dx < 16) dx = 16 - r.left;
+    if (dx) {
+      b.style.transform = 'translateX(' + Math.round(dx) + 'px)';
+      b.style.setProperty('--ax', Math.round(24 - dx) + 'px');
+    }
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const shown = document.querySelectorAll('.tip.open, .tip:hover, .tip:focus-within');
+  shown.forEach((w) => { closeTip(w); w.classList.add('hush'); });
+  if (shown.length) e.stopPropagation();
+});
+document.addEventListener('click', () => document.querySelectorAll('.tip.open').forEach(closeTip));
 
 // Keeps the keyboard focus on the same control across a re-render
 function keepFocus(fn) {
@@ -149,12 +217,19 @@ function render() {
   });
 }
 
-// Re-renders one region if it's on screen, otherwise nothing
+// Re-renders one region if it's on screen, otherwise nothing (a scrolled list keeps its place)
 function refresh(region) {
   const el = document.querySelector('[data-region="' + region + '"]');
   if (!el) return;
-  const builders = { card: statusCard, apps: appsSection, shortcuts: shortcutRows };
-  keepFocus(() => el.replaceWith(builders[region]()));
+  const builders = { card: statusCard, apps: appsSection, shortcuts: shortcutRows, ducktest: duckButton, ducknow: duckNow };
+  const scrolled = el.querySelector('.scroll');
+  const top = scrolled ? scrolled.scrollTop : 0;
+  keepFocus(() => {
+    const fresh = builders[region]();
+    el.replaceWith(fresh);
+    const list = fresh.querySelector('.scroll');
+    if (list) list.scrollTop = top;
+  });
 }
 
 function statusCard() {
@@ -177,12 +252,13 @@ function statusCard() {
   }
   return h('div.card' + cls, { 'data-region': 'card', role: 'status', 'aria-live': 'polite' },
     h('div.icon', icon(iconName, 26)),
-    h('div.body', h('div.title', title), h('div.sub', sub)),
+    h('div.body', h('div.title', title), h('div.sub', { title: sub }, sub)),
     button);
 }
 
 function lockSelect(focusKey) {
-  return h('select', { id: 'lock', 'data-focus': focusKey, on: { change: (e) => set('lock', e.target.value) } },
+  return h('select', { id: 'lock', 'data-focus': focusKey, 'aria-describedby': S.settings.lock === 'CapsLock' ? 'caps-warning' : null,
+    on: { change: (e) => set('lock', e.target.value) } },
     LOCKS.map((l) => h('option', { value: l, selected: S.settings.lock === l }, t('lock.' + l))));
 }
 
@@ -196,7 +272,7 @@ function appsSection() {
   const apps = S.apps;
   const shown = S.showAll ? apps : apps.slice(0, VISIBLE_APPS);
   const box = apps.length
-    ? h('div.apps', shown.map((a) =>
+    ? h('div.apps' + (S.showAll ? '.scroll' : ''), shown.map((a) =>
         h('label.app', { title: a.name },
           h('input', { type: 'checkbox', checked: !!a.checked, 'data-focus': 'app:' + a.id,
             on: { change: (e) => set('app', { id: a.id, checked: e.target.checked ? 1 : 0 }) } }),
@@ -204,27 +280,69 @@ function appsSection() {
           a.live ? h('span.badge', t('main.now')) : null)))
     : h('p.muted', t('main.no_history'));
   return h('div.section', { 'data-region': 'apps' },
-    h('h2', t('main.apps_title')),
-    box,
-    apps.length > VISIBLE_APPS
-      ? link(S.showAll ? t('main.show_less') : t('main.show_all', apps.length), () => { S.showAll = !S.showAll; refresh('apps'); }, 'more')
-      : null,
-    h('p.small.muted', t('main.apps_hint')));
+    h('div.line',
+      h('h2', t('main.apps_title')),
+      tip(t('main.apps_hint'), t('tip.apps'), 'tip:apps'),
+      apps.length > VISIBLE_APPS
+        ? link(S.showAll ? t('main.show_less') : t('main.show_all', apps.length), () => { S.showAll = !S.showAll; refresh('apps'); }, 'more')
+        : null),
+    box);
+}
+
+// --- Lowering other sounds (main view and the Sound section) ---
+
+// The slider and its value; the value follows the slider at once, the setting is sent on release
+function levelSlider(id) {
+  const s = S.settings;
+  const value = h('span.pct' + (s.duck ? '' : '.off'), { 'aria-hidden': 'true' }, s.duckLevel + '%');
+  const input = h('input', { type: 'range', id, min: 0, max: 100, step: 5, value: String(s.duckLevel), disabled: !s.duck,
+    'aria-labelledby': 'duck-label', 'aria-valuetext': t('sound.level_value', s.duckLevel), 'data-focus': id,
+    on: {
+      input: (e) => { value.textContent = e.target.value + '%'; e.target.setAttribute('aria-valuetext', t('sound.level_value', e.target.value)); },
+      change: (e) => set('duckLevel', parseInt(e.target.value, 10))
+    } });
+  return { input, value };
+}
+
+// "Test lowering"; while lowered on air it says so ("Lowered now") and can't be pressed
+function duckButton() {
+  const s = S.settings, st = S.state;
+  const label = st.duckTesting ? t('btn.duck_testing') : st.ducked ? t('btn.duck_now') : t('btn.test_duck');
+  return h('button.test', { 'data-region': 'ducktest', 'data-focus': 'duck-test',
+    disabled: !s.duck || st.ducked || st.duckTesting || s.duckLevel >= 100, on: { click: () => send('testDuck') } }, label);
+}
+
+function duckCheckbox() {
+  const s = S.settings;
+  return h('label.check',
+    h('input', { type: 'checkbox', checked: !!s.duck, 'data-focus': 'duck', on: { change: (e) => set('duck', e.target.checked ? 1 : 0) } }),
+    h('span.label#duck-label', t('main.sound')));
+}
+
+function soundBlock() {
+  const slider = levelSlider('duck-level');
+  return h('div.block',
+    h('div.line', duckCheckbox(), tip(t('main.sound_tip'), t('tip.sound'), 'tip:sound')),
+    h('div.ctl.indent', slider.input, slider.value, duckButton()));
+}
+
+function ledBlock() {
+  return h('div.block',
+    h('div.line', h('label.label', { for: 'lock' }, t('main.led')), tip(t('main.led_tip'), t('tip.led'), 'tip:led')),
+    h('div.ctl', lockSelect('lock-main'),
+      h('button.test', { 'data-focus': 'test-main', on: { click: () => send('testLed') } }, t('btn.test_led'))),
+    S.settings.lock === 'CapsLock' ? h('p.msg.warning#caps-warning', t('indicator.caps_warning')) : null);
 }
 
 function viewMain() {
-  const s = S.settings;
-  return h('div.page',
-    logos(),
-    statusCard(),
-    h('div.row',
-      h('label.label.grow', { for: 'lock' }, t('main.led')),
-      lockSelect('lock-main'),
-      h('button', { 'data-focus': 'test-main', on: { click: () => send('testLed') } }, t('btn.test_led'))),
-    s.lock === 'CapsLock' ? h('p.msg.warning', t('indicator.caps_warning')) : null,
+  return h('div.page.main',
+    h('div.header',
+      h('div.brand', logos(),
+        h('a.ver', { href: '#', title: t('section.about'), on: { click: (e) => { e.preventDefault(); go('advanced', 'about'); } } },
+          S.version ? 'v' + S.version : '')),
+      statusCard()),
     appsSection(),
-    checkbox(t('general.autostart'), s.autostart, (v) => set('autostart', v ? 1 : 0),
-      s.autostartManaged ? null : t('general.autostart_dev')),
+    h('div.two', soundBlock(), ledBlock()),
     h('footer',
       h('div.links',
         link(t('nav.howto'), () => go('howto')),
@@ -245,8 +363,8 @@ function viewAdvanced() {
       }, h('span', t('section.' + id)), soon ? h('span.soon', t('section.soon')) : null);
     }),
     link('← ' + t('nav.simple'), () => go('main'), 'back'));
-  const builders = { source: secSource, shortcuts: secShortcuts, indicator: secIndicator, general: secGeneral,
-    diag: secDiag, about: secAbout };
+  const builders = { source: secSource, shortcuts: secShortcuts, indicator: secIndicator, sound: secSound,
+    general: secGeneral, diag: secDiag, about: secAbout };
   return h('div.split', nav, h('main.pane', (builders[sec] || secSource)()));
 }
 
@@ -283,7 +401,9 @@ function shortcutRows() {
     const text = (s.shortcuts || {})[a] || '';
     const issue = S.assignMsg[a] || issues[a];
     return h('div.key',
-      h('div.top', h('b', t('action.' + a)), h('span.muted', t('type.' + TYPES[a]))),
+      h('div.top',
+        h('span.line', h('b', t('action.' + a)), a === 'Cancel' ? tip(t('keys.escape_hint'), t('tip.more', t('action.Cancel')), 'tip:escape') : null),
+        h('span.muted', t('type.' + TYPES[a]))),
       h('div.line',
         h('span.combo' + (waiting ? '.wait' : text ? '.mono' : '.none'), { 'aria-live': 'polite' },
           waiting ? t('assign.prompt') : text || t('shortcut.none')),
@@ -304,7 +424,6 @@ function secShortcuts() {
       ? h('p.muted', t('keys.unused'), ' ', link(t('keys.change_source'), () => { S.section = 'source'; render(); }))
       : null,
     shortcutRows(),
-    h('p.small.muted', t('keys.escape_hint')),
     checkbox(t('keys.pause_in_wispr'), s.pauseInWispr, (v) => set('pauseInWispr', v ? 1 : 0), t('keys.pause_in_wispr_hint'))
   ];
 }
@@ -319,8 +438,8 @@ function secIndicator() {
           on: { change: () => set('lock', l) } }),
         h('span', t('lock.' + l + (l === 'ScrollLock' ? '_rec' : '')))))),
     s.lock === 'CapsLock' ? h('p.msg.warning', t('indicator.caps_warning')) : null,
-    h('div.buttons', h('button', { 'data-focus': 'test-adv', on: { click: () => send('testLed') } }, t('btn.test_led'))),
-    h('p.small.muted', t('indicator.keyboard_hint')),
+    h('div.buttons', h('button', { 'data-focus': 'test-adv', on: { click: () => send('testLed') } }, t('btn.test_led')),
+      tip(t('indicator.keyboard_hint'), t('tip.led'), 'tip:keyboard')),
     checkbox(t('indicator.tray_state'), s.trayState, (v) => set('trayState', v ? 1 : 0))
   ];
 }
@@ -348,8 +467,70 @@ function secDiag() {
     h('div.buttons',
       h('button', { on: { click: () => send('showLog') } }, t('diag.show_log')),
       h('button', { on: { click: () => send('openConfig') } }, t('diag.open_config')),
-      h('button.primary', { on: { click: () => send('bug') } }, t('nav.bug'))),
-    h('p.small.muted', t('diag.ini_hint'))
+      h('button.primary', { on: { click: () => send('bug') } }, t('nav.bug')),
+      tip(t('diag.ini_hint'), t('tip.more', t('diag.open_config')), 'tip:ini'))
+  ];
+}
+
+// Seconds in the window ("0,25" in Polish), milliseconds in the settings
+function seconds(ms) {
+  const text = String(Math.round(ms / 10) / 100);
+  return S.lang === 'pl' ? text.replace('.', ',') : text;
+}
+
+// Back to the nearest allowed value (steps of 0.05 s); text that isn't a number keeps the old one
+function parseSeconds(text, maxMs, oldMs) {
+  const v = parseFloat(String(text).replace(',', '.'));
+  if (isNaN(v)) return oldMs;
+  return Math.min(maxMs, Math.max(0, Math.round(v * 20) * 50));
+}
+
+function timeField(key, id, label, tipText, maxMs) {
+  const s = S.settings;
+  return h('div.stack',
+    h('div.line', h('label.small.strong', { for: id }, label), tip(tipText, t('tip.more', label), 'tip:' + id)),
+    h('div.line',
+      h('input.sec', { id, type: 'text', inputmode: 'decimal', value: seconds(s[key]), disabled: !s.duck, 'data-focus': id,
+        on: { change: (e) => { const ms = parseSeconds(e.target.value, maxMs, s[key]); e.target.value = seconds(ms); set(key, ms); } } }),
+      h('span.muted', t('sound.unit'), ' ', h('span.small', t('sound.range', maxMs / 1000)))));
+}
+
+function duckExample() {
+  const level = S.settings.duckLevel;
+  if (level <= 0) return t('sound.example_0');
+  if (level >= 100) return t('sound.example_100');
+  return t('sound.example', Math.round(60 * level / 100));
+}
+
+// The lowered apps, or why nothing is
+function duckNow() {
+  const s = S.settings, st = S.state, names = st.duckedApps || [];
+  return h('div.now', { 'data-region': 'ducknow', 'aria-live': 'polite' },
+    !s.duck ? h('span.strong', t('sound.off'))
+      : st.ducked && names.length ? [h('span.strong', t('sound.now')), names.map((n) => h('span.tag', n))]
+        : h('span.strong', t('sound.none')));
+}
+
+function secSound() {
+  const s = S.settings;
+  const dim = s.duck ? '' : '.dim';
+  const slider = levelSlider('duck-level-adv');
+  return [
+    head(t('sound.title'), t('sound.text')),
+    h('div.line', duckCheckbox(), tip(t('sound.tip', duckExample()), t('tip.sound'), 'tip:duck')),
+    h('div.box' + dim,
+      h('div.ctl',
+        h('div.scale', slider.input, h('div.ends.small.muted', h('span', t('sound.scale_min')), h('span', t('sound.scale_max')))),
+        slider.value,
+        duckButton())),
+    h('div.times' + dim,
+      timeField('duckDown', 'duck-down', t('sound.down'), t('sound.down_tip'), 2000),
+      timeField('duckUp', 'duck-up', t('sound.up'), t('sound.up_tip'), 5000),
+      timeField('duckDelay', 'duck-delay', t('sound.delay'), t('sound.delay_tip'), 10000)),
+    h('div' + dim, checkbox(t('sound.system'), s.duckSystem, (v) => set('duckSystem', v ? 1 : 0), t('sound.system_tip'),
+      { disabled: !s.duck, 'data-focus': 'duck-system' })),
+    duckNow(),
+    note(t('sound.wispr_note'))
   ];
 }
 
@@ -382,7 +563,7 @@ function viewHowto() {
       h('div.what', s.what),
       h('div.detail', s.detail)));
   });
-  return h('div.page',
+  return h('div.page.howto',
     h('div.head', h('h1', t('howto.title')), h('p.muted', t('howto.text'))),
     h('div.steps', row),
     h('p.bighint', t('howto.speak')),
@@ -443,6 +624,8 @@ if (host) {
         if (S.state.assigning && S.state.assigning !== before) delete S.assignMsg[S.state.assigning];
         refresh('card');
         refresh('shortcuts');
+        refresh('ducktest');
+        refresh('ducknow');
         break;
       }
       case 'apps': S.apps = m.apps; refresh('apps'); break;

@@ -14,8 +14,9 @@ class AppWindow {
     static Host := "app.onairkeyboard.local"
     static RuntimeUrl := "https://go.microsoft.com/fwlink/p/?LinkId=2124703"  ; WebView2 Runtime installer
     static Views := ["main", "advanced", "howto", "bug", "support", "about"]
-    ; Client sizes (DPI-scaled): the simple view is narrow, the advanced one has a sidebar
-    static Sizes := Map("main", [660, 640], "wide", [960, 720])
+    ; Client sizes (DPI-scaled): the simple view is narrow, the advanced one has a sidebar. 640 is
+    ; the height a 1080p laptop at 150% has room for; a smaller screen gets a shorter window.
+    static Sizes := Map("main", [760, 640], "wide", [960, 640])
     static ForcedScheme := 0   ; 0 follows Windows, 1 light, 2 dark (screenshots)
 
     ; view: "" opens the main view (or keeps the current one when the window is open)
@@ -84,7 +85,9 @@ class AppWindow {
         AppWindow._SetIcon(win.Hwnd)
         this.ApplyTheme()
         size := this._Size(this.View)
-        win.Show(Format("w{} h{}", size[1], size[2]))
+        win.Show(Format("w{} h{} Hide", size[1], size[2]))
+        this._Resize(true)  ; fits it on the screen
+        win.Show()
         Log.Write("window opened (" this.View ")")
     }
 
@@ -259,16 +262,29 @@ class AppWindow {
 
     _Size(view) => AppWindow.Sizes[this.HasOwnProp("Layout") ? this.Layout : (view = "main" ? "main" : "wide")]
 
-    ; Keeps the window centred on where it was
-    _Resize() {
+    ; Keeps the window centred on where it was, never taller than the screen's work area (the
+    ; page scrolls then) and never past its top
+    _Resize(force := false) {
         size := this._Size(this.View)
         scale := A_ScreenDPI / 96
         this.Win.GetPos(&x, &y, &w, &h)
         this.Win.GetClientPos(, , &cw, &ch)
-        nw := Round(size[1] * scale) + (w - cw), nh := Round(size[2] * scale) + (h - ch)
-        if nw = w && nh = h
+        AppWindow._WorkArea(this.Win.Hwnd, &left, &top, &right, &bottom)
+        nw := Round(size[1] * scale) + (w - cw), nh := Min(Round(size[2] * scale) + (h - ch), bottom - top)
+        if nw = w && nh = h && !force
             return
-        this.Win.Move(x + (w - nw) // 2, y + (h - nh) // 2, nw, nh)
+        nx := Max(left, Min(x + (w - nw) // 2, right - nw)), ny := Max(top, Min(y + (h - nh) // 2, bottom - nh))
+        this.Win.Move(nx, ny, nw, nh)
+    }
+
+    ; The work area (without the taskbar) of the monitor the window is on
+    static _WorkArea(hwnd, &left, &top, &right, &bottom) {
+        mon := DllCall("MonitorFromWindow", "Ptr", hwnd, "UInt", 2, "Ptr")  ; MONITOR_DEFAULTTONEAREST
+        info := Buffer(40, 0)
+        NumPut("UInt", 40, info)
+        DllCall("GetMonitorInfoW", "Ptr", mon, "Ptr", info)
+        left := NumGet(info, 20, "Int"), top := NumGet(info, 24, "Int")
+        right := NumGet(info, 28, "Int"), bottom := NumGet(info, 32, "Int")
     }
 
     ; Light or "Grafit": title bar (DWM), the window behind the page, and the page's colour scheme

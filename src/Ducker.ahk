@@ -13,6 +13,8 @@
 ; app that is started later (Windows remembers the lowered volume of a closed app).
 ;
 ; Every method takes the time (A_TickCount) as an argument, so tests can drive it step by step.
+; The public methods run as Critical (_Atomic): a fade step interrupted halfway (between setting
+; a volume and remembering it) would look like a volume the user changed.
 class Ducker {
     static TickMs := 30          ; fade steps
     static RefreshMs := 500      ; looking for new sessions while held
@@ -48,7 +50,9 @@ class Ducker {
     }
 
     ; cfg: Config (Duck* settings). Turning it off restores at once; a new level applies at once.
-    Configure(cfg, now := A_TickCount) {
+    Configure(cfg, now := A_TickCount) => this._Atomic(() => this._Configure(cfg, now))
+
+    _Configure(cfg, now) {
         levelChanged := cfg.DuckLevel != this.Level || cfg.DuckSystemSounds != this.SystemSounds
         this.Level := cfg.DuckLevel
         this.SystemSounds := cfg.DuckSystemSounds
@@ -59,7 +63,7 @@ class Ducker {
             this.Enabled := cfg.DuckEnabled
             Log.Write("ducking " (this.Enabled ? "on, level " this.Level "%" : "off"))
             if !this.Enabled
-                this.RestoreNow("turned off")
+                this._RestoreNow("turned off", now)
         } else if levelChanged && this.Managed.Count {
             for key, m in this.Managed
                 m.Target := Ducker.TargetOf(m.Original, this.Level)
@@ -70,17 +74,21 @@ class Ducker {
     }
 
     ; immediate: restore without the delay and the fade (pause)
-    SetOnAir(onAir, immediate := false, now := A_TickCount) {
+    SetOnAir(onAir, immediate := false, now := A_TickCount) => this._Atomic(() => this._SetOnAir(onAir, immediate, now))
+
+    _SetOnAir(onAir, immediate, now) {
         this.Wanted := onAir ? true : false
         if !onAir && immediate && this.TestUntil = 0 {
-            this.RestoreNow("paused")
+            this._RestoreNow("paused", now)
             return
         }
         this._Update(now)
     }
 
     ; The window's "Test" button: lowered for TestMs, then back without the delay
-    Test(now := A_TickCount) {
+    Test(now := A_TickCount) => this._Atomic(() => this._Test(now))
+
+    _Test(now) {
         if !this.Enabled || this.Wanted || this.TestUntil
             return false
         Log.Write("ducking test")
@@ -104,13 +112,17 @@ class Ducker {
     }
 
     ; The microphone changed: an app that now uses it gets its sound back, a new one may go down
-    Refresh(now := A_TickCount) {
+    Refresh(now := A_TickCount) => this._Atomic(() => this._RefreshNow(now))
+
+    _RefreshNow(now) {
         if this.Active
             this._Refresh(now, true)
     }
 
     ; Back to the original volumes at once (pause, turned off, sleep, exit)
-    RestoreNow(reason, now := A_TickCount) {
+    RestoreNow(reason, now := A_TickCount) => this._Atomic(() => this._RestoreNow(reason, now))
+
+    _RestoreNow(reason, now) {
         this.TestUntil := 0
         if this.Managed.Count {
             restored := 0
@@ -133,7 +145,9 @@ class Ducker {
     }
 
     ; At start: volumes a crash left lowered (StatePath) come back
-    Recover(now := A_TickCount) {
+    Recover(now := A_TickCount) => this._Atomic(() => this._Recover(now))
+
+    _Recover(now) {
         if this.StatePath = "" || !FileExist(this.StatePath)
             return
         for section in StrSplit(IniRead(this.StatePath), "`n") {
@@ -211,7 +225,20 @@ class Ducker {
 
     _OnTimer() => this.Tick(A_TickCount)
 
-    Tick(now := A_TickCount) {
+    ; Runs fn as Critical and gives the caller back its own state (a start-up thread left
+    ; Critical would delay every timer until it ends)
+    _Atomic(fn) {
+        was := A_IsCritical
+        Critical
+        try
+            return fn()
+        finally
+            Critical(was ? was : "Off")
+    }
+
+    Tick(now := A_TickCount) => this._Atomic(() => this._Tick(now))
+
+    _Tick(now) {
         if this.TestUntil && now >= this.TestUntil {
             this.TestUntil := 0
             this._EndedTest := true
@@ -233,7 +260,7 @@ class Ducker {
                     for key, m in this.Managed
                         m.From := m.Last
                     this._Enter("up", now)
-                    this.Tick(now)
+                    this._Tick(now)
                     return
                 }
             case "up":

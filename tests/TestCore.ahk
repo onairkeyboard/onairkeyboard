@@ -209,7 +209,7 @@ while pos := RegExMatch(pageJs, "\bt\('([\w.]+)'[,)]", &m, pos) {  ; t('key') an
 ; Keys the page builds from a prefix
 for prefix, suffixes in Map("action.", ["PushToTalk", "HandsFree", "Cancel", "CommandMode"], "type.", ["hold", "toggle", "reset"]
         , "lock.", ["ScrollLock", "NumLock", "CapsLock", "ScrollLock_rec"], "lang.name.", ["pl", "en"]
-        , "section.", ["source", "shortcuts", "indicator", "general", "diag", "about", "obs"]
+        , "section.", ["source", "shortcuts", "indicator", "sound", "general", "diag", "about", "obs"]
         , "source.", ["Microphone", "Shortcuts", "Both", "Microphone_text", "Shortcuts_text", "Both_text"]
         , "bug.copied_", ["address", "subject", "text"])
     for name in suffixes

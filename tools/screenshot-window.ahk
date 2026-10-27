@@ -1,7 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Saves PNG screenshots of the OnAir keyboard window: every view, in the light and the dark
-; ("Grafit") theme, from a temporary instance with a fake microphone history (Caps Lock as the
-; indicator, so a running setup isn't disturbed). Nothing is left on screen.
+; ("Grafit") theme, from a temporary instance with a fake microphone history and a fake mixer
+; (Caps Lock as the indicator, the user's apps keep their sound, so a running setup isn't
+; disturbed). Nothing is left on screen.
 ;   AutoHotkey64.exe /ErrorStdOut tools\screenshot-window.ahk [pl|en] [output folder]
 #SingleInstance Off
 #NoTrayIcon
@@ -38,7 +39,12 @@ Lock=CapsLock
 [General]
 Language={1}
 Debug=1
+[Ducking]
+Enabled=1
 )", Language), Dir "\config.ini", "UTF-16")
+; What plays meanwhile: lowered while Wispr Flow is on air
+Mixer := Dir "\mixer.ini"
+FileAppend("[spotify]`nExe=Spotify.exe`nVolume=0.6`n[chrome]`nExe=chrome.exe`nVolume=0.8`n[system]`nSystem=1`nVolume=1`n", Mixer, "UTF-16")
 
 ; A typical microphone history; Wispr Flow is on air
 FakeMic.Reset()
@@ -49,9 +55,14 @@ FakeMic.Set("C:#Program Files#Microsoft#Teams#ms-teams.exe", 860, 865, true)
 FakeMic.Set("C:#Users#me#AppData#Local#Discord#app-1.0#Discord.exe", 850, 855, true)
 FakeMic.Set("C:#Program Files#Google#Chrome#Application#chrome.exe", 840, 845, true)
 FakeMic.Set("C:#Program Files#Zoom#bin#Zoom.exe", 830, 835, true)
+FakeMic.Set("C:#Program Files#Microsoft#Edge#msedge.exe", 820, 825, true)
+FakeMic.Set("C:#Program Files#obs-studio#bin#64bit#obs64.exe", 810, 815, true)
+FakeMic.Set("C:#Users#me#AppData#Local#slack#app-4.41#slack.exe", 800, 805, true)
+FakeMic.Set("C:#Program Files#Mozilla Firefox#firefox.exe", 790, 795, true)
+FakeMic.Set("Microsoft.WindowsSoundRecorder_8wekyb3d8bbwe", 780, 785)
 
 Pid := 0
-Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk" --config "' Dir '\config.ini" --mic-key "' FakeMic.Key '"', , , &Pid)
+Run('"' A_AhkPath '" "' A_LineFile '\..\..\src\OnAirKeyboard.ahk" --config "' Dir '\config.ini" --mic-key "' FakeMic.Key '" --audio-file "' Mixer '"', , , &Pid)
 WaitLog("started")
 Win := "OnAir keyboard ahk_class AutoHotkeyGUI ahk_pid " Pid
 
@@ -92,9 +103,9 @@ Show(view, section := "") {
 
 ; The instance drives Caps Lock (like the tests), the pictures show the recommended Scroll Lock;
 ; and they show the installed program, which manages autostart
-Shot(name) {
-    Eval("S.settings.lock = 'ScrollLock'; S.settings.autostartManaged = 1; render(); 1")
-    Sleep(150)
+Shot(name, after := "") {
+    Eval("S.settings.lock = 'ScrollLock'; S.settings.autostartManaged = 1; render(); " (after != "" ? after "; " : "") "1")
+    Sleep(after != "" ? 400 : 150)
     hwnd := WinExist(Win)
     WinGetPos(, , &w, &h, hwnd)
     file := OutDir "\window-" Language "-" name ".png"
@@ -148,11 +159,19 @@ for theme in ["light", "dark"] {
     WinMove(20, 20, , , Win)
     Sleep(800)
     Shot(theme "-main-on-air")
+    Shot(theme "-main-tooltip", "document.querySelectorAll('.tip button')[2].click()")
+    Shot(theme "-main-show-all", "S.showAll = true; refresh('apps')")
+    Eval("S.showAll = false; 1")
     FakeMic.Set("C:#Users#me#AppData#Local#WisprFlow#app-1.6.1264#Wispr Flow.exe", 900, 950, true)
-    Sleep(800)
+    Sleep(2500)  ; the sound comes back after the delay
     Shot(theme "-main-quiet")
+    PostMessage(0x8001, 1, 0, , "ahk_class AutoHotkey ahk_pid " Pid)  ; pause
+    Sleep(500)
+    Shot(theme "-main-paused")
+    PostMessage(0x8001, 1, 0, , "ahk_class AutoHotkey ahk_pid " Pid)  ; resume
     FakeMic.Set("C:#Users#me#AppData#Local#WisprFlow#app-1.6.1264#Wispr Flow.exe", 960, 0, true)
-    for section in ["source", "shortcuts", "indicator", "general", "diag", "about"] {
+    Sleep(800)
+    for section in ["source", "shortcuts", "indicator", "sound", "general", "diag", "about"] {
         Show("advanced", section)
         Shot(theme "-advanced-" section)
     }
