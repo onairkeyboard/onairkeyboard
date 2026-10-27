@@ -61,6 +61,8 @@ Sleep(1500)
 
 SendLevel(1)
 Caps() => GetKeyState("CapsLock", "T")
+; The LED changes only once the program has seen the keys released, which a busy moment can
+; delay (a slow tray icon update took 0.5 s once): checks for a change after a tap use WaitCaps
 Tap(key) {
     Send("{Ctrl down}{Shift down}{" key " down}")
     Sleep(60)
@@ -81,13 +83,13 @@ Sleep(250)
 Check("ptt released off", Caps(), 0)
 
 Tap("F21")
-Check("hands-free on", Caps(), 1)
+Check("hands-free on", WaitCaps(1), true)
 Tap("F21")
-Check("hands-free off", Caps(), 0)
+Check("hands-free off", WaitCaps(0), true)
 
 Tap("F21")
 Tap("F22")
-Check("cancel off", Caps(), 0)
+Check("cancel off", WaitCaps(0), true)
 
 Send("{Ctrl down}{F20 down}")
 Sleep(250)
@@ -113,9 +115,9 @@ Loop 5 {
 }
 Send("{F21 up}{Shift up}{Ctrl up}")
 Sleep(250)
-Check("auto-repeat toggles once", Caps(), 1)
+Check("auto-repeat toggles once", WaitCaps(1), true)
 Tap("F22")
-Check("cleanup off", Caps(), 0)
+Check("cleanup off", WaitCaps(0), true)
 
 ; Commands normally triggered from the tray menu (App.WM_COMMAND = 0x8001)
 DetectHiddenWindows(true)
@@ -131,7 +133,7 @@ Command(1)  ; resume
 Sleep(250)
 Check("resume stays off", Caps(), 0)
 Tap("F21")
-Check("works after resume", Caps(), 1)
+Check("works after resume", WaitCaps(1), true)
 Tap("F22")
 
 Command(2)  ; test LED: 3 blinks, 300 ms on / 300 ms off
@@ -348,7 +350,7 @@ Check("no wispr ignores keys", Caps(), 0)
 Run('ping.exe -n 60 127.0.0.1', , "Hide", &pingPid)
 Check("helper start detected", WaitLog("Wispr helper running", 6000, wDir), true)
 Tap("F21")
-Check("keys work once wispr runs", Caps(), 1)
+Check("keys work once wispr runs", WaitCaps(1), true)
 ProcessClose(pingPid)
 Check("helper exit logged", WaitLog("Wispr helper exited", 6000, wDir), true)
 Sleep(250)
@@ -484,7 +486,7 @@ Check("duck: starts", WaitLog("started, config", 4000, duckDir), true)
 Check("duck: nothing lowered off air", Vol("spotify"), 0.6)
 FakeMic.Set("Claude_pzs8sxrjxfjjc", 300, 0)
 Check("duck: spotify lowered on air", WaitVol("spotify", 0.12), true)
-Check("duck: system sounds lowered", Vol("system"), 0.2)
+Check("duck: system sounds lowered", WaitVol("system", 0.2, 500), true)  ; set right after Spotify, in the same step
 Check("duck: microphone app keeps its sound", Vol("chatgpt"), 1)
 Check("duck: wispr flow keeps its sound", Vol("wispr"), 0.9)
 Check("duck: lowered logged", WaitLog("lowered to 20%", 1000, duckDir), true)
@@ -560,7 +562,7 @@ Check("guard: shortcut ignored", Caps(), 0)
 fakeWispr.Hide()
 Check("guard: window inactive", WaitLog("Wispr Flow window inactive", 3000, guardDir), true)
 Tap("F21")
-Check("guard: shortcuts work again", Caps(), 1)
+Check("guard: shortcuts work again", WaitCaps(1), true)
 ; Windows may refuse to bring a window back to the front at once: retry until the guard sees it
 GuardActivations() {
     text := ""
@@ -583,7 +585,7 @@ fakeWispr.Destroy()
 Sleep(600)
 Check("guard: still on after the window", Caps(), 1)
 Tap("F21")
-Check("guard: off by shortcut", Caps(), 0)
+Check("guard: off by shortcut", WaitCaps(0), true)
 WinClose("ahk_class AutoHotkey ahk_pid " guardPid)
 ProcessWaitClose(guardPid, 3)
 SetCapsLockState(false)
