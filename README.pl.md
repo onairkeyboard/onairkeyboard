@@ -44,6 +44,9 @@ Instalujesz i działa, bez ustawiania skrótów.
 - **Dioda klawiatury jako lampka „na antenie”.** Działa z każdą klawiaturą, której diody umieją
   pokazywać stan Locka (np. SayoDevice): domyślnie Scroll Lock, do wyboru Num Lock albo Caps Lock.
 - **Czerwona ikona w zasobniku**, więc OnAir keyboard pomaga także bez diody.
+- **Muzyka i filmy cichną, gdy dyktujesz** (do włączenia w oknie): inne aplikacje zostaną
+  wyciszone do wybranego poziomu i wrócą do swojej głośności po zakończeniu; aplikacja, z którą
+  rozmawiasz, gra normalnie.
 - **Dla zaawansowanych: skróty Wispr Flow** (dioda zapala się w chwili puszczenia klawisza)
   albo hybryda: skrót zapala, mikrofon poprawia.
 - **Motyw jasny i ciemny** za ustawieniem Windows, po polsku i po angielsku, jeden mały plik EXE,
@@ -133,7 +136,9 @@ prowadzi do reszty:
   używasz w Wispr Flow. Najpierw ustaw skróty w Wispr Flow: OnAir keyboard zapala diodę,
   naciskając za Ciebie Scroll Lock, a to dodatkowe naciśnięcie psułoby kombinację nagrywaną
   w Wispr Flow. Dlatego program sam się wstrzymuje, gdy okno Wispr Flow jest aktywne.
-- **Wskaźnik, Ogólne, Diagnostyka, O programie.**
+- **Dźwięk:** wyciszanie innych dźwięków na antenie: poziom, test, jak szybko dźwięk cichnie
+  i wraca, dźwięki systemowe Windows oraz aplikacje wyciszone w tej chwili.
+- **Wskaźnik, Ogólne** (uruchamianie z Windows, język)**, Diagnostyka, O programie.**
 
 ## Warto wiedzieć
 
@@ -143,6 +148,10 @@ prowadzi do reszty:
   słucha. **Przy Push to talk dioda nie świeci**, dopóki trzymasz klawisz: wciśnięcie Locka
   w środku skrótu Wispr Flow opóźniłoby albo przerwało nagrywanie. Stan pokazuje czerwona ikona
   w zasobniku.
+- **Wyciszanie zmienia głośność poszczególnych aplikacji** (suwaki w mikserze głośności Windows),
+  nie głośność główną. Jeśli OnAir keyboard zostanie zamknięty albo się zawiesi w trakcie
+  wyciszenia, dźwięk wróci od razu albo przy następnym starcie. Wispr Flow też potrafi wyciszać
+  muzykę (w swoich ustawieniach): włącz to tylko w jednym z dwóch programów.
 - **Trzymaj ikonę w zasobniku na widoku.** Windows chowa nowe ikony pod strzałką **^** obok
   zegara. Przeciągnij stamtąd ikonę OnAir keyboard na pasek zadań.
 - **Lock naprawdę się przełącza.** Gdy wskaźnikiem jest Scroll Lock, strzałki w Excelu przewijają
@@ -171,7 +180,8 @@ i zatrzymasz pracę AI. Przypisz Cancel do osobnego klawisza na klawiaturze makr
 ## Prywatność
 
 OnAir keyboard czyta z rejestru Windows tylko znaczniki czasu użycia mikrofonu i nazwy aplikacji
-(ten sam wpis, z którego Windows rysuje ikonkę mikrofonu). Nie dotyka dźwięku, nie czyta tekstu,
+(ten sam wpis, z którego Windows rysuje ikonkę mikrofonu). Nie nagrywa ani nie słucha dźwięku
+(przy włączonym wyciszaniu przesuwa tylko suwaki głośności innych aplikacji), nie czyta tekstu,
 nie zbiera danych i nie łączy się z internetem, poza otwieraniem linków w przeglądarce, gdy je
 klikniesz. Okno programu pokazuje wyłącznie pliki zapisane na Twoim komputerze. Przy źródle
 „Skróty” program tylko nasłuchuje skrótów Wispr Flow i niczego nie blokuje.
@@ -186,8 +196,8 @@ a niektóre antywirusy mylnie je oznaczają. Pełny kod źródłowy jest w tym r
 ## Ustawienia i odinstalowanie
 
 Ustawienia są w `%APPDATA%\OnAirKeyboard\config.ini` (ścieżkę pokazuje *O programie*), a pliki okna
-w `%LOCALAPPDATA%\OnAirKeyboard`. Żeby usunąć OnAir keyboard: odznacz *Uruchamiaj z Windows*,
-zamknij program z menu w zasobniku, a potem usuń:
+w `%LOCALAPPDATA%\OnAirKeyboard`. Żeby usunąć OnAir keyboard: odznacz *Uruchamiaj z Windows*
+(Ustawienia zaawansowane → Ogólne), zamknij program z menu w zasobniku, a potem usuń:
 
 - folder programu `%LOCALAPPDATA%\Programs\OnAirKeyboard` (albo sam pobrany plik EXE, jeśli nie był
   instalowany),

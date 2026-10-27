@@ -84,3 +84,10 @@ number. A release publishes an existing build unchanged, so public versions may 
 - The self-install runs only in the EXE on the default settings file. Tests use
   `--install-dir <folder>` and `--install-answer yes|no` (see `tests\TestIntegration.ahk`), so
   the real installation, Start menu and Startup folder are never touched.
+- Ducking (lowering other apps' sound) sets real per-app volumes. Tests and screenshots use a fake
+  mixer (`--audio-file <ini>`, `FileMixer`) and must give one to every instance that turns ducking
+  on, so the author's music is never touched; `toolsudio-probe.ahk` lists the real sessions
+  read-only.
+- `Ducker` entry points run Critical through `_Atomic`, which restores the caller's state: a fade
+  step cut in half by another thread looks like a volume the user changed, and a start-up thread
+  left Critical delays every timer (it moved the LED resync into a test's measurement).

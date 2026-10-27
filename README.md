@@ -43,6 +43,8 @@ no shortcuts to set up.
 - **Your keyboard LED as an "on air" light.** Works with any keyboard whose LEDs can show a Lock
   state (SayoDevice, for example): Scroll Lock by default, Num Lock or Caps Lock to choose.
 - **A red tray icon**, so OnAir keyboard helps even without an LED.
+- **Music and videos go quiet while you dictate** (turn it on in the window): other apps are
+  lowered to the level you choose and come back afterwards; the app you talk to keeps its sound.
 - **For the advanced: Wispr Flow shortcuts** (the LED turns on as you release the key) or a
   hybrid: a shortcut turns it on, the microphone corrects it.
 - **Light and dark theme** following Windows, Polish and English, one small EXE that installs itself
@@ -132,7 +134,9 @@ rest:
   use in Wispr Flow. Set the shortcuts in Wispr Flow first: OnAir keyboard lights the LED by
   pressing Scroll Lock for you, and that extra key press would spoil a combination being recorded
   in Wispr Flow. That's why OnAir keyboard pauses itself while a Wispr Flow window is active.
-- **Indicator, General, Diagnostics, About.**
+- **Sound:** lowering other sounds while on air: the level, a test, how fast the sound goes down
+  and comes back, Windows' system sounds, and the apps lowered right now.
+- **Indicator, General** (start with Windows, language)**, Diagnostics, About.**
 
 ## Good to know
 
@@ -141,6 +145,10 @@ rest:
 - **The LED turns on about half a second after recording starts**, which is when the app really
   listens. **With Push to talk the LED stays off** while you hold the key: a Lock press in the
   middle of a Wispr Flow shortcut would delay or end the recording. The red tray icon shows it.
+- **Lowering changes each app's own volume** (the sliders in the Windows volume mixer), not the
+  main volume. If OnAir keyboard is closed or crashes while the sound is lowered, it comes back at
+  once or with the next start. Wispr Flow can lower music too (in its settings): turn it on in one
+  of the two programs only.
 - **Keep the tray icon in sight.** Windows hides new tray icons under the **^** arrow next to the
   clock. Drag the OnAir keyboard icon from there onto the taskbar.
 - **The Lock really toggles.** With Scroll Lock as the indicator, the arrow keys scroll the sheet in
@@ -169,7 +177,8 @@ too. Put Cancel on a dedicated key of your macro pad.
 ## Privacy
 
 OnAir keyboard reads only the microphone usage timestamps and app names from the Windows registry
-(the same entry Windows draws its microphone icon from). It never touches audio, reads no text,
+(the same entry Windows draws its microphone icon from). It never records or listens to audio
+(with lowering on, it only moves other apps' volume sliders), reads no text,
 collects no data and doesn't connect to the internet, except for opening links in your browser
 when you click them. The window shows only files stored on your computer. With the Shortcuts
 source, OnAir keyboard only listens to the Wispr Flow shortcuts and blocks nothing.
@@ -184,8 +193,8 @@ programs flag them by mistake. The full source code is in this repository, and y
 ## Settings and uninstalling
 
 Settings live in `%APPDATA%\OnAirKeyboard\config.ini` (*About* shows the path), the window's files
-in `%LOCALAPPDATA%\OnAirKeyboard`. To remove OnAir keyboard: untick *Start with Windows*, exit it from
-the tray menu, then delete:
+in `%LOCALAPPDATA%\OnAirKeyboard`. To remove OnAir keyboard: untick *Start with Windows* (Advanced
+settings → General), exit it from the tray menu, then delete:
 
 - the program folder `%LOCALAPPDATA%\Programs\OnAirKeyboard` (or just the downloaded EXE, if it
   wasn't installed),

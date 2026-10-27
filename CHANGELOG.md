@@ -5,6 +5,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: the middle number changes with new features; the last one counts builds, so a release
 may skip numbers (0.2.0, then 0.3.4).
 
+## [Unreleased]
+
+Music and videos go quiet while you dictate.
+
+### Added
+- **Lowering other sounds while on air** (off by default; *Lower other sounds to:* in the main
+  view). Other apps go down to the level you choose, in percent of their own volume (20% by
+  default), on every output device, and come back with a fade a second after you go off air. The
+  app using the microphone (a voice chat) and Wispr Flow keep their sound; a volume you change
+  meanwhile is left as is. Pause, sleep and closing OnAir keyboard bring the sound back at once,
+  and after a crash the next start does, also for an app that was closed while lowered.
+- **Sound** section in the advanced settings: level, *Test lowering*, fade and delay times,
+  system sounds (lowered by default) and the apps lowered right now.
+- **Explanations behind an "i"** next to the settings: the bubble opens on hover, with the
+  keyboard or with a click, and Esc closes it. The help texts under the settings moved there.
+
+### Changed
+- **A larger, calmer main window** (760×640): the logo with the version and the status card side by
+  side, then the apps, lowering and the keyboard LED. *Start with Windows* moved to Advanced
+  settings → General.
+- The advanced settings are 640 px tall, like the main view (720 px didn't fit a 1080p laptop at
+  150%), and the window never gets taller than the screen.
+- Shorter status texts, so they fit on one line.
+
 ## [0.2.0] - 2026-10-27
 
 Install it and it works: the LED follows the microphone, no shortcuts to set up.
