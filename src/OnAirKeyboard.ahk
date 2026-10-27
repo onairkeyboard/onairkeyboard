@@ -5,8 +5,8 @@ Persistent
 ; Compiler settings (build.ps1 checks that the version matches App.Version)
 ;@Ahk2Exe-SetName OnAir keyboard
 ;@Ahk2Exe-SetDescription OnAir keyboard - a keyboard LED that shows when you dictate
-;@Ahk2Exe-SetVersion 0.2.0
-;@Ahk2Exe-SetProductVersion 0.2.0
+;@Ahk2Exe-SetVersion 0.3.0
+;@Ahk2Exe-SetProductVersion 0.3.0
 ;@Ahk2Exe-SetCopyright (c) 2026 Patryk Szulczewski - MIT License
 ;@Ahk2Exe-SetCompanyName OnAir keyboard - onairkeyboard.com
 ;@Ahk2Exe-SetOrigFilename OnAirKeyboard.exe
