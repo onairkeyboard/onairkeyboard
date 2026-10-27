@@ -3,9 +3,9 @@
 All notable changes to OnAir keyboard are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: the middle number changes with new features; the last one counts builds, so a release
-may skip numbers (0.2.0, then 0.3.4).
+may skip numbers (0.2.0, then 0.3.5).
 
-## [Unreleased]
+## [0.3.5] - 2026-10-27
 
 Music and videos go quiet while you dictate.
 
@@ -14,10 +14,10 @@ Music and videos go quiet while you dictate.
   view). Other apps go down to the level you choose, 0–50% of their own volume in steps of 1%
   (20% by default), on every output device, and come back with a slow fade about two seconds
   after you go off air. The fades follow the ear: going down the sound drops quickly at first and
-  gently at the end. The
-  app using the microphone (a voice chat) and Wispr Flow keep their sound; a volume you change
-  meanwhile is left as is. Pause, sleep and closing OnAir keyboard bring the sound back at once,
-  and after a crash the next start does, also for an app that was closed while lowered.
+  gently at the end. The app using the microphone (a voice chat) and Wispr Flow keep their sound;
+  a volume you change meanwhile is left as is. Pause, sleep and closing OnAir keyboard bring the
+  sound back at once, and after a crash the next start does, also for an app that was closed
+  while lowered.
 - **Sound** section in the advanced settings: level, *Test lowering*, fade and delay times in
   milliseconds, system sounds (lowered by default) and the apps lowered right now.
 - **Explanations behind an "i"** next to the settings: the bubble opens on hover, with the
@@ -32,6 +32,11 @@ Music and videos go quiet while you dictate.
 - The advanced settings are 640 px tall, like the main view (720 px didn't fit a 1080p laptop at
   150%), and the window never gets taller than the screen.
 - Shorter status texts, so they fit on one line.
+
+### Fixed
+- Closing OnAir keyboard while its window was open ended in a crash report from Windows (since
+  0.2.0), and updating it then could fail with "couldn't install". It closes cleanly now, and the
+  update closes the old window first.
 
 ## [0.2.0] - 2026-10-27
 
