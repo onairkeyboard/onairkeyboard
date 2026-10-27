@@ -57,8 +57,13 @@ Win := "OnAir keyboard ahk_class AutoHotkeyGUI ahk_pid " Pid
 
 Cleanup() {
     global Pid
-    if Pid
-        try ProcessClose(Pid)
+    ; A clean exit closes WebView2 at once; killing the instance leaves its processes ending slowly
+    if Pid {
+        DetectHiddenWindows(true)
+        try WinClose("ahk_class AutoHotkey ahk_pid " Pid)
+        if ProcessWaitClose(Pid, 3)
+            try ProcessClose(Pid)
+    }
     Pid := 0
     FakeMic.Delete()
     SetCapsLockState(false)

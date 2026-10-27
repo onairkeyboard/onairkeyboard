@@ -151,6 +151,9 @@ appWin := "OnAir keyboard ahk_class AutoHotkeyGUI ahk_pid " pid
 logFile := dir "\onairkeyboard.log"
 Eval(js) => PageEval(pid, logFile, js)
 
+; WebView2 processes of an earlier, killed instance may still be ending: only new ones count
+webViewBefore := WebViewProcesses()
+
 ; Report a bug: the window shows the address and a prefilled text, no mail app involved
 Command(6)
 Check("bug report window opens", WinWait(appWin, , 5) != 0, true)
@@ -226,12 +229,12 @@ WebViewProcesses() {
             count++
     return count
 }
-loop 50 {
-    if !WebViewProcesses()
+loop 100 {
+    if WebViewProcesses() <= webViewBefore
         break
     Sleep(100)
 }
-Check("no WebView2 processes left", WebViewProcesses(), 0)
+Check("no WebView2 processes left", WebViewProcesses() <= webViewBefore, true)
 
 Send("{Ctrl down}{Shift down}{F23 down}")
 Sleep(250)

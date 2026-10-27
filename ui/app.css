@@ -60,7 +60,7 @@ label.check.top input { margin-top: 2px; }
 
 /* --- Main view --- */
 .page { height: 100%; display: flex; flex-direction: column; gap: 20px; padding: 22px 28px 16px; overflow-y: auto; }
-.logo { height: 34px; width: auto; align-self: flex-start; }
+.logo { height: 65px; width: auto; align-self: flex-start; }
 .logo.dark { display: none; }
 @media (prefers-color-scheme: dark) { .logo.light { display: none; } .logo.dark { display: block; } }
 
@@ -111,7 +111,7 @@ footer .strong { font-weight: 600; }
 .split { height: 100%; display: flex; }
 nav.side { width: 230px; flex: none; display: flex; flex-direction: column; gap: 3px; padding: 16px 12px;
   background: var(--side); border-right: 1px solid var(--border); }
-nav.side .logo { height: 30px; margin: 2px 8px 14px; }
+nav.side .logo { height: 57px; margin: 0 8px 14px; align-self: flex-start; }
 nav.side button { display: flex; justify-content: space-between; align-items: center; height: 38px; padding: 0 12px;
   border: 0; border-radius: 6px; background: transparent; color: var(--text); text-align: left; }
 nav.side button:hover:not(:disabled) { background: var(--chip); }
